@@ -3,7 +3,7 @@
 #include "hardware/gpio.h"
 #include "hardware/pio.h"
 
-#include "WS2812.pio.h" // This header file gets produced during compilation from the WS2812.pio file
+#include "WS2812.pio.h"
 #include "drivers/logging/logging.h"
 
 #define LED_PIN 14
@@ -15,9 +15,10 @@ int main()
     // Initialise PIO0 to control the LED chain
     uint pio_program_offset = pio_add_program(pio0, &ws2812_program);
     ws2812_program_init(pio0, 0, pio_program_offset, LED_PIN, 800000, false);
-    uint32_t led_data [1];
+    uint32_t led_data[1];
 
-    for (;;) {
+    for (;;)
+    {
         // Test the log system
         log(LogLevel::INFORMATION, "Hello world");
 
@@ -29,7 +30,7 @@ int main()
         pio_sm_put_blocking(pio0, 0, led_data[0]);
         sleep_ms(500);
 
-        // Set the first LED off 
+        // Set the first LED off
         led_data[0] = 0;
         pio_sm_put_blocking(pio0, 0, led_data[0]);
         sleep_ms(500);
