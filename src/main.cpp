@@ -8,6 +8,7 @@
 #include "drivers/logging/logging.h"
 
 #define LED_PIN 14
+#define ON_BOARD_BUTTON 22
 
 // For the led display
 #define I2C_PORT i2c0
@@ -30,6 +31,21 @@ const uint8_t digits[] =
         0b01111111, // 8
         0b01101111  // 9
 };
+
+enum mode
+{
+    RESET,
+    START,
+    STOP,
+    NUM_MODES
+};
+
+uint8_t mode = RESET;
+
+void on_board_button_callback(uint gpio, uint32_t events)
+{
+    mode = (mode < NUM_MODES - 1) ? mode + 1 : RESET;
+}
 
 void ht16k33_display_number(int value, uint8_t decimal_mask = 0)
 {
@@ -68,26 +84,32 @@ int main()
     gpio_set_function(SCL_PIN, GPIO_FUNC_I2C);
     gpio_pull_up(SDA_PIN);
     gpio_pull_up(SCL_PIN); // May not need these... only if forgot resistors??
-
     uint8_t cmd;
-
     cmd = OSCILLATOR_ON;
     i2c_write_blocking(I2C_PORT, HT16K33_ADDR, &cmd, 1, false);
-
     cmd = DISPLAY_ON;
     i2c_write_blocking(I2C_PORT, HT16K33_ADDR, &cmd, 1, false);
-
     cmd = BRIGHTNESS;
     i2c_write_blocking(I2C_PORT, HT16K33_ADDR, &cmd, 1, false);
+
+    gpio_init(ON_BOARD_BUTTON);
+    gpio_set_dir(ON_BOARD_BUTTON, GPIO_IN);
+    gpio_set_irq_enabled_with_callback(ON_BOARD_BUTTON, GPIO_IRQ_EDGE_RISE, true, &on_board_button_callback);
 
     for (;;)
     {
         // Test the log system
         log(LogLevel::INFORMATION, "Hello world");
-        for (uint16_t i = 0; i <= 9999; i++)
+        if (mode == RESET)
         {
-            ht16k33_display_number(i, i % 16);
-            sleep_ms(100);
+            ht16k33_display_number(0);
+        }
+        uint16_t i = 0;
+        while (mode == START)
+        {
+            ht16k33_display_number(i, 0b0100);
+            sleep_ms(10);
+            i++;
         }
     }
 
