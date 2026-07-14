@@ -47,10 +47,11 @@ if(CrossCompiling)
     pico_sdk_init()
 
     add_executable(labs)
-    target_sources(labs 
+    target_sources(labs
         PUBLIC
         src/main.cpp
         src/drivers/logging/logging.cpp
+        src/drivers/leds.cpp
     )
     target_include_directories(labs
         PUBLIC 
@@ -101,6 +102,7 @@ else()
         tests/mocks/hardware/gpio.cpp
         tests/mocks/hardware/pio.cpp
         tests/mocks/ws2812.cpp
+        src/drivers/leds.cpp
     )
     target_include_directories(labs
         PUBLIC 

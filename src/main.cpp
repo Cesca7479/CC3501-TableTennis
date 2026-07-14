@@ -1,44 +1,5 @@
-#include <stdio.h>
-#include "pico/stdlib.h"
-#include "hardware/gpio.h"
-#include "hardware/pio.h"
-#include "hardware/i2c.h"
-
-#include "WS2812.pio.h"
-#include "drivers/logging/logging.h"
-
-#define LED_PIN 14
-#define ON_BOARD_BUTTON 22
-
-// For the led display
-#define I2C_PORT i2c0
-#define SCL_PIN 17
-#define SDA_PIN 16
-#define HT16K33_ADDR 0x70
-#define OSCILLATOR_ON 0x21
-#define DISPLAY_ON 0x81
-#define BRIGHTNESS 255
-const uint8_t digits[] =
-    {
-        0b00111111, // 0
-        0b00000110, // 1
-        0b01011011, // 2
-        0b01001111, // 3
-        0b01100110, // 4
-        0b01101101, // 5
-        0b01111101, // 6
-        0b00000111, // 7
-        0b01111111, // 8
-        0b01101111  // 9
-};
-
-enum mode
-{
-    RESET,
-    START,
-    STOP,
-    NUM_MODES
-};
+#include "board.h"
+#include "drivers/leds.h"
 
 uint8_t mode = RESET;
 
@@ -76,7 +37,8 @@ int main()
     // Initialise PIO0 to control the LED chain
     uint pio_program_offset = pio_add_program(pio0, &ws2812_program);
     ws2812_program_init(pio0, 0, pio_program_offset, LED_PIN, 800000, false);
-    uint32_t led_data[1];
+    LEDDriver led_driver(NUM_LEDS);
+    led_driver.turn_off(); // Ensure all LEDs are off at the start
 
     // Set up led display
     i2c_init(I2C_PORT, 400 * 1000); // Set the clock (400kHz)
@@ -96,6 +58,22 @@ int main()
     gpio_set_dir(ON_BOARD_BUTTON, GPIO_IN);
     gpio_set_irq_enabled_with_callback(ON_BOARD_BUTTON, GPIO_IRQ_EDGE_RISE, true, &on_board_button_callback);
 
+    gpio_init(LEFT_BUTTON);
+    gpio_set_dir(LEFT_BUTTON, GPIO_IN);
+    // gpio_set_irq_enabled_with_callback(LEFT_BUTTON, GPIO_IRQ_EDGE_RISE, true, &AAAAAAAAAAAAA);
+
+    gpio_init(SELECT_BUTTON);
+    gpio_set_dir(SELECT_BUTTON, GPIO_IN);
+    // gpio_set_irq_enabled_with_callback(SELECT_BUTTON, GPIO_IRQ_EDGE_RISE, true, &AAAAAAAAAAA);
+
+    gpio_init(RIGHT_BUTTON);
+    gpio_set_dir(RIGHT_BUTTON, GPIO_IN);
+    // gpio_set_irq_enabled_with_callback(RIGHT_BUTTON, GPIO_IRQ_EDGE_RISE, true, &AAAAAAAAAAA);
+
+    uint8_t red;
+    uint8_t green;
+    uint8_t blue;
+
     for (;;)
     {
         // Test the log system
@@ -111,6 +89,11 @@ int main()
             sleep_ms(10);
             i++;
         }
+        red = (gpio_get(LEFT_BUTTON)) ? 10 : 0;
+        green = (gpio_get(SELECT_BUTTON)) ? 10 : 0;
+        blue = (gpio_get(RIGHT_BUTTON)) ? 10 : 0;
+        led_driver.set_all(red, green, blue);
+        led_driver.send_data();
     }
 
     return 0;
