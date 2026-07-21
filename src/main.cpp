@@ -85,6 +85,7 @@ int main()
                     mode_change_logged = true;
                 }
                 run_piezo_test_mode();
+                break;
         }
     }
 
