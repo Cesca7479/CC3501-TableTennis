@@ -1,99 +1,91 @@
 #include "board.h"
-#include "drivers/leds.h"
 
-uint8_t mode = RESET;
 
-void on_board_button_callback(uint gpio, uint32_t events)
-{
-    mode = (mode < NUM_MODES - 1) ? mode + 1 : RESET;
+#include <stdio.h>
+#include "pico/stdlib.h"
+#include "hardware/gpio.h"
+#include "hardware/i2c.h"
+#include "hardware/pio.h"
+
+#include "WS2812.pio.h"
+
+// Drivers
+#include "drivers/logging/logging.h"
+
+
+// Setup modes and checking ========================================================================================================
+
+uint8_t mode = DEFAULT_MODE;
+bool mode_change_logged = false;
+
+
+void on_board_button_callback(uint gpio, uint32_t events) {
+    mode = (mode < NUM_MODES - 1) ? mode + 1 : DEFAULT_MODE;
+    mode_change_logged = false;
 }
 
-void ht16k33_display_number(int value, uint8_t decimal_mask = 0)
-{
-    uint8_t tx[9];
-    tx[0] = 0;
-    static const uint16_t divisors[] = {1000, 100, 10, 1};
 
-    for (int digit = 0; digit < 4; digit++)
+/**  
+ * @brief This function allows for mode changes during sleeping
+ * @param ms, milliseconds to sleep for (will round down to multiple of 10)
+ * @param expected_mode expected mode when called
+ * @return Returns true if mode changed, false otherwise
+ */
+bool sleep_ms_with_checking(uint16_t ms, uint8_t expected_mode) {
+    for (size_t i = 0; i < (ms/10); i++)
     {
-        uint8_t segments = digits[(value / divisors[digit]) % 10];
-
-        // Turn on decimal point if requested
-        if (decimal_mask & (1 << (3 - digit)))
-        {
-            segments |= 0x80;
-        }
-        tx[1 + digit * 2] = segments;
-        tx[2 + digit * 2] = 0;
+        sleep_ms(10);
+        if (mode != expected_mode) return true;
     }
-
-    i2c_write_blocking(I2C_PORT, HT16K33_ADDR, tx, sizeof(tx), false); // sizeof(tx) = 9 for all lit up. Change this later if don't want
+    return false;
 }
+
+
+
+// Define mode functions ==========================================================================================================
+
+void run_default_mode() {
+    printf("Default mode running\r\n"); // placeholder
+    if (sleep_ms_with_checking(5000, DEFAULT_MODE)) return; // placeholder
+    printf("This can be stopped from printing\r\n"); // placeholder
+    return;
+}
+
+void run_piezo_test_mode() {
+    printf("Piezo test running\r\n"); // placeholder
+    sleep_ms(1000); // placeholder
+    return;
+}
+
+
+// Main ===========================================================================================================================
 
 int main()
 {
     stdio_init_all();
 
-    // Initialise PIO0 to control the LED chain
-    uint pio_program_offset = pio_add_program(pio0, &ws2812_program);
-    ws2812_program_init(pio0, 0, pio_program_offset, LED_PIN, 800000, false);
-    LEDDriver led_driver(NUM_LEDS);
-    led_driver.turn_off(); // Ensure all LEDs are off at the start
+    gpio_init(ON_BOARD_SW_PIN);
+    gpio_set_dir(ON_BOARD_SW_PIN, GPIO_IN);
+    gpio_set_irq_enabled_with_callback(ON_BOARD_SW_PIN, GPIO_IRQ_EDGE_RISE, true, &on_board_button_callback);
 
-    // Set up led display
-    i2c_init(I2C_PORT, 400 * 1000); // Set the clock (400kHz)
-    gpio_set_function(SDA_PIN, GPIO_FUNC_I2C);
-    gpio_set_function(SCL_PIN, GPIO_FUNC_I2C);
-    gpio_pull_up(SDA_PIN);
-    gpio_pull_up(SCL_PIN); // May not need these... only if forgot resistors??
-    uint8_t cmd;
-    cmd = OSCILLATOR_ON;
-    i2c_write_blocking(I2C_PORT, HT16K33_ADDR, &cmd, 1, false);
-    cmd = DISPLAY_ON;
-    i2c_write_blocking(I2C_PORT, HT16K33_ADDR, &cmd, 1, false);
-    cmd = BRIGHTNESS;
-    i2c_write_blocking(I2C_PORT, HT16K33_ADDR, &cmd, 1, false);
 
-    gpio_init(ON_BOARD_BUTTON);
-    gpio_set_dir(ON_BOARD_BUTTON, GPIO_IN);
-    gpio_set_irq_enabled_with_callback(ON_BOARD_BUTTON, GPIO_IRQ_EDGE_RISE, true, &on_board_button_callback);
+    while (true) {
+        switch (mode) {
+            case DEFAULT_MODE:
+                if (!mode_change_logged) {
+                    log(INFORMATION, "Mode Changed: Mode = Default Mode");
+                    mode_change_logged = true;
+                }
+                run_default_mode();
+                break;
 
-    gpio_init(LEFT_BUTTON);
-    gpio_set_dir(LEFT_BUTTON, GPIO_IN);
-    // gpio_set_irq_enabled_with_callback(LEFT_BUTTON, GPIO_IRQ_EDGE_RISE, true, &AAAAAAAAAAAAA);
-
-    gpio_init(SELECT_BUTTON);
-    gpio_set_dir(SELECT_BUTTON, GPIO_IN);
-    // gpio_set_irq_enabled_with_callback(SELECT_BUTTON, GPIO_IRQ_EDGE_RISE, true, &AAAAAAAAAAA);
-
-    gpio_init(RIGHT_BUTTON);
-    gpio_set_dir(RIGHT_BUTTON, GPIO_IN);
-    // gpio_set_irq_enabled_with_callback(RIGHT_BUTTON, GPIO_IRQ_EDGE_RISE, true, &AAAAAAAAAAA);
-
-    uint8_t red;
-    uint8_t green;
-    uint8_t blue;
-
-    for (;;)
-    {
-        // Test the log system
-        log(LogLevel::INFORMATION, "Hello world");
-        if (mode == RESET)
-        {
-            ht16k33_display_number(0);
+            case PIEZO_TEST_MODE:
+                if (!mode_change_logged) {
+                    log(INFORMATION, "Mode Changed: Mode = Test Piezo Mode");
+                    mode_change_logged = true;
+                }
+                run_piezo_test_mode();
         }
-        uint16_t i = 0;
-        while (mode == START)
-        {
-            ht16k33_display_number(i, 0b0100);
-            sleep_ms(10);
-            i++;
-        }
-        red = (gpio_get(LEFT_BUTTON)) ? 10 : 0;
-        green = (gpio_get(SELECT_BUTTON)) ? 10 : 0;
-        blue = (gpio_get(RIGHT_BUTTON)) ? 10 : 0;
-        led_driver.set_all(red, green, blue);
-        led_driver.send_data();
     }
 
     return 0;

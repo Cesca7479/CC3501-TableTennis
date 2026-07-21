@@ -1,51 +1,41 @@
 #pragma once
 
-#include <cstdint>
-#include <stdio.h>
-#include "pico/stdlib.h"
-#include "hardware/gpio.h"
-#include "hardware/i2c.h"
-#include "hardware/pio.h"
-// Need to include the adc one.
-
-// #include "drivers/leds.h"
-#include "WS2812.pio.h" // This header file gets produced during compilation from the WS2812.pio file
-#include "drivers/logging/logging.h"
-// #include "arm_math.h"
-
-#define NUM_LEDS 5 // Change this
-#define ON_BOARD_BUTTON 22
-#define LED_PIN 5
-#define LEFT_BUTTON 19
-#define SELECT_BUTTON 20
-#define RIGHT_BUTTON 21
-
-// For the led display
-#define I2C_PORT i2c0
-#define SCL_PIN 17
-#define SDA_PIN 16
-#define HT16K33_ADDR 0x70
-#define OSCILLATOR_ON 0x21
-#define DISPLAY_ON 0x81
-#define BRIGHTNESS 255
-const uint8_t digits[] =
-    {
-        0b00111111, // 0
-        0b00000110, // 1
-        0b01011011, // 2
-        0b01001111, // 3
-        0b01100110, // 4
-        0b01101101, // 5
-        0b01111101, // 6
-        0b00000111, // 7
-        0b01111111, // 8
-        0b01101111  // 9
+enum Pins {
+    TX_PIN,
+    RX_PIN,
+    BUZZER1_PIN,
+    BUZZER2_PIN,
+    GPIO_4_PIN,
+    EXTERNAL_LED_IN_PIN,
+    GPIO_6_PIN,
+    GPIO_7_PIN,
+    BT_UART_TX_PIN,
+    BT_AURT_RX_PIN,
+    BT_AURT_CTS_PIN,
+    BT_AURT_RTS_PIN,
+    BT_IO1_PIN,
+    BT_IO2_PIN,
+    BT_RESET_PIN,
+    GPIO_15_PIN,
+    GPIO_16_PIN,
+    SDA_MOSI_PIN,
+    SCL_SCLK_PIN,
+    SW1_PIN,
+    SW2_PIN,
+    SW3_PIN,
+    ON_BOARD_SW_PIN,
+    MOTOR_PWR_CTRL_PIN,
+    MOTOR_FAULT_FLAG_PIN,
+    MOTOR_IN_PIN,
+    GPIO_26_PIN,
+    GPIO_27_PIN,
+    VIBRATION_OUTPUT1_PIN,
+    VIBRATION_OUTPUT2_PIN
 };
 
-enum mode
-{
-    RESET,
-    START,
-    STOP,
+
+enum Mode {
+    DEFAULT_MODE,
+    PIEZO_TEST_MODE,
     NUM_MODES
 };
