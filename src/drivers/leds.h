@@ -1,6 +1,8 @@
 #pragma once
 
 #include <cstdint>
+#include "pico/stdlib.h"
+#include "WS2812.pio.h"
 
 class LEDDriver
 {
