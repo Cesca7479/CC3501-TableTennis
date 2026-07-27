@@ -1,5 +1,7 @@
 #include "leds.h"
 #include "board.h"
+#include "pico/stdlib.h"
+#include "hardware/pio.h"
 
 LEDDriver::LEDDriver(uint8_t leds)
 {

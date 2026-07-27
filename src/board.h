@@ -39,3 +39,8 @@ enum Mode {
     PIEZO_TEST_MODE,
     NUM_MODES
 };
+
+enum Side {
+    PLAYER_1_SIDE,
+    PLAYER_2_SIDE
+};

@@ -11,14 +11,21 @@
 
 // Drivers
 #include "drivers/logging/logging.h"
+#include "drivers/piezos/piezos.h"
 
+// Global Constants
+#define SENSITIVITY_THRESHOLD 80
 
-// Setup modes and checking ========================================================================================================
-
-uint8_t mode = DEFAULT_MODE;
+// Global Variables ================================================================================================================
+Piezo Piezo1(VIBRATION_OUTPUT1_PIN, BUZZER1_PIN);
+Piezo Piezo2(VIBRATION_OUTPUT2_PIN, BUZZER2_PIN);
+Piezo Piezo3(27,15);
+uint8_t mode = PIEZO_TEST_MODE;
 bool mode_change_logged = false;
 
 
+
+// Define functions for mode cycling================================================================================================
 void on_board_button_callback(uint gpio, uint32_t events) {
     mode = (mode < NUM_MODES - 1) ? mode + 1 : DEFAULT_MODE;
     mode_change_logged = false;
@@ -52,17 +59,67 @@ void run_default_mode() {
 }
 
 void run_piezo_test_mode() {
-    printf("Piezo test running\r\n"); // placeholder
-    sleep_ms(1000); // placeholder
+    static uint8_t bounces = 0;
+    static uint8_t side = PLAYER_1_SIDE;
+
+    if (!Piezo1.buzzer_on || !Piezo2.buzzer_on) {
+        uint16_t result1 = Piezo1.read();
+        uint16_t result2 = Piezo2.read();
+        uint16_t result3 = Piezo3.read();
+        // printf("%d,%d\r\n", result1, result2);
+
+        if (result1 > 2020 + SENSITIVITY_THRESHOLD || result1 < 2020 - SENSITIVITY_THRESHOLD) {
+            if (side == PLAYER_1_SIDE) {
+                bounces++;
+                Piezo1.play_victory_sequence();
+            }
+            else {
+                bounces = 1;
+                side = PLAYER_1_SIDE;
+            }
+            printf("BOUNCE1: %d\r\n", bounces);
+            if (sleep_ms_with_checking(100, PIEZO_TEST_MODE)) return;
+        }
+        
+        if (result2 > 2020 + SENSITIVITY_THRESHOLD || result2 < 2020 - SENSITIVITY_THRESHOLD) {
+            if (side == PLAYER_2_SIDE) {
+                bounces++;
+                Piezo2.play_victory_sequence();
+            }
+            else {
+                bounces = 1;
+                side = PLAYER_2_SIDE;
+            }
+            printf("BOUNCE2: %d\r\n", bounces);
+            if (sleep_ms_with_checking(100, PIEZO_TEST_MODE)) return;
+        }
+
+        // printf("%d\r\n", result3);
+        if (result3 > 3234 + SENSITIVITY_THRESHOLD || result3 < 3234 - SENSITIVITY_THRESHOLD) {
+            
+            printf("BOUNCE3: %d\r\n", bounces++);
+            Piezo3.play_victory_sequence();
+            if (sleep_ms_with_checking(100, PIEZO_TEST_MODE)) return;
+        }
+    }
+    
+
+    
+
     return;
 }
 
 
 // Main ===========================================================================================================================
 
+
 int main()
 {
     stdio_init_all();
+    Piezo1.init_sensing();
+    Piezo2.init_sensing();
+
+    
 
     gpio_init(ON_BOARD_SW_PIN);
     gpio_set_dir(ON_BOARD_SW_PIN, GPIO_IN);
@@ -83,8 +140,11 @@ int main()
                 if (!mode_change_logged) {
                     log(INFORMATION, "Mode Changed: Mode = Test Piezo Mode");
                     mode_change_logged = true;
+                    Piezo2.play_victory_sequence();
+
                 }
                 run_piezo_test_mode();
+
                 break;
         }
     }
