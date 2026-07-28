@@ -53,6 +53,7 @@ if(CrossCompiling)
         src/drivers/logging/logging.cpp
         src/drivers/leds/leds.cpp
         src/drivers/piezos/piezos.cpp
+        src/drivers/display/display.cpp
     )
     target_include_directories(labs
         PUBLIC 
@@ -106,6 +107,7 @@ else()
         tests/mocks/ws2812.cpp
         src/drivers/leds/leds.cpp
         src/drivers/piezos/piezos.cpp
+        src/drivers/display/display.cpp
     )
     target_include_directories(labs
         PUBLIC 

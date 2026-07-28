@@ -1,6 +1,7 @@
 #pragma once
 
-enum Pins {
+enum Pins
+{
     TX_PIN,
     RX_PIN,
     BUZZER1_PIN,
@@ -17,9 +18,9 @@ enum Pins {
     BT_IO2_PIN,
     BT_RESET_PIN,
     GPIO_15_PIN,
-    GPIO_16_PIN,
     SDA_MOSI_PIN,
     SCL_SCLK_PIN,
+    NOT_CONNECTED,
     SW1_PIN,
     SW2_PIN,
     SW3_PIN,
@@ -33,14 +34,16 @@ enum Pins {
     VIBRATION_OUTPUT2_PIN
 };
 
-
-enum Mode {
+enum Mode
+{
     DEFAULT_MODE,
     PIEZO_TEST_MODE,
+    DISPLAY_TEST_MODE,
     NUM_MODES
 };
 
-enum Side {
+enum Side
+{
     PLAYER_1_SIDE,
     PLAYER_2_SIDE
 };
