@@ -1,5 +1,4 @@
 #include "leds.h"
-#include "board.h"
 #include "pico/stdlib.h"
 #include "hardware/pio.h"
 
