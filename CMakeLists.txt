@@ -54,6 +54,7 @@ if(CrossCompiling)
         src/drivers/leds/leds.cpp
         src/drivers/piezos/piezos.cpp
         src/drivers/display/display.cpp
+        src/drivers/bluetooth/bluetooth.cpp
     )
     target_include_directories(labs
         PUBLIC 
@@ -108,6 +109,7 @@ else()
         src/drivers/leds/leds.cpp
         src/drivers/piezos/piezos.cpp
         src/drivers/display/display.cpp
+        src/drivers/bluetooth/bluetooth.cpp
     )
     target_include_directories(labs
         PUBLIC 

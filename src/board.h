@@ -11,9 +11,9 @@ enum Pins
     GPIO_6_PIN,
     GPIO_7_PIN,
     BT_UART_TX_PIN,
-    BT_AURT_RX_PIN,
-    BT_AURT_CTS_PIN,
-    BT_AURT_RTS_PIN,
+    BT_UART_RX_PIN,
+    BT_UART_CTS_PIN,
+    BT_UART_RTS_PIN,
     BT_IO1_PIN,
     BT_IO2_PIN,
     BT_RESET_PIN,
@@ -39,6 +39,7 @@ enum Mode
     DEFAULT_MODE,
     PIEZO_TEST_MODE,
     DISPLAY_TEST_MODE,
+    BLUETOOTH_TEST_MODE,
     NUM_MODES
 };
 

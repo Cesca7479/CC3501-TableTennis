@@ -12,6 +12,7 @@
 #include "drivers/logging/logging.h"
 #include "drivers/piezos/piezos.h"
 #include "drivers/display/display.h"
+#include "drivers/bluetooth/bluetooth.h"
 
 // Global Constants
 #define SENSITIVITY_THRESHOLD 80
@@ -142,6 +143,7 @@ int main()
     gpio_set_dir(ON_BOARD_SW_PIN, GPIO_IN);
     gpio_set_irq_enabled_with_callback(ON_BOARD_SW_PIN, GPIO_IRQ_EDGE_RISE, true, &on_board_button_callback);
     clear_display();
+    bluetooth_init(BT_UART_TX_PIN, BT_UART_RX_PIN, BT_RESET_PIN);
     while (true)
     {
         switch (mode)
@@ -172,8 +174,14 @@ int main()
             }
             test_display();
             break;
+        case BLUETOOTH_TEST_MODE:
+            if (!mode_change_logged)
+            {
+                log(INFORMATION, "Mode Changed: Mode = Test Bluetooth Mode");
+                mode_change_logged = true;
+            }
+            handle_bluetooth_message();
         }
     }
-
     return 0;
 }
