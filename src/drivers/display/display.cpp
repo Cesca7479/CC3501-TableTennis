@@ -11,8 +11,8 @@ void set_up_display(uint8_t sda_pin, uint8_t scl_pin)
     i2c_init(I2C_PORT, 400 * 1000); // Set the clock (400kHz)
     gpio_set_function(sda_pin, GPIO_FUNC_I2C);
     gpio_set_function(scl_pin, GPIO_FUNC_I2C);
-    // gpio_pull_up(sda_pin);
-    // gpio_pull_up(scl_pin); // May not need these... only if forgot resistors??
+    gpio_pull_up(sda_pin);
+    gpio_pull_up(scl_pin); // May not need these... only if forgot resistors??
     uint8_t cmd;
     cmd = OSCILLATOR_ON;
     i2c_write_blocking(I2C_PORT, HT16K33_ADDR, &cmd, 1, false);
