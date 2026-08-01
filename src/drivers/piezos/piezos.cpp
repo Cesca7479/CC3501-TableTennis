@@ -18,7 +18,6 @@ uint16_t Piezo::read() {
     adc_select_input(ADC_input);
     raw_result = adc_read();
     return raw_result;
-    // printf("Raw result: 0x%03x, Voltage: %f V\r\n", raw_result, raw_result * 3.3f/(1 << 12));
 }
 
 void Piezo::init_buzzer() {

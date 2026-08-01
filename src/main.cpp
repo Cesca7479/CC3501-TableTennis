@@ -8,21 +8,39 @@
 
 #include "WS2812.pio.h"
 
-// Drivers
+
+// Drivers =========================================================================================================================
 #include "drivers/logging/logging.h"
 #include "drivers/piezos/piezos.h"
 #include "drivers/display/display.h"
 #include "drivers/bluetooth/bluetooth.h"
 
-// Global Constants
+
+// Global Constants ================================================================================================================
 #define SENSITIVITY_THRESHOLD 80
 
+
 // Global Variables ================================================================================================================
+bool Testing = true;
+
 Piezo Piezo1(VIBRATION_OUTPUT1_PIN, BUZZER1_PIN);
 Piezo Piezo2(VIBRATION_OUTPUT2_PIN, BUZZER2_PIN);
-Piezo Piezo3(27, 15);
-uint8_t mode = PIEZO_TEST_MODE;
+Piezo Piezo3(26, 15);
+uint8_t mode = DISPLAY_TEST_MODE;
 bool mode_change_logged = false;
+
+class GameState {
+    public:
+        uint8_t mode = SETUP;
+        uint8_t player_score[2] = {0,0};
+        uint8_t player_serving = PLAYER_1;
+        uint8_t points_to_win = 11;
+        bool serve_successful = false;
+        bool professional = false;
+};
+
+GameState State;
+
 
 // Define functions for mode cycling================================================================================================
 void on_board_button_callback(uint gpio, uint32_t events)
@@ -48,7 +66,23 @@ bool sleep_ms_with_checking(uint16_t ms, uint8_t expected_mode)
     return false;
 }
 
-// Define mode functions ==========================================================================================================
+
+// Init board =====================================================================================================================
+void init_board() {
+    stdio_init_all();
+    Piezo1.init_sensing();
+    Piezo2.init_sensing();
+    
+    gpio_init(ON_BOARD_SW_PIN);
+    gpio_set_dir(ON_BOARD_SW_PIN, GPIO_IN);
+    gpio_set_irq_enabled_with_callback(ON_BOARD_SW_PIN, GPIO_IRQ_EDGE_RISE, true, &on_board_button_callback);
+    bluetooth_init(BT_UART_TX_PIN, BT_UART_RX_PIN, BT_RESET_PIN);
+    set_up_display(SDA_MOSI_PIN, SCL_SCLK_PIN);
+    clear_display();
+}
+
+
+// Define TESTING mode functions ==========================================================================================================
 
 void run_default_mode()
 {
@@ -62,18 +96,17 @@ void run_default_mode()
 void run_piezo_test_mode()
 {
     static uint8_t bounces = 0;
-    static uint8_t side = PLAYER_1_SIDE;
+    static uint8_t side = PLAYER_1;
 
     if (!Piezo1.buzzer_on || !Piezo2.buzzer_on)
     {
         uint16_t result1 = Piezo1.read();
         uint16_t result2 = Piezo2.read();
         uint16_t result3 = Piezo3.read();
-        // printf("%d,%d\r\n", result1, result2);
 
         if (result1 > 2020 + SENSITIVITY_THRESHOLD || result1 < 2020 - SENSITIVITY_THRESHOLD)
         {
-            if (side == PLAYER_1_SIDE)
+            if (side == PLAYER_1)
             {
                 bounces++;
                 Piezo1.play_victory_sequence();
@@ -81,7 +114,7 @@ void run_piezo_test_mode()
             else
             {
                 bounces = 1;
-                side = PLAYER_1_SIDE;
+                side = PLAYER_1;
             }
             printf("BOUNCE1: %d\r\n", bounces);
             if (sleep_ms_with_checking(100, PIEZO_TEST_MODE))
@@ -90,7 +123,7 @@ void run_piezo_test_mode()
 
         if (result2 > 2020 + SENSITIVITY_THRESHOLD || result2 < 2020 - SENSITIVITY_THRESHOLD)
         {
-            if (side == PLAYER_2_SIDE)
+            if (side == PLAYER_2)
             {
                 bounces++;
                 Piezo2.play_victory_sequence();
@@ -98,14 +131,13 @@ void run_piezo_test_mode()
             else
             {
                 bounces = 1;
-                side = PLAYER_2_SIDE;
+                side = PLAYER_2;
             }
             printf("BOUNCE2: %d\r\n", bounces);
             if (sleep_ms_with_checking(100, PIEZO_TEST_MODE))
                 return;
         }
 
-        // printf("%d\r\n", result3);
         if (result3 > 3234 + SENSITIVITY_THRESHOLD || result3 < 3234 - SENSITIVITY_THRESHOLD)
         {
 
@@ -131,57 +163,160 @@ void test_display()
     sleep_ms(200);
 }
 
+
+// Define GAME mode functions
+void run_setup_mode() {
+    // KEYA PUT YOUR HATS IN HERE - this will be run every loop
+
+    // Should: read from ADC -> determine what hat is in (consider setting a default mode if no hat is on so it doesnt break)
+    // Change settings in GameState State -> state. points_to_win, state.professional
+    // Change state.serve_successful = false
+    // On middle pushbutton press -> change state.mode to BOUNCE_LISTEN
+    return;
+}
+
+void run_bounce_listening_mode() {
+    static absolute_time_t start = get_absolute_time();
+    static absolute_time_t prev_bounce_time = get_absolute_time();
+    static uint8_t prev_bounce_side;
+
+    absolute_time_t current_time = get_absolute_time();    
+
+    if (absolute_time_diff_us(start, current_time) >= 100000) // Sample every 100ms to prevent overcounting bounces
+    {
+        uint16_t result1 = Piezo1.read();
+        uint16_t result2 = Piezo2.read();
+        uint16_t result3 = Piezo3.read();
+
+        bool isBounce[3] = {result1 > 2020 + SENSITIVITY_THRESHOLD || result1 < 2020 - SENSITIVITY_THRESHOLD,
+                            result2 > 2020 + SENSITIVITY_THRESHOLD || result2 < 2020 - SENSITIVITY_THRESHOLD,
+                            result3 > 3234 + SENSITIVITY_THRESHOLD || result3 < 3234 - SENSITIVITY_THRESHOLD};
+       
+        
+
+        if (!State.serve_successful) {
+            static bool has_serve_bounced = false;
+            if (isBounce[State.player_serving] && !has_serve_bounced) has_serve_bounced = true;
+            else if (isBounce[State.player_serving] && has_serve_bounced) State.player_score[State.player_serving]--;
+            
+             
+        } 
+        else {
+            if (isBounce[PLAYER_1] && prev_bounce_side == PLAYER_1) // Detects double bounce in player 1 side
+            {
+                State.player_score[PLAYER_2]++;
+                prev_bounce_side = PLAYER_1;
+            }
+            else if (isBounce[PLAYER_2] && prev_bounce_side == PLAYER_2) // Detects double bounce in player 2 side
+            {
+                State.player_score[PLAYER_1]++;
+                prev_bounce_side = PLAYER_2;
+            }
+            else if (!isBounce[PLAYER_1] && !isBounce[PLAYER_2] && absolute_time_diff_us(prev_bounce_time, current_time) >= 2000000 && State.serve_successful) // Detects 2 second time elapsed since previous bounce
+            {
+                uint8_t winner = (prev_bounce_side == PLAYER_1) ? PLAYER_2 : PLAYER_1;
+                State.player_score[winner]++;
+            }
+            display_number(State.player_score[PLAYER_1] * 100 + State.player_score[PLAYER_2]);  // CHANGE WHEN DRIVER IS UPDATED
+
+        }
+
+
+
+
+        
+
+        
+
+        start = get_absolute_time();
+    } 
+    
+
+
+    return;
+}
+
+void run_camera_check_mode() {
+    return;
+}
+
+void run_point_add_mode() {
+    return;
+}
+
+void run_victory_mode() {
+    return;
+}
+
+
 // Main ===========================================================================================================================
 
 int main()
 {
-    stdio_init_all();
-    Piezo1.init_sensing();
-    Piezo2.init_sensing();
-    set_up_display(SDA_MOSI_PIN, SCL_SCLK_PIN);
-    gpio_init(ON_BOARD_SW_PIN);
-    gpio_set_dir(ON_BOARD_SW_PIN, GPIO_IN);
-    gpio_set_irq_enabled_with_callback(ON_BOARD_SW_PIN, GPIO_IRQ_EDGE_RISE, true, &on_board_button_callback);
-    clear_display();
-    bluetooth_init(BT_UART_TX_PIN, BT_UART_RX_PIN, BT_RESET_PIN);
+    init_board();
+    
+
     while (true)
     {
-        switch (mode)
-        {
-        case DEFAULT_MODE:
-            if (!mode_change_logged)
+        if (Testing) {
+            switch (mode)
             {
-                log(INFORMATION, "Mode Changed: Mode = Default Mode");
-                mode_change_logged = true;
-            }
-            run_default_mode();
-            break;
+            case DEFAULT_MODE:
+                if (!mode_change_logged)
+                {
+                    log(INFORMATION, "Mode Changed: Mode = Default Mode");
+                    mode_change_logged = true;
+                }
+                run_default_mode();
+                break;
 
-        case PIEZO_TEST_MODE:
-            if (!mode_change_logged)
-            {
-                log(INFORMATION, "Mode Changed: Mode = Test Piezo Mode");
-                mode_change_logged = true;
-                Piezo2.play_victory_sequence();
+            case PIEZO_TEST_MODE:
+                if (!mode_change_logged)
+                {
+                    log(INFORMATION, "Mode Changed: Mode = Test Piezo Mode");
+                    mode_change_logged = true;
+                    Piezo2.play_victory_sequence();
+                }
+                run_piezo_test_mode();
+                break;
+            case DISPLAY_TEST_MODE:
+                if (!mode_change_logged)
+                {
+                    log(INFORMATION, "Mode Changed: Mode = Test Display Mode");
+                    mode_change_logged = true;
+                }
+                test_display();
+                break;
+            case BLUETOOTH_TEST_MODE:
+                if (!mode_change_logged)
+                {
+                    log(INFORMATION, "Mode Changed: Mode = Test Bluetooth Mode");
+                    mode_change_logged = true;
+                }
+                handle_bluetooth_message();
+                break;
             }
-            run_piezo_test_mode();
-            break;
-        case DISPLAY_TEST_MODE:
-            if (!mode_change_logged)
-            {
-                log(INFORMATION, "Mode Changed: Mode = Test Display Mode");
-                mode_change_logged = true;
-            }
-            test_display();
-            break;
-        case BLUETOOTH_TEST_MODE:
-            if (!mode_change_logged)
-            {
-                log(INFORMATION, "Mode Changed: Mode = Test Bluetooth Mode");
-                mode_change_logged = true;
-            }
-            handle_bluetooth_message();
         }
+        else {
+            switch (State.mode) {
+                case SETUP:
+                    run_setup_mode();
+                    break;                
+                case BOUNCE_LISTEN:
+                    run_bounce_listening_mode();
+                    break;
+                case CAMERA_CHECK:
+                    run_camera_check_mode();
+                    break;
+                case POINT_ADD:
+                    run_point_add_mode();
+                    break;
+                case VICTORY:
+                    run_victory_mode();
+                    break;
+            }
+        }
+        
     }
     return 0;
 }

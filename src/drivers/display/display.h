@@ -9,6 +9,7 @@
 #define OSCILLATOR_ON 0x21
 #define DISPLAY_ON 0x81
 #define BRIGHTNESS 255
+
 const uint8_t digits[] =
     {
         0b00111111, // 0

@@ -43,8 +43,18 @@ enum Mode
     NUM_MODES
 };
 
-enum Side
+enum State
 {
-    PLAYER_1_SIDE,
-    PLAYER_2_SIDE
+    SETUP,
+    SERVE_DETECTION,
+    BOUNCE_LISTEN,
+    CAMERA_CHECK,
+    POINT_ADD,
+    VICTORY    
+};
+
+enum Player
+{
+    PLAYER_1,
+    PLAYER_2
 };
