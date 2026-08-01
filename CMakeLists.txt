@@ -55,6 +55,7 @@ if(CrossCompiling)
         src/drivers/piezos/piezos.cpp
         src/drivers/display/display.cpp
         src/drivers/bluetooth/bluetooth.cpp
+        src/drivers/motor/motor.cpp
 
         src/helpers/colours/colour.cpp
     )
@@ -112,6 +113,7 @@ else()
         src/drivers/piezos/piezos.cpp
         src/drivers/display/display.cpp
         src/drivers/bluetooth/bluetooth.cpp
+        src/drivers/motor/motor.cpp
 
         src/helpers/colours/colour.cpp
     )
