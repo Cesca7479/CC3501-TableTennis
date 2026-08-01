@@ -1,34 +1,47 @@
 #pragma once
+#include "helpers/colours/colours.h"
 
-#include <cstdint>
-#include "pico/stdlib.h"
-#include "WS2812.pio.h"
+#define LED_PIO pio0
+#define LED_SM 0
+#define MAX_NUM_LED 2
 
-class LEDDriver
-{
-private:
-    uint32_t *led_data;
-    uint8_t num_leds;
-    bool is_sent;
+#define RED_TEXT "\033[31m"
+#define GREEN_TEXT "\033[32m"
+#define DEFAULT_TEXT "\033[0m"
 
-public:
-    LEDDriver(uint8_t leds);
-    ~LEDDriver();
+/**
+ * @brief Initialise PIO to control the LED chain
+ * 
+ * By default, all LEDs off (0, 0, 0)
+ */
+void init_leds();
 
-    void send_data();
-    void turn_off();
-    bool has_pending_changes();
+/**
+ * @brief Set a single LED colour (RGB)
+ * @param led_index Index of desired LED to set
+ * @param colour rgb values of the colour to set. Use get_rgb(colour_name) to get the rgb values of a given colour name.
+ */
+void set_single_led(uint8_t led_index, rgb_colour colour);
 
-    void set_single(uint8_t chosen_led, uint8_t red, uint8_t green, uint8_t blue);
-    void set_all(uint8_t red, uint8_t green, uint8_t blue);
-    void set_range(uint8_t start_led, uint8_t end_led, uint8_t red, uint8_t green, uint8_t blue);
-    void set_multiple(uint32_t *led_values, uint8_t length);
-    void set_number_of_leds(uint8_t leds);
-    void set_single_hsv(uint8_t chosen_led, uint8_t hue, uint8_t saturation, uint8_t value);
-    void set_all_hsv(uint8_t hue, uint8_t saturation, uint8_t value);
-    void set_range_hsv(uint8_t start_led, uint8_t end_led, uint8_t hue, uint8_t saturation, uint8_t value);
-    void hsv_to_rgb(uint8_t hue, uint8_t saturation, uint8_t value, uint8_t &red, uint8_t &green, uint8_t &blue);
-    void set_multiple_hsv(uint8_t *hue_values, uint8_t *saturation_values, uint8_t *value_values, uint8_t length);
+/**
+ * @brief Set all LED colours to one colour (RGB)
+ * @param colour rgb values of the colour to set. Use get_rgb(colour_name) to get the rgb values of a given colour name.
+ */
+void set_all_leds(rgb_colour colour);
 
-    uint32_t *get_led_data();
-};
+/**
+ * @brief Print the status of all LEDs
+ * 
+ * If not updated, print set colours and current colours of all LEDs
+ */
+void print_status_leds();
+
+/**
+ * @brief Clear all LEDs to (0, 0, 0)
+ * 
+ * Both setting and updating all LEDs
+ */
+void clear_all_leds();
+
+/** @brief Update all LEDs to set colours */
+void update_all_leds();
