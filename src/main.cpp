@@ -27,7 +27,7 @@ bool Testing = true;
 Piezo Piezo1(VIBRATION_OUTPUT1_PIN, BUZZER1_PIN);
 Piezo Piezo2(VIBRATION_OUTPUT2_PIN, BUZZER2_PIN);
 Piezo Piezo3(26, 15);
-uint8_t mode = DISPLAY_TEST_MODE;
+uint8_t mode = MOTOR_TEST_MODE;
 bool mode_change_logged = false;
 
 class GameState
@@ -80,6 +80,9 @@ void init_board()
     bluetooth_init(BT_UART_TX_PIN, BT_UART_RX_PIN, BT_RESET_PIN);
     set_up_display(SDA_MOSI_PIN, SCL_SCLK_PIN);
     clear_display();
+
+    init_motor_pwr_ctrl();
+    init_motor();
 }
 
 // Define TESTING mode functions ==========================================================================================================
@@ -163,6 +166,10 @@ void test_display()
     sleep_ms(200);
 }
 
+void run_motor_test_mode() {
+    move_motor_position_safely(LEFT);
+    move_motor_position_safely(RIGHT);
+}
 // Define GAME mode functions
 void run_setup_mode()
 {
@@ -248,7 +255,10 @@ void run_victory_mode()
 
 int main()
 {
-    init_board();
+    // init_board();
+    stdio_init_all();
+    init_motor_pwr_ctrl();
+    init_motor();
 
     while (true)
     {
@@ -289,6 +299,15 @@ int main()
                     mode_change_logged = true;
                 }
                 handle_bluetooth_message();
+                break;
+
+            case MOTOR_TEST_MODE:
+                if (!mode_change_logged)
+                {
+                    log(INFORMATION, "Mode Changed: Mode = Test Motor Mode");
+                    mode_change_logged = true;
+                }
+                run_motor_test_mode();
                 break;
             }
         }
