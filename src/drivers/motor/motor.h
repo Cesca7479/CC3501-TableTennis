@@ -19,22 +19,26 @@ enum ServoPosition
  */
 void init_motor_pwr_ctrl();
 
-/** @brief Initializes the motor's PWM functionality */
+/** 
+ * @brief Initializes the motor's PWM functionality 
+ */
 void init_motor();
 
 /**
  * @brief Enable motor's power
  *
- * Will not enable if the motor power control has not been initialised
- *
- * Will not enable if a motor fault is detected (over-current or high temperature)
+ * @return true if the motor was successfully enabled, false if there was a fault or the power control was not initialised
  */
-void enable_motor();
+bool enable_motor();
 
-/** @brief Disable motor's power and input signal*/
+/** 
+ * @brief Disable motor's power and input signal 
+ * */
 void disable_motor();
 
-/** @brief Check if a motor fault is active (over-current or high temperature) */
+/** 
+ * @brief Check if a motor fault is active (over-current or high temperature) 
+ * */
 bool is_motor_fault_active();
 
 /**

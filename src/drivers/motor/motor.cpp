@@ -23,7 +23,7 @@ Use units of us as the PWM register uses an integer count and to simplify calcul
 #define MOTOR_RIGHT_PULSE_US 1950
 
 #define MOTOR_MOVE_TIME_MS 200
-#define MOTOR_FAULT_CHECK_INTERVAL_MS 50
+#define MOTOR_FAULT_CHECK_INTERVAL_MS 10
 
 bool is_power_enabled = false;
 bool is_motor_pwr_ctrl_initialised = false;
@@ -56,27 +56,27 @@ void init_motor()
     pwm_set_enabled(motor_pwm_slice, true);
 }
 
-void enable_motor()
+bool enable_motor()
 {
     // Check if the motor power control has been initialised
     if (!is_motor_pwr_ctrl_initialised)
     {
         log(LogLevel::ERROR, "Motor power control not initialised.");
         pwm_set_gpio_level(MOTOR_IN_PIN, 0);
-        return;
+        return false;
     }
 
     // Check for motor fault
     if (is_motor_fault_active())
     {
-        log(LogLevel::ERROR, "Motor fault detected, over-current or high temperature detected.");
-        pwm_set_gpio_level(MOTOR_IN_PIN, 0);
-        return;
+        log(LogLevel::ERROR, "Motor fault, over-current or high temperature detected. Motor power disabled.");
+        disable_motor();
+        return false;
     }
 
     gpio_put(MOTOR_PWR_CTRL_PIN, true);
     is_power_enabled = true;
-    log(LogLevel::INFORMATION, "Motor power enabled.");
+    return true;
 }
 
 void disable_motor()
@@ -84,7 +84,6 @@ void disable_motor()
     pwm_set_gpio_level(MOTOR_IN_PIN, 0);
     gpio_put(MOTOR_PWR_CTRL_PIN, false);
     is_power_enabled = false;
-    log(LogLevel::INFORMATION, "Motor power disabled.");
 }
 
 bool is_motor_fault_active()
@@ -118,14 +117,17 @@ void set_motor_position(ServoPosition position)
 void move_motor_position_safely(ServoPosition position)
 {
     set_motor_position(position);
-    enable_motor();
+    if (!enable_motor())
+    {
+        return;
+    }
 
     absolute_time_t end_time = make_timeout_time_ms(MOTOR_MOVE_TIME_MS);
     while (!time_reached(end_time))
     {
         if (is_motor_fault_active())
         {
-            log(LogLevel::ERROR, "Motor fault detected, over-current or high temperature detected.");
+            log(LogLevel::ERROR, "Motor fault, over-current or high temperature detected. Motor power disabled.");
             disable_motor();
             return;
         }
