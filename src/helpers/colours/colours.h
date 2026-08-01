@@ -45,6 +45,16 @@ static const ColourInfo colour_info_table[] =
         {"WHITE", {10, 10, 10}},
         {"OFF", {0, 0, 0}}};
 
+static const LedColour rainbow[7] =
+    {
+        RED,
+        ORANGE,
+        YELLOW,
+        GREEN,
+        BLUE,
+        PURPLE,
+        PINK};
+        
 /**
  * @brief Get the rgb values of a given colour
  * @param colour Allows: RED, ORANGE, YELLOW, GREEN, BLUE, PURPLE, PINK, WHITE and OFF
