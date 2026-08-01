@@ -2,7 +2,6 @@
 
 #include "pico/stdlib.h"
 #include "hardware/gpio.h"
-#include "hardware/clocks.h"
 #include "hardware/pwm.h"
 
 #include "drivers/motor/motor.h"
@@ -43,9 +42,9 @@ void init_motor_pwr_ctrl()
 void init_motor()
 {
     pwm_config config = pwm_get_default_config();
-    int motor_pwm_slice = pwm_gpio_to_slice_num(TEST_MOTOR_IN_PIN);
+    int motor_pwm_slice = pwm_gpio_to_slice_num(MOTOR_IN_PIN);
 
-    gpio_set_function(TEST_MOTOR_IN_PIN, GPIO_FUNC_PWM);
+    gpio_set_function(MOTOR_IN_PIN, GPIO_FUNC_PWM);
 
     // Slow down clock to COUNTER_HZ
     float clock_divider = CLK_SYS_HZ / COUNTER_HZ;
@@ -53,7 +52,7 @@ void init_motor()
     pwm_config_set_wrap(&config, PWM_PERIOD_US - 1);
     pwm_init(motor_pwm_slice, &config, false);
 
-    pwm_set_gpio_level(TEST_MOTOR_IN_PIN, 0); // Set initial pulse width to 0 (motor off)
+    pwm_set_gpio_level(MOTOR_IN_PIN, 0); // Set initial pulse width to 0 (motor off)
     pwm_set_enabled(motor_pwm_slice, true);
 }
 
@@ -63,7 +62,7 @@ void enable_motor()
     if (!is_motor_pwr_ctrl_initialised)
     {
         log(LogLevel::ERROR, "Motor power control not initialised.");
-        pwm_set_gpio_level(TEST_MOTOR_IN_PIN, 0);
+        pwm_set_gpio_level(MOTOR_IN_PIN, 0);
         return;
     }
 
@@ -71,7 +70,7 @@ void enable_motor()
     if (is_motor_fault_active())
     {
         log(LogLevel::ERROR, "Motor fault detected, over-current or high temperature detected.");
-        pwm_set_gpio_level(TEST_MOTOR_IN_PIN, 0);
+        pwm_set_gpio_level(MOTOR_IN_PIN, 0);
         return;
     }
 
@@ -82,7 +81,7 @@ void enable_motor()
 
 void disable_motor()
 {
-    pwm_set_gpio_level(TEST_MOTOR_IN_PIN, 0);
+    pwm_set_gpio_level(MOTOR_IN_PIN, 0);
     gpio_put(MOTOR_PWR_CTRL_PIN, false);
     is_power_enabled = false;
     log(LogLevel::INFORMATION, "Motor power disabled.");
@@ -99,15 +98,15 @@ void set_motor_position(ServoPosition position)
     switch (position)
     {
     case LEFT:
-        pwm_set_gpio_level(TEST_MOTOR_IN_PIN, MOTOR_LEFT_PULSE_US);
+        pwm_set_gpio_level(MOTOR_IN_PIN, MOTOR_LEFT_PULSE_US);
         log(LogLevel::INFORMATION, "Motor set to LEFT position.");
         break;
     case CENTRE:
-        pwm_set_gpio_level(TEST_MOTOR_IN_PIN, MOTOR_CENTRE_PULSE_US);
+        pwm_set_gpio_level(MOTOR_IN_PIN, MOTOR_CENTRE_PULSE_US);
         log(LogLevel::INFORMATION, "Motor set to CENTRE position.");
         break;
     case RIGHT:
-        pwm_set_gpio_level(TEST_MOTOR_IN_PIN, MOTOR_RIGHT_PULSE_US);
+        pwm_set_gpio_level(MOTOR_IN_PIN, MOTOR_RIGHT_PULSE_US);
         log(LogLevel::INFORMATION, "Motor set to RIGHT position.");
         break;
     default:
@@ -119,7 +118,7 @@ void set_motor_position(ServoPosition position)
 void move_motor_position_safely(ServoPosition position)
 {
     set_motor_position(position);
-    // enable_motor();
+    enable_motor();
 
     absolute_time_t end_time = make_timeout_time_ms(MOTOR_MOVE_TIME_MS);
     while (!time_reached(end_time))

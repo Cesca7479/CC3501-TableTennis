@@ -2,9 +2,6 @@
 
 #define CLK_SYS_HZ 125000000 // Default system clock frequency
 
-// prac board
-#define TEST_MOTOR_IN_PIN 12
-
 /**
  * @brief Predefined mechanical positions of the servo.
  */
@@ -52,6 +49,8 @@ void set_motor_position(ServoPosition position);
  * @brief Move the motor's position safely
  * 
  * Sets input signal, enables motor, waits for motor to move while checking for faults then disables motor
+ * 
+ * Note: also is a blocking function which will need to be changed in future
  *
  * @param position The desired position of the motor (LEFT, CENTRE or RIGHT)
  */
