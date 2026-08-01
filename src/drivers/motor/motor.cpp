@@ -19,9 +19,12 @@ Use units of us as the PWM register uses an integer count and to simplify calcul
 #define COUNTER_HZ 1000000  // How many times the PWM counter increments per second
 #define PWM_PERIOD_US 20000 // 20ms
 
-#define MOTOR_LEFT_PULSE_US 1500  
-#define MOTOR_CENTRE_PULSE_US 1700 
-#define MOTOR_RIGHT_PULSE_US 1900  
+#define MOTOR_LEFT_PULSE_US 1550
+#define MOTOR_CENTRE_PULSE_US 1750
+#define MOTOR_RIGHT_PULSE_US 1950
+
+#define MOTOR_MOVE_TIME_MS 200
+#define MOTOR_FAULT_CHECK_INTERVAL_MS 50
 
 bool is_power_enabled = false;
 bool is_motor_pwr_ctrl_initialised = false;
@@ -34,7 +37,6 @@ void init_motor_pwr_ctrl()
 
     gpio_init(MOTOR_FAULT_FLAG_PIN);
     gpio_set_dir(MOTOR_FAULT_FLAG_PIN, GPIO_IN);
-    is_power_enabled = false;
     is_motor_pwr_ctrl_initialised = true;
 }
 
@@ -51,16 +53,17 @@ void init_motor()
     pwm_config_set_wrap(&config, PWM_PERIOD_US - 1);
     pwm_init(motor_pwm_slice, &config, false);
 
-    pwm_set_gpio_level(TEST_MOTOR_IN_PIN, MOTOR_CENTRE_PULSE_US); // Default to centre position on startup
+    pwm_set_gpio_level(TEST_MOTOR_IN_PIN, 0); // Set initial pulse width to 0 (motor off)
     pwm_set_enabled(motor_pwm_slice, true);
 }
 
-void enable_motor_power()
+void enable_motor()
 {
     // Check if the motor power control has been initialised
     if (!is_motor_pwr_ctrl_initialised)
     {
-        log(LogLevel::ERROR, "Motor power control not initialised. Call init_motor_pwr_ctrl() first.");
+        log(LogLevel::ERROR, "Motor power control not initialised.");
+        pwm_set_gpio_level(TEST_MOTOR_IN_PIN, 0);
         return;
     }
 
@@ -68,6 +71,7 @@ void enable_motor_power()
     if (is_motor_fault_active())
     {
         log(LogLevel::ERROR, "Motor fault detected, over-current or high temperature detected.");
+        pwm_set_gpio_level(TEST_MOTOR_IN_PIN, 0);
         return;
     }
 
@@ -76,8 +80,9 @@ void enable_motor_power()
     log(LogLevel::INFORMATION, "Motor power enabled.");
 }
 
-void disable_motor_power()
+void disable_motor()
 {
+    pwm_set_gpio_level(TEST_MOTOR_IN_PIN, 0);
     gpio_put(MOTOR_PWR_CTRL_PIN, false);
     is_power_enabled = false;
     log(LogLevel::INFORMATION, "Motor power disabled.");
@@ -109,4 +114,23 @@ void set_motor_position(ServoPosition position)
         log(LogLevel::ERROR, "Invalid motor position specified.");
         break;
     }
+}
+
+void move_motor_position_safely(ServoPosition position)
+{
+    set_motor_position(position);
+    // enable_motor();
+
+    absolute_time_t end_time = make_timeout_time_ms(MOTOR_MOVE_TIME_MS);
+    while (!time_reached(end_time))
+    {
+        if (is_motor_fault_active())
+        {
+            log(LogLevel::ERROR, "Motor fault detected, over-current or high temperature detected.");
+            disable_motor();
+            return;
+        }
+        sleep_ms(MOTOR_FAULT_CHECK_INTERVAL_MS);
+    }
+    disable_motor();
 }
