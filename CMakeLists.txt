@@ -55,6 +55,7 @@ if(CrossCompiling)
         src/drivers/piezos/piezos.cpp
         src/drivers/display/display.cpp
         src/drivers/bluetooth/bluetooth.cpp
+        src/drivers/motor/motor.cpp
     )
     target_include_directories(labs
         PUBLIC 
@@ -106,10 +107,12 @@ else()
         tests/mocks/hardware/gpio.cpp
         tests/mocks/hardware/pio.cpp
         tests/mocks/ws2812.cpp
+        
         src/drivers/leds/leds.cpp
         src/drivers/piezos/piezos.cpp
         src/drivers/display/display.cpp
         src/drivers/bluetooth/bluetooth.cpp
+        src/drivers/motor/motor.cpp
     )
     target_include_directories(labs
         PUBLIC 
