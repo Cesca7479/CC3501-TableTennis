@@ -58,6 +58,7 @@ if(CrossCompiling)
         src/drivers/motor/motor.cpp
 
         src/helpers/colours/colour.cpp
+        src/programs/referee_reactions/refereee_reactions.cpp
     )
     target_include_directories(labs
         PUBLIC 
@@ -116,6 +117,7 @@ else()
         src/drivers/motor/motor.cpp
 
         src/helpers/colours/colour.cpp
+        src/programs/referee_reactions/refereee_reactions.cpp
     )
     target_include_directories(labs
         PUBLIC 

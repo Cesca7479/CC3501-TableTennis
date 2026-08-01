@@ -8,17 +8,18 @@
 
 #include "WS2812.pio.h"
 
-
 // Drivers =========================================================================================================================
 #include "drivers/logging/logging.h"
 #include "drivers/piezos/piezos.h"
 #include "drivers/display/display.h"
 #include "drivers/bluetooth/bluetooth.h"
+#include "drivers/motor/motor.h"
+#include "drivers/leds/leds.h"
 
+#include "programs/referee_reactions/referee_reactions.h"
 
 // Global Constants ================================================================================================================
 #define SENSITIVITY_THRESHOLD 80
-
 
 // Global Variables ================================================================================================================
 bool Testing = true;
@@ -29,18 +30,18 @@ Piezo Piezo3(26, 15);
 uint8_t mode = DISPLAY_TEST_MODE;
 bool mode_change_logged = false;
 
-class GameState {
-    public:
-        uint8_t mode = SETUP;
-        uint8_t player_score[2] = {0,0};
-        uint8_t player_serving = PLAYER_1;
-        uint8_t points_to_win = 11;
-        bool serve_successful = false;
-        bool professional = false;
+class GameState
+{
+public:
+    uint8_t mode = SETUP;
+    uint8_t player_score[2] = {0, 0};
+    uint8_t player_serving = PLAYER_1;
+    uint8_t points_to_win = 11;
+    bool serve_successful = false;
+    bool professional = false;
 };
 
 GameState State;
-
 
 // Define functions for mode cycling================================================================================================
 void on_board_button_callback(uint gpio, uint32_t events)
@@ -66,13 +67,13 @@ bool sleep_ms_with_checking(uint16_t ms, uint8_t expected_mode)
     return false;
 }
 
-
 // Init board =====================================================================================================================
-void init_board() {
+void init_board()
+{
     stdio_init_all();
     Piezo1.init_sensing();
     Piezo2.init_sensing();
-    
+
     gpio_init(ON_BOARD_SW_PIN);
     gpio_set_dir(ON_BOARD_SW_PIN, GPIO_IN);
     gpio_set_irq_enabled_with_callback(ON_BOARD_SW_PIN, GPIO_IRQ_EDGE_RISE, true, &on_board_button_callback);
@@ -80,7 +81,6 @@ void init_board() {
     set_up_display(SDA_MOSI_PIN, SCL_SCLK_PIN);
     clear_display();
 }
-
 
 // Define TESTING mode functions ==========================================================================================================
 
@@ -163,9 +163,9 @@ void test_display()
     sleep_ms(200);
 }
 
-
 // Define GAME mode functions
-void run_setup_mode() {
+void run_setup_mode()
+{
     // KEYA PUT YOUR HATS IN HERE - this will be run every loop
 
     // Should: read from ADC -> determine what hat is in (consider setting a default mode if no hat is on so it doesnt break)
@@ -175,12 +175,13 @@ void run_setup_mode() {
     return;
 }
 
-void run_bounce_listening_mode() {
+void run_bounce_listening_mode()
+{
     static absolute_time_t start = get_absolute_time();
     static absolute_time_t prev_bounce_time = get_absolute_time();
     static uint8_t prev_bounce_side;
 
-    absolute_time_t current_time = get_absolute_time();    
+    absolute_time_t current_time = get_absolute_time();
 
     if (absolute_time_diff_us(start, current_time) >= 100000) // Sample every 100ms to prevent overcounting bounces
     {
@@ -191,17 +192,17 @@ void run_bounce_listening_mode() {
         bool isBounce[3] = {result1 > 2020 + SENSITIVITY_THRESHOLD || result1 < 2020 - SENSITIVITY_THRESHOLD,
                             result2 > 2020 + SENSITIVITY_THRESHOLD || result2 < 2020 - SENSITIVITY_THRESHOLD,
                             result3 > 3234 + SENSITIVITY_THRESHOLD || result3 < 3234 - SENSITIVITY_THRESHOLD};
-       
-        
 
-        if (!State.serve_successful) {
+        if (!State.serve_successful)
+        {
             static bool has_serve_bounced = false;
-            if (isBounce[State.player_serving] && !has_serve_bounced) has_serve_bounced = true;
-            else if (isBounce[State.player_serving] && has_serve_bounced) State.player_score[State.player_serving]--;
-            
-             
-        } 
-        else {
+            if (isBounce[State.player_serving] && !has_serve_bounced)
+                has_serve_bounced = true;
+            else if (isBounce[State.player_serving] && has_serve_bounced)
+                State.player_score[State.player_serving]--;
+        }
+        else
+        {
             if (isBounce[PLAYER_1] && prev_bounce_side == PLAYER_1) // Detects double bounce in player 1 side
             {
                 State.player_score[PLAYER_2]++;
@@ -217,48 +218,42 @@ void run_bounce_listening_mode() {
                 uint8_t winner = (prev_bounce_side == PLAYER_1) ? PLAYER_2 : PLAYER_1;
                 State.player_score[winner]++;
             }
-            display_number(State.player_score[PLAYER_1] * 100 + State.player_score[PLAYER_2]);  // CHANGE WHEN DRIVER IS UPDATED
-
+            display_number(State.player_score[PLAYER_1] * 100 + State.player_score[PLAYER_2]); // CHANGE WHEN DRIVER IS UPDATED
         }
 
-
-
-
-        
-
-        
-
         start = get_absolute_time();
-    } 
-    
-
+    }
 
     return;
 }
 
-void run_camera_check_mode() {
+void run_camera_check_mode()
+{
     return;
 }
 
-void run_point_add_mode() {
+void run_point_add_mode()
+{
+    // referee_point_scored();
     return;
 }
 
-void run_victory_mode() {
+void run_victory_mode()
+{
+    // referee_dance();
     return;
 }
-
 
 // Main ===========================================================================================================================
 
 int main()
 {
     init_board();
-    
 
     while (true)
     {
-        if (Testing) {
+        if (Testing)
+        {
             switch (mode)
             {
             case DEFAULT_MODE:
@@ -297,26 +292,27 @@ int main()
                 break;
             }
         }
-        else {
-            switch (State.mode) {
-                case SETUP:
-                    run_setup_mode();
-                    break;                
-                case BOUNCE_LISTEN:
-                    run_bounce_listening_mode();
-                    break;
-                case CAMERA_CHECK:
-                    run_camera_check_mode();
-                    break;
-                case POINT_ADD:
-                    run_point_add_mode();
-                    break;
-                case VICTORY:
-                    run_victory_mode();
-                    break;
+        else
+        {
+            switch (State.mode)
+            {
+            case SETUP:
+                run_setup_mode();
+                break;
+            case BOUNCE_LISTEN:
+                run_bounce_listening_mode();
+                break;
+            case CAMERA_CHECK:
+                run_camera_check_mode();
+                break;
+            case POINT_ADD:
+                run_point_add_mode();
+                break;
+            case VICTORY:
+                run_victory_mode();
+                break;
             }
         }
-        
     }
     return 0;
 }
