@@ -40,3 +40,18 @@ void referee_dance(uint duration_ms)
         flash_leds_rainbow(10);
     }
 }
+
+void referee_angry(ServoPosition bad_side, uint duration_ms)
+{
+    absolute_time_t end_time = make_timeout_time_ms(duration_ms);
+    while (!time_reached(end_time))
+    {
+        move_motor_position_safely(bad_side, 50);
+        set_all_leds(get_rgb(RED));
+        update_all_leds();
+
+        move_motor_position_safely(CENTRE, 50);
+        set_all_leds(get_rgb(OFF));
+        update_all_leds();
+    }
+}

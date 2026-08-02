@@ -166,7 +166,8 @@ void test_display()
     sleep_ms(200);
 }
 
-void run_motor_test_mode() {
+void run_motor_test_mode()
+{
     move_motor_position_safely(LEFT);
     move_motor_position_safely(RIGHT);
 }
@@ -251,6 +252,10 @@ void run_victory_mode()
     return;
 }
 
+void run_foul_mode() {
+    // referee_angry();
+    return;
+}
 // Main ===========================================================================================================================
 
 int main()
@@ -329,6 +334,9 @@ int main()
                 break;
             case VICTORY:
                 run_victory_mode();
+                break;
+            case FOUL:
+                run_foul_mode();
                 break;
             }
         }

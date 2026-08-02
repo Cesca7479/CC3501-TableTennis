@@ -25,3 +25,13 @@ void referee_point_scored(ServoPosition side_scored);
  * @param duration_ms The duration of the dance in milliseconds
  */
 void referee_dance(uint duration_ms);
+
+
+/**
+ * @brief Referee reaction for when a players been BAD
+ * 
+ * Note: is a blocking function which will need to be changed in future
+ * @param bad_side The side that made the mistake (LEFT or RIGHT)
+ * @param duration_ms The duration of the angry reaction in milliseconds
+ */
+void referee_angry(ServoPosition bad_side, uint duration_ms);

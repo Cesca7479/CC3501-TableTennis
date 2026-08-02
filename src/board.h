@@ -51,7 +51,8 @@ enum State
     BOUNCE_LISTEN,
     CAMERA_CHECK,
     POINT_ADD,
-    VICTORY    
+    VICTORY,
+    FOUL  
 };
 
 enum Player
