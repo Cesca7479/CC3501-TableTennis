@@ -4,6 +4,7 @@
 #include "drivers/motor/motor.h"
 #include "drivers/leds/leds.h"
 #include "helpers/colours/colours.h"
+#include "referee_reactions.h"
 
 void flash_leds_rainbow(uint time_interval_ms)
 {
@@ -15,17 +16,28 @@ void flash_leds_rainbow(uint time_interval_ms)
     }
 }
 
+void light_player_side(ServoPosition player_side, rgb_colour colour)
+{
+    if (player_side == LEFT)
+    {
+        set_single_led(0, colour);
+    }
+    if (player_side == RIGHT)
+    {
+        set_single_led(1, colour);
+    }
+}
+
+void referee_indicate_server(ServoPosition side_serving)
+{
+    move_motor_position_safely(side_serving);
+    light_player_side(side_serving, get_rgb(WHITE));
+}
+
 void referee_point_scored(ServoPosition side_scored)
 {
     move_motor_position_safely(side_scored);
-    if (side_scored == LEFT)
-    {
-        set_single_led(0, get_rgb(GREEN));
-    }
-    if (side_scored == RIGHT)
-    {
-        set_single_led(1, get_rgb(GREEN));
-    }
+    light_player_side(side_scored, get_rgb(GREEN));
 }
 
 void referee_dance(uint duration_ms)
