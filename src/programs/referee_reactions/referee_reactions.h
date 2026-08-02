@@ -11,26 +11,33 @@
 void flash_leds_rainbow(uint time_interval_ms);
 
 /** 
+ * @brief Light led on side of specified player
+ * @param player_side The side the specified player is on
+ * @param colour The colour to light the led
+ */
+void light_player_side(ServoPosition player_side, rgb_colour colour);
+
+/** 
+ * @brief Referee reaction for indicating which side is serving
+ * @param side_serving The side that is serving 
+ */
+void referee_indicate_server(ServoPosition side_serving);
+
+/** 
  * @brief Referee reaction for when a point is scored
- *
- * Note: change side positioning and arguments as required
  * @param side_scored The side that scored the point (LEFT or RIGHT)
  */
 void referee_point_scored(ServoPosition side_scored);
 
 /**
  * @brief Referee reaction for a dance 
- * 
- * Note: can be changed to victory dance, also is a blocking function which will need to be changed in future
  * @param duration_ms The duration of the dance in milliseconds
  */
 void referee_dance(uint duration_ms);
 
 
 /**
- * @brief Referee reaction for when a players been BAD
- * 
- * Note: is a blocking function which will need to be changed in future
+ * @brief Referee reaction for when a player's been BAD
  * @param bad_side The side that made the mistake (LEFT or RIGHT)
  * @param duration_ms The duration of the angry reaction in milliseconds
  */
