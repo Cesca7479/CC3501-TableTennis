@@ -1,6 +1,6 @@
 #pragma once
 
-#define CLK_SYS_HZ 125000000 // Default system clock frequency
+#define DEFAULT_MOTOR_MOVE_TIME_MS 200
 
 /**
  * @brief Predefined mechanical positions of the servo.
@@ -33,7 +33,7 @@ bool enable_motor();
 
 /** 
  * @brief Disable motor's power and input signal 
- * */
+ */
 void disable_motor();
 
 /** 
@@ -57,5 +57,6 @@ void set_motor_position(ServoPosition position);
  * Note: also is a blocking function which will need to be changed in future
  *
  * @param position The desired position of the motor (LEFT, CENTRE or RIGHT)
+ * @param move_time_ms The time in milliseconds to wait for the motor to move before disabling power (default is minimum time to move from left to right)
  */
-void move_motor_position_safely(ServoPosition position);
+void move_motor_position_safely(ServoPosition position, uint32_t move_time_ms = DEFAULT_MOTOR_MOVE_TIME_MS);

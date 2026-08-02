@@ -15,6 +15,7 @@ Use units of us as the PWM register uses an integer count and to simplify calcul
 (floating-point calculations aren't supported on the RP2040)
 */
 
+#define CLK_SYS_HZ 125000000 // Default system clock frequency
 #define COUNTER_HZ 1000000  // How many times the PWM counter increments per second
 #define PWM_PERIOD_US 20000 // 20ms
 
@@ -22,7 +23,6 @@ Use units of us as the PWM register uses an integer count and to simplify calcul
 #define MOTOR_CENTRE_PULSE_US 1750
 #define MOTOR_RIGHT_PULSE_US 1950
 
-#define MOTOR_MOVE_TIME_MS 200
 #define MOTOR_FAULT_CHECK_INTERVAL_MS 10
 
 bool is_power_enabled = false;
@@ -114,7 +114,7 @@ void set_motor_position(ServoPosition position)
     }
 }
 
-void move_motor_position_safely(ServoPosition position)
+void move_motor_position_safely(ServoPosition position, uint32_t move_time_ms)
 {
     set_motor_position(position);
     if (!enable_motor())
@@ -122,7 +122,7 @@ void move_motor_position_safely(ServoPosition position)
         return;
     }
 
-    absolute_time_t end_time = make_timeout_time_ms(MOTOR_MOVE_TIME_MS);
+    absolute_time_t end_time = make_timeout_time_ms(move_time_ms);
     while (!time_reached(end_time))
     {
         if (is_motor_fault_active())
