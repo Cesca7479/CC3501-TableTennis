@@ -17,7 +17,7 @@ enum Pins
     BT_IO1_PIN,
     BT_IO2_PIN,
     BT_RESET_PIN,
-    GPIO_15_PIN,
+    BUZZER3_PIN,
     SDA_MOSI_PIN,
     SCL_SCLK_PIN,
     NOT_CONNECTED,
@@ -28,7 +28,7 @@ enum Pins
     MOTOR_PWR_CTRL_PIN,
     MOTOR_FAULT_FLAG_PIN,
     MOTOR_IN_PIN,
-    GPIO_26_PIN,
+    VIBRATION_OUTPUT3_PIN,
     GPIO_27_PIN,
     VIBRATION_OUTPUT1_PIN,
     VIBRATION_OUTPUT2_PIN
@@ -46,17 +46,25 @@ enum Mode
 
 enum State
 {
-    SETUP,
+    SETUP_GAME,
+    SETUP_ROUND,
     SERVE_DETECTION,
     BOUNCE_LISTEN,
     CAMERA_CHECK,
-    POINT_ADD,
-    VICTORY,
+    CHECK_VICTORY_AND_SCORE,
     FOUL  
 };
 
-enum Player
+enum Bounce_Location
 {
     PLAYER_1,
-    PLAYER_2
+    PLAYER_2,
+    NET
+};
+
+enum Sound_Length
+{
+    NONE,
+    SHORT,
+    LONG
 };

@@ -19,26 +19,39 @@
 #include "programs/referee_reactions/referee_reactions.h"
 
 // Global Constants ================================================================================================================
-#define SENSITIVITY_THRESHOLD 80
+#define SENSITIVITY_THRESHOLD_TABLE 80
+#define SENSITIVITY_THRESHOLD_NET 80
+#define BOUNCE_SAMPLING_RATE_MS 100 // Sample once every 100ms to prevent overcounting bounces
 
 // Global Variables ================================================================================================================
-bool Testing = true;
+bool Testing = false;
+uint8_t mode = PIEZO_TEST_MODE;
 
 Piezo Piezo1(VIBRATION_OUTPUT1_PIN, BUZZER1_PIN);
 Piezo Piezo2(VIBRATION_OUTPUT2_PIN, BUZZER2_PIN);
 Piezo Piezo3(26, 15);
-uint8_t mode = MOTOR_TEST_MODE;
+
 bool mode_change_logged = false;
 
-class GameState
-{
-public:
-    uint8_t mode = SETUP;
+struct Settings {
+    uint8_t points_to_win = 11;
+    bool win_by_two = true;
+    uint8_t sound_length = SHORT;
+    uint8_t serves_per_player = 2;
+    bool limited_lets = true;
+    uint8_t num_lets_allowed = 1;
+    uint16_t time_out_threshold_ms = 2000;
+};
+
+struct GameState {
+    uint8_t mode = SETUP_GAME;
+    uint8_t game_number = 0;
     uint8_t player_score[2] = {0, 0};
     uint8_t player_serving = PLAYER_1;
-    uint8_t points_to_win = 11;
-    bool serve_successful = false;
-    bool professional = false;
+    uint8_t prev_bounce_side;
+    absolute_time_t prev_bounce_time;
+    Settings settings;
+    uint16_t piezo_dc_biases[3];
 };
 
 GameState State;
@@ -107,12 +120,12 @@ void run_piezo_test_mode()
         uint16_t result2 = Piezo2.read();
         uint16_t result3 = Piezo3.read();
 
-        if (result1 > 2020 + SENSITIVITY_THRESHOLD || result1 < 2020 - SENSITIVITY_THRESHOLD)
+        if (result1 > 2020 + SENSITIVITY_THRESHOLD_TABLE || result1 < 2020 - SENSITIVITY_THRESHOLD_TABLE)
         {
             if (side == PLAYER_1)
             {
                 bounces++;
-                Piezo1.play_victory_sequence();
+                // Piezo1.play_victory_sequence();
             }
             else
             {
@@ -124,12 +137,12 @@ void run_piezo_test_mode()
                 return;
         }
 
-        if (result2 > 2020 + SENSITIVITY_THRESHOLD || result2 < 2020 - SENSITIVITY_THRESHOLD)
+        if (result2 > 2020 + SENSITIVITY_THRESHOLD_TABLE || result2 < 2020 - SENSITIVITY_THRESHOLD_TABLE)
         {
             if (side == PLAYER_2)
             {
                 bounces++;
-                Piezo2.play_victory_sequence();
+                // Piezo2.play_victory_sequence();
             }
             else
             {
@@ -141,11 +154,11 @@ void run_piezo_test_mode()
                 return;
         }
 
-        if (result3 > 3234 + SENSITIVITY_THRESHOLD || result3 < 3234 - SENSITIVITY_THRESHOLD)
+        if (result3 > 2700 + SENSITIVITY_THRESHOLD_NET || result3 < 2700 - SENSITIVITY_THRESHOLD_NET)
         {
 
-            printf("BOUNCE3: %d\r\n", bounces++);
-            Piezo3.play_victory_sequence();
+            printf("BOUNCE3: %d,%d\r\n", result3, bounces++);
+            // Piezo3.play_victory_sequence();
             if (sleep_ms_with_checking(100, PIEZO_TEST_MODE))
                 return;
         }
@@ -171,68 +184,181 @@ void run_motor_test_mode()
     move_motor_position_safely(LEFT);
     move_motor_position_safely(RIGHT);
 }
+
 // Define GAME mode functions
-void run_setup_mode()
+void run_setup_game_mode()
 {
     // KEYA PUT YOUR HATS IN HERE - this will be run every loop
 
     // Should: read from ADC -> determine what hat is in (consider setting a default mode if no hat is on so it doesnt break)
-    // Change settings in GameState State -> state. points_to_win, state.professional
-    // Change state.serve_successful = false
-    // On middle pushbutton press -> change state.mode to BOUNCE_LISTEN
-    return;
-}
+    // Change settings in GameState State.settings
+    // On middle pushbutton press -> do the raise arm stuff & change state.mode to BOUNCE_LISTEN
 
-void run_bounce_listening_mode()
-{
-    static absolute_time_t start = get_absolute_time();
-    static absolute_time_t prev_bounce_time = get_absolute_time();
-    static uint8_t prev_bounce_side;
+    uint32_t sum_piezo1;
+    uint32_t sum_piezo2;
+    uint32_t sum_piezo3;
 
-    absolute_time_t current_time = get_absolute_time();
-
-    if (absolute_time_diff_us(start, current_time) >= 100000) // Sample every 100ms to prevent overcounting bounces
+    for (size_t i = 0; i < 10; i++)
     {
         uint16_t result1 = Piezo1.read();
         uint16_t result2 = Piezo2.read();
         uint16_t result3 = Piezo3.read();
 
-        bool isBounce[3] = {result1 > 2020 + SENSITIVITY_THRESHOLD || result1 < 2020 - SENSITIVITY_THRESHOLD,
-                            result2 > 2020 + SENSITIVITY_THRESHOLD || result2 < 2020 - SENSITIVITY_THRESHOLD,
-                            result3 > 3234 + SENSITIVITY_THRESHOLD || result3 < 3234 - SENSITIVITY_THRESHOLD};
-
-        if (!State.serve_successful)
-        {
-            static bool has_serve_bounced = false;
-            if (isBounce[State.player_serving] && !has_serve_bounced)
-                has_serve_bounced = true;
-            else if (isBounce[State.player_serving] && has_serve_bounced)
-                State.player_score[State.player_serving]--;
-        }
-        else
-        {
-            if (isBounce[PLAYER_1] && prev_bounce_side == PLAYER_1) // Detects double bounce in player 1 side
-            {
-                State.player_score[PLAYER_2]++;
-                prev_bounce_side = PLAYER_1;
-            }
-            else if (isBounce[PLAYER_2] && prev_bounce_side == PLAYER_2) // Detects double bounce in player 2 side
-            {
-                State.player_score[PLAYER_1]++;
-                prev_bounce_side = PLAYER_2;
-            }
-            else if (!isBounce[PLAYER_1] && !isBounce[PLAYER_2] && absolute_time_diff_us(prev_bounce_time, current_time) >= 2000000 && State.serve_successful) // Detects 2 second time elapsed since previous bounce
-            {
-                uint8_t winner = (prev_bounce_side == PLAYER_1) ? PLAYER_2 : PLAYER_1;
-                State.player_score[winner]++;
-            }
-            display_number(State.player_score[PLAYER_1] * 100 + State.player_score[PLAYER_2]); // CHANGE WHEN DRIVER IS UPDATED
-        }
-
-        start = get_absolute_time();
+        sum_piezo1 += result1;
+        sum_piezo2 += result2;
+        sum_piezo3 += result3;
     }
+    
+    State.piezo_dc_biases[0] = sum_piezo1/10;
+    State.piezo_dc_biases[1] = sum_piezo2/10;
+    State.piezo_dc_biases[2] = sum_piezo3/10;
 
+    printf("DC Biases: %d, %d, %d\r\n", State.piezo_dc_biases[0],State.piezo_dc_biases[1],State.piezo_dc_biases[2]);
+    State.mode = SETUP_ROUND;
     return;
+}
+
+
+void run_setup_round_mode() 
+{
+    uint8_t total_points = State.player_score[PLAYER_1] + State.player_score[PLAYER_2];
+    State.player_serving = (State.game_number + total_points / State.settings.serves_per_player) % 2; // PLAYER_1 = 0, PLAYER_2 = 1
+    printf("Player %d serving\r\n", State.player_serving + 1);
+    // raise arm and light and whatever
+    State.mode = SERVE_DETECTION;
+}
+
+void reset_serve_state(uint8_t &serve_attempts, bool &has_hit_table, bool &has_hit_net) // Resets serve state
+{
+    serve_attempts = 0;
+    has_hit_table = false;
+    has_hit_net = false;
+}
+
+void run_serve_detection_mode()
+{
+    static absolute_time_t start = get_absolute_time();
+    static absolute_time_t prev_bounce_time = get_absolute_time();
+    static uint8_t serve_attempts = 0;
+    absolute_time_t current_time = get_absolute_time();
+    static bool has_hit_table = false;
+    static bool has_hit_net = false;
+
+    if (absolute_time_diff_us(start, current_time) >= BOUNCE_SAMPLING_RATE_MS * 1000) 
+    {
+        uint16_t result1 = Piezo1.read();
+        uint16_t result2 = Piezo2.read();
+        uint16_t result3 = Piezo3.read();
+
+        bool isBounce[3] = {result1 > State.piezo_dc_biases[0] + SENSITIVITY_THRESHOLD_TABLE || result1 < State.piezo_dc_biases[0] - SENSITIVITY_THRESHOLD_TABLE,
+                            result2 > State.piezo_dc_biases[1] + SENSITIVITY_THRESHOLD_TABLE || result2 < State.piezo_dc_biases[1] - SENSITIVITY_THRESHOLD_TABLE,
+                            result3 > State.piezo_dc_biases[2] + SENSITIVITY_THRESHOLD_NET || result3 < State.piezo_dc_biases[2] - SENSITIVITY_THRESHOLD_NET};
+        
+        if (isBounce[PLAYER_1]) printf("Player 1 side hit\r\n");
+        if (isBounce[PLAYER_2]) printf("Player 2 side hit\r\n");
+        if (isBounce[NET]) printf("Net hit\r\n");
+
+        uint8_t opposing_player = (State.player_serving == PLAYER_1) ? PLAYER_2 : PLAYER_1;
+
+        if (isBounce[State.player_serving]) // Detects hitting server side table
+        {
+            printf("Serving side %d hit\r\n", State.player_serving);
+            has_hit_table = true; 
+            prev_bounce_time = current_time;
+        }
+        
+        if (has_hit_table && isBounce[NET]) // Detects hitting the net
+        {
+            printf("Net hit after serve\r\n");
+            has_hit_net = true; 
+        }
+
+
+        if (has_hit_table && has_hit_net && isBounce[opposing_player]) // Detects a let
+        {
+            printf("Let detected\r\n");
+            serve_attempts++;
+
+            if (serve_attempts > State.settings.num_lets_allowed && State.settings.limited_lets) // If too many lets in a row are served -> point for opposing player
+            {
+                printf("Too many lets in a row: %d\r\n", serve_attempts);
+                State.player_score[opposing_player]++;
+                reset_serve_state(serve_attempts, has_hit_table, has_hit_net);
+                State.mode = CHECK_VICTORY_AND_SCORE;
+            };
+        }
+
+        else if (has_hit_table && has_hit_net && isBounce[State.player_serving]) // Hits server side, then hits net, then falls back onto server side -> point for opposing player
+        { 
+            printf("Point to Player %d, hit net fall back\r\n", opposing_player + 1);
+            State.player_score[opposing_player]++;
+            reset_serve_state(serve_attempts, has_hit_table, has_hit_net);
+            State.mode = CHECK_VICTORY_AND_SCORE;
+        } 
+
+        else if (has_hit_table && absolute_time_diff_us(prev_bounce_time, current_time) > State.settings.time_out_threshold_ms * 1000) // If served but went out (doesn't matter if it hit the net or not)
+        {
+            printf("Served but went out\r\n");
+            State.player_score[opposing_player]++;
+            reset_serve_state(serve_attempts, has_hit_table, has_hit_net);
+            State.mode = CHECK_VICTORY_AND_SCORE;
+        }
+
+        else if (has_hit_table && !has_hit_net && isBounce[opposing_player]) // Hits server side, then opposing player side without touching net -> Serve successful
+        {
+            printf("Serve successful\r\n");
+            reset_serve_state(serve_attempts, has_hit_table, has_hit_net);
+            State.prev_bounce_side = opposing_player;
+            State.prev_bounce_time = current_time;
+            State.mode = BOUNCE_LISTEN;
+        }
+
+        start = current_time;
+    }
+}
+
+void run_bounce_listening_mode()
+{
+    static absolute_time_t start = get_absolute_time();
+    absolute_time_t current_time = get_absolute_time();
+
+    if (absolute_time_diff_us(start, current_time) >= BOUNCE_SAMPLING_RATE_MS * 1000)
+    {
+        uint16_t result1 = Piezo1.read();
+        uint16_t result2 = Piezo2.read();
+
+        bool isBounce[2] = {result1 > State.piezo_dc_biases[0] + SENSITIVITY_THRESHOLD_TABLE || result1 < State.piezo_dc_biases[0] - SENSITIVITY_THRESHOLD_TABLE,
+                            result2 > State.piezo_dc_biases[1] + SENSITIVITY_THRESHOLD_TABLE || result2 < State.piezo_dc_biases[1] - SENSITIVITY_THRESHOLD_TABLE};
+
+        
+        if (isBounce[PLAYER_1] && State.prev_bounce_side == PLAYER_1) // Detects double bounce in player 1 side
+        {
+            State.player_score[PLAYER_2]++;
+            State.mode = CHECK_VICTORY_AND_SCORE;
+        }
+        else if (isBounce[PLAYER_2] && State.prev_bounce_side == PLAYER_2) // Detects double bounce in player 2 side
+        {
+            State.player_score[PLAYER_1]++;
+            State.mode = CHECK_VICTORY_AND_SCORE;
+        }
+        else if (isBounce[PLAYER_1]) // Sets previous bounce side and time
+        {
+            State.prev_bounce_side = PLAYER_1;
+            State.prev_bounce_time = current_time;
+        }
+        else if (isBounce[PLAYER_2]) // Sets previous bounce side and time
+        {
+            State.prev_bounce_side = PLAYER_2;
+            State.prev_bounce_time = current_time;
+        }
+        else if (absolute_time_diff_us(State.prev_bounce_time, current_time) >= State.settings.time_out_threshold_ms * 1000) // Detects ball gone out by time threshold
+        {
+            State.player_score[(State.prev_bounce_side == PLAYER_1) ? PLAYER_2 : PLAYER_1]++;
+            State.mode = CHECK_VICTORY_AND_SCORE;
+        }        
+
+        start = current_time;
+    }
 }
 
 void run_camera_check_mode()
@@ -246,8 +372,22 @@ void run_point_add_mode()
     return;
 }
 
-void run_victory_mode()
+void run_check_victory_and_score_mode()
 {
+    display_number(State.player_score[PLAYER_1] * 100 + State.player_score[PLAYER_2]); // DISPLAY POINTS
+    bool is_win = false;
+    uint8_t winner;
+    if (State.player_score[PLAYER_1] >= State.settings.points_to_win && (State.player_score[PLAYER_1] - 2 >= State.player_score[PLAYER_2] || !State.settings.win_by_two)) {
+        is_win = true;
+        winner = PLAYER_1;
+    }
+    else if (State.player_score[PLAYER_2] >= State.settings.points_to_win && (State.player_score[PLAYER_2] - 2 >= State.player_score[PLAYER_1] || !State.settings.win_by_two)) {
+        is_win = true;
+        winner = PLAYER_2;
+    }
+    else {
+        State.mode = SETUP_ROUND;
+    }
     // referee_dance();
     return;
 }
@@ -260,7 +400,7 @@ void run_foul_mode() {
 
 int main()
 {
-    // init_board();
+    init_board();
     stdio_init_all();
     init_motor_pwr_ctrl();
     init_motor();
@@ -285,7 +425,7 @@ int main()
                 {
                     log(INFORMATION, "Mode Changed: Mode = Test Piezo Mode");
                     mode_change_logged = true;
-                    Piezo2.play_victory_sequence();
+                    // Piezo2.play_victory_sequence();
                 }
                 run_piezo_test_mode();
                 break;
@@ -320,8 +460,14 @@ int main()
         {
             switch (State.mode)
             {
-            case SETUP:
-                run_setup_mode();
+            case SETUP_GAME:
+                run_setup_game_mode();
+                break;
+            case SETUP_ROUND:
+                run_setup_round_mode();
+                break;
+            case SERVE_DETECTION:
+                run_serve_detection_mode();
                 break;
             case BOUNCE_LISTEN:
                 run_bounce_listening_mode();
@@ -329,11 +475,8 @@ int main()
             case CAMERA_CHECK:
                 run_camera_check_mode();
                 break;
-            case POINT_ADD:
-                run_point_add_mode();
-                break;
-            case VICTORY:
-                run_victory_mode();
+            case CHECK_VICTORY_AND_SCORE:
+                run_check_victory_and_score_mode();
                 break;
             case FOUL:
                 run_foul_mode();
