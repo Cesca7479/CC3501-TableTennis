@@ -30,13 +30,13 @@ void light_player_side(ServoPosition player_side, rgb_colour colour)
 
 void referee_indicate_server(ServoPosition side_serving)
 {
-    move_motor_position_safely(side_serving);
+    motor_move_motor_safely(side_serving);
     light_player_side(side_serving, get_rgb(WHITE));
 }
 
 void referee_point_scored(ServoPosition side_scored)
 {
-    move_motor_position_safely(side_scored);
+    motor_move_motor_safely(side_scored);
     light_player_side(side_scored, get_rgb(GREEN));
 }
 
@@ -45,10 +45,10 @@ void referee_dance(uint duration_ms)
     absolute_time_t end_time = make_timeout_time_ms(duration_ms);
     while (!time_reached(end_time))
     {
-        move_motor_position_safely(LEFT);
+        motor_move_motor_safely(LEFT);
         flash_leds_rainbow(10);
 
-        move_motor_position_safely(RIGHT);
+        motor_move_motor_safely(RIGHT);
         flash_leds_rainbow(10);
     }
 }
@@ -58,13 +58,13 @@ void referee_angry(uint duration_ms)
     absolute_time_t end_time = make_timeout_time_ms(duration_ms);
     while (!time_reached(end_time))
     {
-        move_motor_position_safely(LEFT);
+        motor_move_motor_safely(LEFT);
         set_all_leds(get_rgb(RED));
         update_all_leds();
 
-        move_motor_position_safely(RIGHT);
+        motor_move_motor_safely(RIGHT);
         set_all_leds(get_rgb(OFF));
         update_all_leds();
     }
-    move_motor_position_safely(CENTRE);
+    motor_move_motor_safely(CENTRE);
 }

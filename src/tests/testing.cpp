@@ -178,9 +178,9 @@ void run_test_words()
 void run_motor_test_mode()
 {
     printf("Motor test left right centre");
-    move_motor_position_safely(CENTRE);
+    motor_move_motor_safely(CENTRE);
     sleep_ms(1000);
-    move_motor_position_safely(LEFT);
+    motor_move_motor_safely(LEFT);
     sleep_ms(2000);
     // printf("led test");
     // set_all_leds(get_rgb(GREEN));
