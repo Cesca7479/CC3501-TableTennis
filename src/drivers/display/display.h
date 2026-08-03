@@ -24,7 +24,9 @@ const uint8_t digits[] =
         0b01101111  // 9
 };
 
-void set_up_display(uint8_t sda_pin, uint8_t scl_pin);
+void display_init(uint8_t sda_pin, uint8_t scl_pin);
 void display_number(int value);
-void clear_display();
-void blank_digits(uint8_t first_digit, uint8_t last_digit);
+void display_clear();
+void display_clear_digits(uint8_t first_digit, uint8_t last_digit);
+void display_player_score(uint8_t player_1_score, uint8_t player_2_score);
+void display_word(const char *word);
