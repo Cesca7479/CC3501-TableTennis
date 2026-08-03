@@ -17,13 +17,17 @@
 #include "drivers/bluetooth/bluetooth.h"
 #include "drivers/motor/motor.h"
 #include "drivers/leds/leds.h"
+#include "drivers/hat_id/hat_id.h"
 
+// Helpers and programs ============================================================================================================
 #include "programs/referee_reactions/referee_reactions.h"
+#include "helpers/game_settings/game_settings.h"
 
 // Global Constants ================================================================================================================
 #define SENSITIVITY_THRESHOLD_TABLE 80
 #define SENSITIVITY_THRESHOLD_NET 80
 #define BOUNCE_SAMPLING_RATE_MS 100 // Sample once every 100ms to prevent overcounting bounces
+#define TIME_OUT_THRESHOLD_MS 2000
 
 // Global Variables ================================================================================================================
 bool Testing = true;
@@ -35,26 +39,16 @@ Piezo Piezo3(26, 15);
 
 bool mode_change_logged = false;
 
-struct Settings
-{
-    uint8_t points_to_win = 11;
-    bool win_by_two = true;
-    uint8_t sound_length = SHORT;
-    uint8_t serves_per_player = 2;
-    bool limited_lets = true;
-    uint8_t num_lets_allowed = 1;
-    uint16_t time_out_threshold_ms = 2000;
-};
-
 struct GameState
 {
     uint8_t mode = SETUP_GAME;
+    GameMode game_mode = GameMode::NO_MODE_SELECTED;
     uint8_t game_number = 0;
     uint8_t player_score[2] = {0, 0};
     uint8_t player_serving = PLAYER_1;
     uint8_t prev_bounce_side;
     absolute_time_t prev_bounce_time;
-    Settings settings;
+    GameSettings settings = GameSettings{};
     uint16_t piezo_dc_biases[3];
 };
 
@@ -84,6 +78,30 @@ bool sleep_ms_with_checking(uint16_t ms, uint8_t expected_mode)
     return false;
 }
 
+/**
+ * @brief Sets the current game mode
+ * @param mode The mode to be set, if UNKNOWN or NO_MODE_SELECTED, defaults to CASUAL mode
+ */
+void set_game_mode(GameMode mode)
+{
+    if (mode == GameMode::NO_MODE_SELECTED || mode == GameMode::UNKNOWN)
+    {
+        if (mode == GameMode::UNKNOWN)
+        {
+            log(LogLevel::ERROR, "Invalid adc reading from hat ID system. Game mode unable to be determined. Defaulting to CASUAL mode.");
+        }
+        else
+        {
+            log(LogLevel::WARNING, "No hat found in hat ID system. Defaulting to CASUAL mode.");
+        }
+        State.game_mode = GameMode::CASUAL;
+        State.settings = get_game_mode_settings(State.game_mode);
+        return;
+    }
+    State.game_mode = mode;
+    State.settings = get_game_mode_settings(State.game_mode);
+}
+
 // Init board =====================================================================================================================
 void init_board()
 {
@@ -100,6 +118,8 @@ void init_board()
 
     init_motor_pwr_ctrl();
     init_motor();
+
+    hat_id_init();
 }
 
 // Define TESTING mode functions ==========================================================================================================
@@ -236,19 +256,32 @@ void run_test_words()
 
 void run_motor_test_mode()
 {
+    printf("Motor test left right centre");
+    move_motor_position_safely(CENTRE);
+    sleep_ms(1000);
     move_motor_position_safely(LEFT);
-    move_motor_position_safely(RIGHT);
+    sleep_ms(2000);
+    // printf("led test");
+    // set_all_leds(get_rgb(GREEN));
+    // update_all_leds();
+    // sleep_ms(1000);
+    // set_single_led(0, get_rgb(WHITE));
+    // set_single_led(1, get_rgb(RED));
+    // update_all_leds();
+    // sleep_ms(1000);
 }
 
 // Define GAME mode functions
 void run_setup_game_mode()
 {
-    // KEYA PUT YOUR HATS IN HERE - this will be run every loop
+    // Determine game mode
+    GameMode detected_mode = hat_id_read_mode();
+    if (detected_mode != State.game_mode)
+    {
+        set_game_mode(detected_mode);
+    }
 
-    // Should: read from ADC -> determine what hat is in (consider setting a default mode if no hat is on so it doesnt break)
-    // Change settings in GameState State.settings
-    // On middle pushbutton press -> do the raise arm stuff & change state.mode to BOUNCE_LISTEN
-
+    // Determine piezo DC biases
     uint32_t sum_piezo1;
     uint32_t sum_piezo2;
     uint32_t sum_piezo3;
@@ -269,6 +302,8 @@ void run_setup_game_mode()
     State.piezo_dc_biases[2] = sum_piezo3 / 10;
 
     printf("DC Biases: %d, %d, %d\r\n", State.piezo_dc_biases[0], State.piezo_dc_biases[1], State.piezo_dc_biases[2]);
+
+    // On middle pushbutton press -> do the raise arm stuff & change state.mode to BOUNCE_LISTEN
     State.mode = SETUP_ROUND;
     return;
 }
@@ -278,7 +313,7 @@ void run_setup_round_mode()
     uint8_t total_points = State.player_score[PLAYER_1] + State.player_score[PLAYER_2];
     State.player_serving = (State.game_number + total_points / State.settings.serves_per_player) % 2; // PLAYER_1 = 0, PLAYER_2 = 1
     printf("Player %d serving\r\n", State.player_serving + 1);
-    // raise arm and light and whatever
+    // referee_indicate_server();
     State.mode = SERVE_DETECTION;
 }
 
@@ -350,7 +385,7 @@ void run_serve_detection_mode()
             State.mode = CHECK_VICTORY_AND_SCORE;
         }
 
-        else if (has_hit_table && absolute_time_diff_us(prev_bounce_time, current_time) > State.settings.time_out_threshold_ms * 1000) // If served but went out (doesn't matter if it hit the net or not)
+        else if (has_hit_table && absolute_time_diff_us(prev_bounce_time, current_time) > TIME_OUT_THRESHOLD_MS * 1000) // If served but went out (doesn't matter if it hit the net or not)
         {
             printf("Served but went out\r\n");
             State.player_score[opposing_player]++;
@@ -403,7 +438,7 @@ void run_bounce_listening_mode()
             State.prev_bounce_side = PLAYER_2;
             State.prev_bounce_time = current_time;
         }
-        else if (absolute_time_diff_us(State.prev_bounce_time, current_time) >= State.settings.time_out_threshold_ms * 1000) // Detects ball gone out by time threshold
+        else if (absolute_time_diff_us(State.prev_bounce_time, current_time) >= TIME_OUT_THRESHOLD_MS * 1000) // Detects ball gone out by time threshold
         {
             State.player_score[(State.prev_bounce_side == PLAYER_1) ? PLAYER_2 : PLAYER_1]++;
             State.mode = CHECK_VICTORY_AND_SCORE;
@@ -450,6 +485,10 @@ void run_check_victory_and_score_mode()
 void run_foul_mode()
 {
     // referee_angry();
+    /* conditions for foul:
+     - let + professional game
+     - table slam (vibration detected but no camera agreement
+     */
     return;
 }
 // Main ===========================================================================================================================
@@ -458,8 +497,7 @@ int main()
 {
     init_board();
     stdio_init_all();
-    init_motor_pwr_ctrl();
-    init_motor();
+    set_game_mode(State.game_mode);
 
     while (true)
     {
