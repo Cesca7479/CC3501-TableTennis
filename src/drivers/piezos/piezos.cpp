@@ -1,8 +1,11 @@
 #include "piezos.h"
-#include "hardware/adc.h"
-#include "hardware/pwm.h"
-#include "drivers/logging/logging.h"
-#include "stdio.h"
+
+
+Piezo Piezos[3] = {
+    Piezo(VIBRATION_OUTPUT1_PIN, BUZZER1_PIN),
+    Piezo(VIBRATION_OUTPUT2_PIN, BUZZER2_PIN),
+    Piezo(VIBRATION_OUTPUT3_PIN, BUZZER3_PIN)
+};
 
 
 const uint32_t notes[6] = {500, 600, 800, 1200, 1300, 1300};

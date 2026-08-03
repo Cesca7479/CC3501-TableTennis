@@ -60,7 +60,17 @@ if(CrossCompiling)
 
         src/helpers/colours/colour.cpp
         src/helpers/game_settings/game_settings.cpp
+
         src/programs/referee_reactions/refereee_reactions.cpp
+
+        src/game/gamestate.cpp
+        src/game/setup_game.cpp
+        src/game/setup_round.cpp
+        src/game/serve_detection.cpp
+        src/game/bounce_listen.cpp
+        src/game/check_victory_and_score.cpp
+
+        src/tests/testing.cpp
     )
     target_include_directories(labs
         PUBLIC 
@@ -121,7 +131,17 @@ else()
 
         src/helpers/colours/colour.cpp
         src/helpers/game_settings/game_settings.cpp
+
         src/programs/referee_reactions/refereee_reactions.cpp
+
+        src/game/gamestate.cpp
+        src/game/setup_game.cpp
+        src/game/setup_round.cpp
+        src/game/serve_detection.cpp
+        src/game/bounce_listen.cpp
+        src/game/check_victory_and_score.cpp
+
+        src/tests/testing.cpp
     )
     target_include_directories(labs
         PUBLIC 

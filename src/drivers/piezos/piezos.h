@@ -1,6 +1,11 @@
 #pragma once
 
 #include "pico/stdlib.h"
+#include "board.h"
+#include "hardware/adc.h"
+#include "hardware/pwm.h"
+#include "drivers/logging/logging.h"
+#include "stdio.h"
 
 
 class Piezo {
@@ -29,3 +34,5 @@ class Piezo {
         };
 
 };
+
+extern Piezo Piezos[3];

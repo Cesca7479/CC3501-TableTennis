@@ -34,27 +34,6 @@ enum Pins
     VIBRATION_OUTPUT2_PIN
 };
 
-enum Mode
-{
-    DEFAULT_MODE,
-    PIEZO_TEST_MODE,
-    DISPLAY_TEST_MODE,
-    BLUETOOTH_TEST_MODE,
-    MOTOR_TEST_MODE,
-    NUM_MODES
-};
-
-enum State
-{
-    SETUP_GAME,
-    SETUP_ROUND,
-    SERVE_DETECTION,
-    BOUNCE_LISTEN,
-    CAMERA_CHECK,
-    CHECK_VICTORY_AND_SCORE,
-    FOUL  
-};
-
 enum Bounce_Location
 {
     PLAYER_1,
