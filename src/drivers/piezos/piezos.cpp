@@ -10,8 +10,6 @@ const uint32_t notes[6] = {500, 600, 800, 1200, 1300, 1300};
 void Piezo::init_sensing() {
     adc_init();
     adc_gpio_init(GPIO_sensing_pin);
-
-    
 }
 
 uint16_t Piezo::read() {

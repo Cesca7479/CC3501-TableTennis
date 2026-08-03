@@ -13,11 +13,11 @@ class Piezo {
         void init_buzzer();
         void stop_buzzer();
         uint slice_num;
+        int GPIO_sensing_pin;
+        int GPIO_buzzer_pin;
         
     public:
         bool buzzer_on = false;
-        int GPIO_sensing_pin;
-        int GPIO_buzzer_pin;
         void init_sensing();
         void play_tone(uint32_t frequency);
         void play_victory_sequence();
