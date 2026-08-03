@@ -183,6 +183,16 @@ void run_display_test_mode()
     sleep_ms(200);
 }
 
+void run_display_test_scores()
+{
+    uint8_t player_1_score = 20;
+    uint8_t player_2_score = 19;
+    display_player_score(player_1_score, player_2_score);
+    sleep_ms(2000);
+    display_clear_individual_score(1);
+    sleep_ms(2000);
+}
+
 void run_test_letters()
 {
     // All letters your display supports
@@ -483,7 +493,8 @@ int main()
                 }
                 // run_display_test_mode();
                 // run_test_letters();
-                run_test_words();
+                // run_test_words();
+                run_display_test_scores();
                 break;
             case BLUETOOTH_TEST_MODE:
                 if (!mode_change_logged)

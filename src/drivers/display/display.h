@@ -30,3 +30,4 @@ void display_clear();
 void display_clear_digits(uint8_t first_digit, uint8_t last_digit);
 void display_player_score(uint8_t player_1_score, uint8_t player_2_score);
 void display_word(const char *word);
+void display_clear_individual_score(uint8_t player_number);

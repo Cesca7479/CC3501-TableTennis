@@ -185,7 +185,7 @@ void display_player_score(uint8_t player_1_score, uint8_t player_2_score)
     display_number(player_1_score * 100 + player_2_score);
 }
 
-bool display_clear_individual_score(uint8_t player_number)
+void display_clear_individual_score(uint8_t player_number)
 {
     if (player_number == 0)
     {
