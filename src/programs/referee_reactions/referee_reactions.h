@@ -38,7 +38,6 @@ void referee_dance(uint duration_ms);
 
 /**
  * @brief Referee reaction for when a player's been BAD
- * @param bad_side The side that made the mistake (LEFT or RIGHT)
  * @param duration_ms The duration of the angry reaction in milliseconds
  */
-void referee_angry(ServoPosition bad_side, uint duration_ms);
+void referee_angry(uint duration_ms);
