@@ -49,8 +49,8 @@ void init_board()
     display_init(SDA_MOSI_PIN, SCL_SCLK_PIN);
     display_clear();
 
-    init_motor_pwr_ctrl();
-    init_motor();
+    motor_pwr_ctrl_init();
+    motor_init();
 
     hat_id_init();
 }
@@ -72,7 +72,6 @@ void run_foul_mode() // not currently used - if used should be moved to external
 int main()
 {
     init_board();
-    stdio_init_all();
     set_game_mode(State.game_mode);
 
     while (true)
