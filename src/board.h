@@ -29,7 +29,7 @@ enum Pins
     MOTOR_FAULT_FLAG_PIN,
     MOTOR_IN_PIN,
     VIBRATION_OUTPUT3_PIN,
-    GPIO_27_PIN,
+    HAT_ID_PIN,
     VIBRATION_OUTPUT1_PIN,
     VIBRATION_OUTPUT2_PIN
 };
@@ -60,11 +60,4 @@ enum Bounce_Location
     PLAYER_1,
     PLAYER_2,
     NET
-};
-
-enum Sound_Length
-{
-    NONE,
-    SHORT,
-    LONG
 };
