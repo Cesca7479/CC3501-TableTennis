@@ -56,8 +56,10 @@ if(CrossCompiling)
         src/drivers/display/display.cpp
         src/drivers/bluetooth/bluetooth.cpp
         src/drivers/motor/motor.cpp
+        src/drivers/hat_id/hat_id.cpp
 
         src/helpers/colours/colour.cpp
+        src/helpers/game_settings/game_settings.cpp
         src/programs/referee_reactions/refereee_reactions.cpp
     )
     target_include_directories(labs
@@ -115,8 +117,10 @@ else()
         src/drivers/display/display.cpp
         src/drivers/bluetooth/bluetooth.cpp
         src/drivers/motor/motor.cpp
+        src/drivers/hat_id/hat_id.cpp
 
         src/helpers/colours/colour.cpp
+        src/helpers/game_settings/game_settings.cpp
         src/programs/referee_reactions/refereee_reactions.cpp
     )
     target_include_directories(labs

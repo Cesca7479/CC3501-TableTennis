@@ -5,6 +5,8 @@
 #include "hardware/gpio.h"
 #include "hardware/i2c.h"
 #include "hardware/pio.h"
+#include <cstring>
+#include <iterator>
 
 #include "WS2812.pio.h"
 
@@ -15,16 +17,20 @@
 #include "drivers/bluetooth/bluetooth.h"
 #include "drivers/motor/motor.h"
 #include "drivers/leds/leds.h"
+#include "drivers/hat_id/hat_id.h"
 
+// Helpers and programs ============================================================================================================
 #include "programs/referee_reactions/referee_reactions.h"
+#include "helpers/game_settings/game_settings.h"
 
 // Global Constants ================================================================================================================
 #define SENSITIVITY_THRESHOLD_TABLE 80
 #define SENSITIVITY_THRESHOLD_NET 80
 #define BOUNCE_SAMPLING_RATE_MS 100 // Sample once every 100ms to prevent overcounting bounces
+#define TIME_OUT_THRESHOLD_MS 2000
 
 // Global Variables ================================================================================================================
-bool Testing = false;
+bool Testing = true;
 uint8_t mode = PIEZO_TEST_MODE;
 
 Piezo Piezos[3] = {
@@ -36,25 +42,17 @@ Piezo Piezos[3] = {
 
 bool mode_change_logged = false;
 
-struct Settings {
-    uint8_t points_to_win = 11;
-    bool win_by_two = true;
-    uint8_t sound_length = SHORT;
-    uint8_t serves_per_player = 2;
-    bool limited_lets = true;
-    uint8_t num_lets_allowed = 1;
-    uint16_t time_out_threshold_ms = 5000;
-};
-
-struct GameState {
+struct GameState
+{
     uint8_t mode = SETUP_GAME;
+    GameMode game_mode = GameMode::NO_MODE_SELECTED;
     uint8_t game_number = 0;
     uint8_t player_score[2] = {0, 0};
     uint8_t player_serving = PLAYER_1;
     uint8_t prev_bounce_side;
     absolute_time_t prev_bounce_time;
     absolute_time_t last_read_time[3] = {0,0,0};
-    Settings settings;
+    GameSettings settings = GameSettings{};
     uint16_t piezo_dc_biases[3];
 };
 
@@ -84,6 +82,30 @@ bool sleep_ms_with_checking(uint16_t ms, uint8_t expected_mode)
     return false;
 }
 
+/**
+ * @brief Sets the current game mode
+ * @param mode The mode to be set, if UNKNOWN or NO_MODE_SELECTED, defaults to CASUAL mode
+ */
+void set_game_mode(GameMode mode)
+{
+    if (mode == GameMode::NO_MODE_SELECTED || mode == GameMode::UNKNOWN)
+    {
+        if (mode == GameMode::UNKNOWN)
+        {
+            log(LogLevel::ERROR, "Invalid adc reading from hat ID system. Game mode unable to be determined. Defaulting to CASUAL mode.");
+        }
+        else
+        {
+            log(LogLevel::WARNING, "No hat found in hat ID system. Defaulting to CASUAL mode.");
+        }
+        State.game_mode = GameMode::CASUAL;
+        State.settings = get_game_mode_settings(State.game_mode);
+        return;
+    }
+    State.game_mode = mode;
+    State.settings = get_game_mode_settings(State.game_mode);
+}
+
 // Init board =====================================================================================================================
 void init_board()
 {
@@ -98,11 +120,13 @@ void init_board()
     gpio_set_dir(ON_BOARD_SW_PIN, GPIO_IN);
     gpio_set_irq_enabled_with_callback(ON_BOARD_SW_PIN, GPIO_IRQ_EDGE_RISE, true, &on_board_button_callback);
     bluetooth_init(BT_UART_TX_PIN, BT_UART_RX_PIN, BT_RESET_PIN);
-    set_up_display(SDA_MOSI_PIN, SCL_SCLK_PIN);
-    display_number(0000);
+    display_init(SDA_MOSI_PIN, SCL_SCLK_PIN);
+    display_clear();
 
     init_motor_pwr_ctrl();
     init_motor();
+
+    hat_id_init();
 }
 
 // Define TESTING mode functions ==========================================================================================================
@@ -194,35 +218,98 @@ void run_piezo_test_mode()
     return;
 }
 
-void test_display()
+void run_display_test_mode()
 {
     display_number(1234);
     sleep_ms(200);
-    clear_display();
+    display_clear();
     sleep_ms(200);
     display_number(1234);
     sleep_ms(200);
-    blank_digits(1, 2);
+    display_clear_digits(1, 2);
     sleep_ms(200);
+}
+
+void run_display_test_scores()
+{
+    uint8_t player_1_score = 20;
+    uint8_t player_2_score = 19;
+    display_player_score(player_1_score, player_2_score);
+    sleep_ms(2000);
+    display_clear_individual_score(1);
+    sleep_ms(2000);
+}
+
+void run_test_letters()
+{
+    // All letters your display supports
+    static const char supported[] = "abcdefghijlnopqrstuyz";
+
+    const int length = strlen(supported);
+
+    // Step through 4 letters at a time
+    for (int i = 0; i < length; i += 4)
+    {
+        char word[5] = {' ', ' ', ' ', ' ', '\0'};
+
+        for (int j = 0; j < 4; j++)
+        {
+            if (i + j < length)
+            {
+                word[j] = supported[i + j];
+            }
+        }
+
+        display_word(word);
+        sleep_ms(5000);
+    }
+}
+
+void run_test_words()
+{
+    const char *words[] = {
+        "let",
+        "pro.L",
+        "pro.S",
+        "cas.",
+        "no.so",
+        "n.a."};
+    for (uint8_t i = 0; i < std::size(words); i++)
+    {
+        display_word(words[i]);
+        sleep_ms(2000);
+    }
 }
 
 void run_motor_test_mode()
 {
+    printf("Motor test left right centre");
+    move_motor_position_safely(CENTRE);
+    sleep_ms(1000);
     move_motor_position_safely(LEFT);
-    move_motor_position_safely(RIGHT);
+    sleep_ms(2000);
+    // printf("led test");
+    // set_all_leds(get_rgb(GREEN));
+    // update_all_leds();
+    // sleep_ms(1000);
+    // set_single_led(0, get_rgb(WHITE));
+    // set_single_led(1, get_rgb(RED));
+    // update_all_leds();
+    // sleep_ms(1000);
 }
 
 // Define GAME mode functions
 void run_setup_game_mode()
 {
-    // KEYA PUT YOUR HATS IN HERE - this will be run every loop
+    // Determine game mode
+    GameMode detected_mode = hat_id_read_mode();
+    if (detected_mode != State.game_mode)
+    {
+        set_game_mode(detected_mode);
+    }
 
-    // Should: read from ADC -> determine what hat is in (consider setting a default mode if no hat is on so it doesnt break)
-    // Change settings in GameState State.settings
-    // On middle pushbutton press -> do the raise arm stuff & change state.mode to BOUNCE_LISTEN
-
+    // Determine piezo DC biases
     uint32_t sum_piezos[3] = {0,0,0};
-
     uint16_t result;
 
     for (size_t i = 0; i < 10; i++)
@@ -240,18 +327,19 @@ void run_setup_game_mode()
         State.piezo_dc_biases[i] = sum_piezos[i]/10;
     }
 
-    printf("DC Biases: %d, %d, %d\r\n", State.piezo_dc_biases[0],State.piezo_dc_biases[1],State.piezo_dc_biases[2]);
+    printf("DC Biases: %d, %d, %d\r\n", State.piezo_dc_biases[0], State.piezo_dc_biases[1], State.piezo_dc_biases[2]);
+
+    // On middle pushbutton press -> do the raise arm stuff & change state.mode to BOUNCE_LISTEN
     State.mode = SETUP_ROUND;
     return;
 }
 
-
-void run_setup_round_mode() 
+void run_setup_round_mode()
 {
     uint8_t total_points = State.player_score[PLAYER_1] + State.player_score[PLAYER_2];
     State.player_serving = (State.game_number + total_points / State.settings.serves_per_player) % 2; // PLAYER_1 = 0, PLAYER_2 = 1
     printf("Player %d serving\r\n", State.player_serving + 1);
-    // raise arm and light and whatever
+    // referee_indicate_server();
     State.mode = SERVE_DETECTION;
 }
 
@@ -290,7 +378,7 @@ void run_serve_detection_mode()
     if (isBounce[PLAYER_1]) printf("Player 1 side hit\r\n");
     else if (isBounce[PLAYER_2]) printf("Player 2 side hit\r\n");
     else if (isBounce[NET]) printf("Net hit\r\n");
-    else if (has_hit_table && absolute_time_diff_us(State.prev_bounce_time, current_time) > State.settings.time_out_threshold_ms * 1000) // If served but went out (doesn't matter if it hit the net or not)
+    else if (has_hit_table && absolute_time_diff_us(State.prev_bounce_time, current_time) > TIME_OUT_THRESHOLD_MS * 1000) // If served but went out (doesn't matter if it hit the net or not)
     {
         printf("Served but went out\r\n");
         State.player_score[opposing_player]++;
@@ -393,7 +481,7 @@ void run_bounce_listening_mode()
         State.prev_bounce_side = PLAYER_2;
         State.prev_bounce_time = current_time;
     }
-    else if (absolute_time_diff_us(State.prev_bounce_time, current_time) >= State.settings.time_out_threshold_ms * 1000) // Detects ball gone out by time threshold
+    else if (absolute_time_diff_us(State.prev_bounce_time, current_time) >= TIME_OUT_THRESHOLD_MS * 1000) // Detects ball gone out by time threshold
     {
         printf("Ball went out\r\n");
         State.player_score[(State.prev_bounce_side == PLAYER_1) ? PLAYER_2 : PLAYER_1]++;
@@ -414,18 +502,21 @@ void run_point_add_mode()
 
 void run_check_victory_and_score_mode()
 {
-    display_number(State.player_score[PLAYER_1] * 100 + State.player_score[PLAYER_2]); // DISPLAY POINTS
+    display_player_score(State.player_score[PLAYER_1], State.player_score[PLAYER_2]); // DISPLAY POINTS
     bool is_win = false;
     uint8_t winner;
-    if (State.player_score[PLAYER_1] >= State.settings.points_to_win && (State.player_score[PLAYER_1] - 2 >= State.player_score[PLAYER_2] || !State.settings.win_by_two)) {
+    if (State.player_score[PLAYER_1] >= State.settings.points_to_win && (State.player_score[PLAYER_1] - 2 >= State.player_score[PLAYER_2] || !State.settings.win_by_two))
+    {
         is_win = true;
         winner = PLAYER_1;
     }
-    else if (State.player_score[PLAYER_2] >= State.settings.points_to_win && (State.player_score[PLAYER_2] - 2 >= State.player_score[PLAYER_1] || !State.settings.win_by_two)) {
+    else if (State.player_score[PLAYER_2] >= State.settings.points_to_win && (State.player_score[PLAYER_2] - 2 >= State.player_score[PLAYER_1] || !State.settings.win_by_two))
+    {
         is_win = true;
         winner = PLAYER_2;
     }
-    else {
+    else
+    {
         State.mode = SETUP_ROUND;
     }
 
@@ -437,8 +528,13 @@ void run_check_victory_and_score_mode()
     return;
 }
 
-void run_foul_mode() {
+void run_foul_mode()
+{
     // referee_angry();
+    /* conditions for foul:
+     - let + professional game
+     - table slam (vibration detected but no camera agreement
+     */
     return;
 }
 // Main ===========================================================================================================================
@@ -447,8 +543,7 @@ int main()
 {
     init_board();
     stdio_init_all();
-    init_motor_pwr_ctrl();
-    init_motor();
+    set_game_mode(State.game_mode);
 
     while (true)
     {
@@ -480,7 +575,10 @@ int main()
                     log(INFORMATION, "Mode Changed: Mode = Test Display Mode");
                     mode_change_logged = true;
                 }
-                test_display();
+                // run_display_test_mode();
+                // run_test_letters();
+                // run_test_words();
+                run_display_test_scores();
                 break;
             case BLUETOOTH_TEST_MODE:
                 if (!mode_change_logged)
