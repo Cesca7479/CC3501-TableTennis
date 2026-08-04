@@ -246,6 +246,17 @@ void run_hat_id_test_mode()
 
 void run_music_test_mode()
 {
+    printf("musssiiiiiic\n");
+    Piezos[2].play_victory_sequence();
+    sleep_ms(500);
+    Piezos[2].play_angry_sounds();
+    sleep_ms(500);
+    Piezos[2].play_point();
+    sleep_ms(500);
+    Piezos[2].play_serve();
+    sleep_ms(500);
+    Piezos[2].play_select();
+    sleep_ms(500);
 }
 
 void run_user_buttons_test_mode()
