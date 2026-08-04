@@ -70,12 +70,12 @@ void bluetooth_compare_message(char buffer[64])
     if (strcmp(buffer, "Left") == 0)
     {
         printf("Left\n");
-        State.ball_location = PLAYER_1;
+        State.ball_location = PLAYER_2;
     }
     if (strcmp(buffer, "Right") == 0)
     {
         printf("Right\n");
-        State.ball_location = PLAYER_2;
+        State.ball_location = PLAYER_1;
     }
     if (strcmp(buffer, "Edge") == 0)
     {

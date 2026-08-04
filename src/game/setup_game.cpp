@@ -36,6 +36,8 @@ void run_setup_game_mode()
 
     printf("DC Biases: %d, %d, %d\r\n", State.piezo_dc_biases[0], State.piezo_dc_biases[1], State.piezo_dc_biases[2]);
 
+    State.player_score[PLAYER_1] = 0;
+    State.player_score[PLAYER_2] = 0;
     State.mode = SETUP_ROUND;
     return;
 }

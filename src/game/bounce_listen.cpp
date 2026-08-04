@@ -17,9 +17,10 @@ void run_bounce_listening_mode()
     }
 
     // Ignores "bounces" if they do not occur where the ball is positioned - rejects accidental contacts
-    isBounce[PLAYER_1] = (State.ball_location == PLAYER_1 || !State.rpi_connected) ? isBounce[PLAYER_1] : false; 
-    isBounce[PLAYER_2] = (State.ball_location == PLAYER_2 || !State.rpi_connected) ? isBounce[PLAYER_2] : false;
+    if (State.ball_location != PLAYER_1 && State.rpi_connected) isBounce[PLAYER_1] = false;
+    if (State.ball_location != PLAYER_2 && State.rpi_connected) isBounce[PLAYER_2] = false;
 
+    
     if (isBounce[PLAYER_1] && State.prev_bounce_side == PLAYER_1) // Detects double bounce in player 1 side
     {
         printf("Double bounce in Player 1 side\r\n");
