@@ -63,7 +63,6 @@ if(CrossCompiling)
         src/helpers/game_settings/game_settings.cpp
 
         src/programs/referee_reactions/refereee_reactions.cpp
-        src/programs/button_controller/button_controller.cpp
 
         src/game/gamestate.cpp
         src/game/setup_game.cpp
@@ -72,6 +71,7 @@ if(CrossCompiling)
         src/game/bounce_listen.cpp
         src/game/check_victory_and_score.cpp
         src/game/camera_check.cpp
+        src/game/change_score.cpp
 
         src/tests/testing.cpp
     )
@@ -137,7 +137,6 @@ else()
         src/helpers/game_settings/game_settings.cpp
 
         src/programs/referee_reactions/refereee_reactions.cpp
-        src/programs/button_controller/button_controller.cpp
 
         src/game/gamestate.cpp
         src/game/setup_game.cpp
@@ -146,6 +145,7 @@ else()
         src/game/bounce_listen.cpp
         src/game/check_victory_and_score.cpp
         src/game/camera_check.cpp
+        src/game/change_score.cpp
 
         src/tests/testing.cpp
     )

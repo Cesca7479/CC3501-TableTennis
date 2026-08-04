@@ -19,6 +19,7 @@ enum State
     BOUNCE_LISTEN,
     CAMERA_CHECK,
     CHECK_VICTORY_AND_SCORE,
+    CHANGE_SCORE,
     FOUL  
 };
 

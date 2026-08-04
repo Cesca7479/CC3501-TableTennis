@@ -33,12 +33,13 @@
 #include "game/bounce_listen.h"
 #include "game/check_victory_and_score.h"
 #include "game/camera_check.h"
+#include "game/change_score.h"
 
 // Testing Files
 #include "tests/testing.h"
 
 // Global Variables ================================================================================================================
-bool Testing = true;
+bool Testing = false;
 
 // Init board =====================================================================================================================
 void init_board()
@@ -209,6 +210,9 @@ int main()
                 break;
             case CHECK_VICTORY_AND_SCORE:
                 run_check_victory_and_score_mode();
+                break;
+            case CHANGE_SCORE:
+                run_change_score_mode();
                 break;
                 // case FOUL:
                 //     run_foul_mode();

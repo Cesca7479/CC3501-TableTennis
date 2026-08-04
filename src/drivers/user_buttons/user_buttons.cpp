@@ -1,15 +1,19 @@
-#include <stdio.h>
+#include <stdint.h>
 
 #include "pico/stdlib.h"
+#include "pico/time.h"
+
+#include "hardware/gpio.h"
+#include "hardware/sync.h"
 
 #include "user_buttons.h"
+#include "game/gamestate.h"
 #include "board.h"
 
 #define BUTTON_DEBOUNCE_TIME_US 10000
 #define NUMBER_OF_BUTTONS 3
 
 // released = LOW, pressed  = HIGH
-// Uses polling instead of interrupts
 
 uint8_t BUTTON_PINS[] = {
     SW1_PIN,
@@ -18,88 +22,71 @@ uint8_t BUTTON_PINS[] = {
 
 struct ButtonState
 {
-    bool is_last_state_on; // debounce adjusted state
-    bool pressed;
-    bool released;
-    uint64_t change_time_us;
+    volatile bool is_button_pressed;
+    volatile uint32_t time_since_last_press;
 };
 
 ButtonState button_states[NUMBER_OF_BUTTONS]{};
 
-void user_buttons_init()
+void button_callback(uint gpio, uint32_t event_mask)
 {
-    uint64_t start_time = to_us_since_boot(get_absolute_time());
-
     for (uint8_t i = 0; i < NUMBER_OF_BUTTONS; i++)
     {
-        uint8_t pin = BUTTON_PINS[i];
-
-        // Initialise pin
-        gpio_init(pin);
-        gpio_set_dir(pin, GPIO_IN);
-
-        // Initialise button states
-        button_states[i].is_last_state_on = 0;
-        button_states[i].change_time_us = start_time;
-        button_states[i].pressed = false;
-        button_states[i].released = false;
-    }
-}
-
-void user_buttons_update()
-{
-    uint64_t current_time = to_us_since_boot(get_absolute_time());
-
-    for (size_t i = 0; i < NUMBER_OF_BUTTONS; i++)
-    {
-        ButtonState &current_state = button_states[i];
-        bool is_state_on = gpio_get(BUTTON_PINS[i]);
-
-        // Check if current button state has been changed ignoring debounce
-        if (is_state_on != current_state.is_last_state_on && (current_time - current_state.change_time_us) >= BUTTON_DEBOUNCE_TIME_US)
+        if (BUTTON_PINS[i] == gpio)
         {
-            current_state.is_last_state_on = is_state_on;
-            current_state.change_time_us = current_time;
+            // check for 'button bounce'
+            uint32_t current_time_us = time_us_32();
+            if (current_time_us - button_states[i].time_since_last_press > 10000) // 10000us = 10ms
+            {
+                button_states[i].time_since_last_press = current_time_us;
+                button_states[i].is_button_pressed = true;
 
-            // Set released or pressed states
-            if (is_state_on)
-            {
-                current_state.pressed = true;
-            }
-            else
-            {
-                current_state.released = true;
+                if (State.mode != CHANGE_SCORE)
+                {
+                    State.mode = CHANGE_SCORE;
+                }
             }
         }
     }
 }
 
-bool is_button_on(UserButton button)
+void user_buttons_init()
 {
-    return button_states[button].is_last_state_on;
+    for (uint8_t i = 0; i < NUMBER_OF_BUTTONS; i++)
+    {
+        uint8_t pin = BUTTON_PINS[i];
+        gpio_init(pin);
+        gpio_set_dir(pin, GPIO_IN);
+        gpio_set_irq_enabled_with_callback(pin, GPIO_IRQ_EDGE_RISE, true, &button_callback);
+
+        button_states[i].is_button_pressed = false;
+        button_states[i].time_since_last_press = 0;
+    }
 }
 
 bool is_button_pressed(UserButton button)
 {
-    ButtonState &state = button_states[button];
-
-    bool event_occurred = state.pressed;
-    state.pressed = false;
-
-    return event_occurred;
+    // Ensure button interrupt doesn't override current button press
+    uint32_t interrupt_state = save_and_disable_interrupts();
+    bool was_pressed = button_states[button].is_button_pressed;
+    button_states[button].is_button_pressed = false;
+    restore_interrupts(interrupt_state);
+    return was_pressed;
 }
 
-bool is_button_released(UserButton button)
+bool is_button_on(UserButton button)
 {
-    ButtonState &state = button_states[button];
+    uint8_t index = static_cast<uint8_t>(button);
 
-    bool event_occurred = state.released;
-    state.released = false;
+    if (index >= NUMBER_OF_BUTTONS)
+    {
+        return false;
+    }
 
-    return event_occurred;
+    return gpio_get(BUTTON_PINS[index]);
 }
 
-char *user_button_to_string(UserButton button)
+const char *user_button_to_string(UserButton button)
 {
     switch (button)
     {
