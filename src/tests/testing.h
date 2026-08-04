@@ -8,6 +8,9 @@
 #include <cstring>
 #include <iterator>
 #include "drivers/motor/motor.h"
+#include "drivers/leds/leds.h"
+#include "helpers/colours/colours.h"
+#include "programs/referee_reactions/referee_reactions.h"
 
 extern uint8_t mode;
 extern bool mode_change_logged;
@@ -19,6 +22,9 @@ enum Mode
     DISPLAY_TEST_MODE,
     BLUETOOTH_TEST_MODE,
     MOTOR_TEST_MODE,
+    LED_TEST_MODE,
+    REFEREE_TEST_MODE,
+    HAT_ID_TEST_MODE,
     NUM_MODES
 };
 
@@ -39,3 +45,6 @@ void run_display_test_scores();
 void run_test_letters();
 void run_test_words();
 void run_motor_test_mode();
+void run_led_test_mode();
+void run_referee_test_mode();
+void run_hat_id_test_mode();

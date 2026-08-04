@@ -17,24 +17,24 @@ enum ServoPosition
  *
  * Power is disabled on initalisation
  */
-void init_motor_pwr_ctrl();
+void motor_pwr_ctrl_init();
 
 /** 
  * @brief Initializes the motor's PWM functionality 
  */
-void init_motor();
+void motor_init();
 
 /**
  * @brief Enable motor's power
  *
  * @return true if the motor was successfully enabled, false if there was a fault or the power control was not initialised
  */
-bool enable_motor();
+bool motor_enable();
 
 /** 
  * @brief Disable motor's power and input signal 
  */
-void disable_motor();
+void motor_disable();
 
 /** 
  * @brief Check if a motor fault is active (over-current or high temperature) 
@@ -47,7 +47,7 @@ bool is_motor_fault_active();
  * Note: motor will not move until the power is enabled
  * @param position The desired position of the motor (LEFT, CENTRE or RIGHT)
  */
-void set_motor_position(ServoPosition position);
+void motor_set_position(ServoPosition position);
 
 /**
  * @brief Move the motor's position safely
@@ -59,4 +59,4 @@ void set_motor_position(ServoPosition position);
  * @param position The desired position of the motor (LEFT, CENTRE or RIGHT)
  * @param move_time_ms The time in milliseconds to wait for the motor to move before disabling power (default is minimum time to move from left to right)
  */
-void move_motor_position_safely(ServoPosition position, uint32_t move_time_ms = DEFAULT_MOTOR_MOVE_TIME_MS);
+void motor_move_motor_safely(ServoPosition position, uint32_t move_time_ms = DEFAULT_MOTOR_MOVE_TIME_MS);

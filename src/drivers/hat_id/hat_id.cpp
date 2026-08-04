@@ -5,7 +5,6 @@
 #include "hardware/adc.h"
 
 #include "hat_id.h"
-#include "drivers/logging/logging.h"
 #include "board.h"
 #include "helpers/game_settings/game_settings.h"
 

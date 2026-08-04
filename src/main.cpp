@@ -59,8 +59,8 @@ void init_board()
     display_init(SDA_MOSI_PIN, SCL_SCLK_PIN);
     display_clear();
 
-    init_motor_pwr_ctrl();
-    init_motor();
+    motor_pwr_ctrl_init();
+    motor_init();
 
     hat_id_init();
 }
@@ -81,7 +81,6 @@ void run_foul_mode() // not currently used - if used should be moved to external
 int main()
 {
     init_board();
-    stdio_init_all();
     set_game_mode(State.game_mode);
 
     while (true)
@@ -140,6 +139,33 @@ int main()
                     mode_change_logged = true;
                 }
                 run_motor_test_mode();
+                break;
+
+            case LED_TEST_MODE:
+                if (!mode_change_logged)
+                {
+                    log(INFORMATION, "Mode Changed: Mode = Test LED Mode");
+                    mode_change_logged = true;
+                }
+                run_led_test_mode();
+                break;
+
+            case REFEREE_TEST_MODE:
+                if (!mode_change_logged)
+                {
+                    log(INFORMATION, "Mode Changed: Mode = Test LED Mode");
+                    mode_change_logged = true;
+                }
+                run_referee_test_mode();
+                break;
+
+            case HAT_ID_TEST_MODE:
+                if (!mode_change_logged)
+                {
+                    log(INFORMATION, "Mode Changed: Mode = Test hat ID Mode");
+                    mode_change_logged = true;
+                }
+                run_hat_id_test_mode();
                 break;
             }
         }

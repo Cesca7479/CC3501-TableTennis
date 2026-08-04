@@ -1,6 +1,9 @@
 #include "testing.h"
 
-uint8_t mode = PIEZO_TEST_MODE;
+#include "drivers/hat_id/hat_id.h"
+#include "game/setup_game.h"
+
+uint8_t mode = BLUETOOTH_TEST_MODE;
 bool mode_change_logged = false;
 
 // Define functions for mode cycling================================================================================================
@@ -63,6 +66,7 @@ void run_piezo_test_mode()
 
         // printf("%d:%d:%d\r\n", result1, result2,result3);
         if (result1 > sum_piezo1 / 10 + SENSITIVITY_THRESHOLD_TABLE || result1 < sum_piezo1 / 10 - SENSITIVITY_THRESHOLD_TABLE)
+        if (result1 > sum_piezo1 / 10 + SENSITIVITY_THRESHOLD_TABLE || result1 < sum_piezo1 / 10 - SENSITIVITY_THRESHOLD_TABLE)
         {
             if (side == PLAYER_1)
             {
@@ -75,12 +79,13 @@ void run_piezo_test_mode()
                 side = PLAYER_1;
             }
             printf("BOUNCE1: %d, Distance: %d\r\n", bounces, result1 - sum_piezo1 / 10);
+            printf("BOUNCE1: %d, Distance: %d\r\n", bounces, result1 - sum_piezo1 / 10);
             if (sleep_ms_with_checking(100, PIEZO_TEST_MODE))
                 return;
         }
 
-        // printf("result2: %d\r\n", result2);
-        if (result2 > sum_piezo2/10 + SENSITIVITY_THRESHOLD_TABLE || result2 < sum_piezo2/10 - SENSITIVITY_THRESHOLD_TABLE)
+        if (result2 > sum_piezo2 / 10 + SENSITIVITY_THRESHOLD_TABLE || result2 < sum_piezo2 / 10 - SENSITIVITY_THRESHOLD_TABLE)
+        if (result2 > sum_piezo2 / 10 + SENSITIVITY_THRESHOLD_TABLE || result2 < sum_piezo2 / 10 - SENSITIVITY_THRESHOLD_TABLE)
         {
             if (side == PLAYER_2)
             {
@@ -93,13 +98,16 @@ void run_piezo_test_mode()
                 side = PLAYER_2;
             }
             printf("BOUNCE2: %d, Distance: %d\r\n", bounces, result2 - sum_piezo2 / 10);
+            printf("BOUNCE2: %d, Distance: %d\r\n", bounces, result2 - sum_piezo2 / 10);
             if (sleep_ms_with_checking(100, PIEZO_TEST_MODE))
                 return;
         }
 
         if (result3 > sum_piezo3 / 10 + SENSITIVITY_THRESHOLD_NET || result3 < sum_piezo3 / 10 - SENSITIVITY_THRESHOLD_NET)
+        if (result3 > sum_piezo3 / 10 + SENSITIVITY_THRESHOLD_NET || result3 < sum_piezo3 / 10 - SENSITIVITY_THRESHOLD_NET)
         {
 
+            printf("BOUNCE3: %d, Distance: %d\r\n", bounces, result3 - sum_piezo3 / 10);
             printf("BOUNCE3: %d, Distance: %d\r\n", bounces, result3 - sum_piezo3 / 10);
             // Piezo3.play_victory_sequence();
             if (sleep_ms_with_checking(100, PIEZO_TEST_MODE))
@@ -175,17 +183,63 @@ void run_test_words()
 
 void run_motor_test_mode()
 {
-    printf("Motor test left right centre");
-    move_motor_position_safely(CENTRE);
+    motor_move_motor_safely(CENTRE);
     sleep_ms(1000);
-    move_motor_position_safely(LEFT);
+    motor_move_motor_safely(LEFT);
     sleep_ms(2000);
-    // printf("led test");
-    // set_all_leds(get_rgb(GREEN));
-    // update_all_leds();
+}
+
+void run_led_test_mode()
+{
+    for (;;)
+    {
+        for (uint i = 0; i < 7; i++)
+        {
+            set_single_led(0, get_rgb(rainbow[i]));
+            update_all_leds();
+            sleep_ms(1000);
+        }
+    }
+}
+
+void run_referee_test_mode()
+{
+    // printf("REFEREE ANGY!\n");
+    // referee_angry(2000);
     // sleep_ms(1000);
-    // set_single_led(0, get_rgb(WHITE));
-    // set_single_led(1, get_rgb(RED));
-    // update_all_leds();
-    // sleep_ms(1000);
+
+    // Cha cha dance
+    printf("REFEREE DANCE!\n");
+    referee_dance(1000, 500);
+    referee_dance(500, 250);
+
+    // printf("REFEREE POINT LEFT\n");
+    // referee_point_scored(LEFT);
+    // sleep_ms(2000);
+    // clear_all_leds();
+
+    // printf("REFEREE POINT RIGHT\n");
+    // referee_point_scored(RIGHT);
+    // sleep_ms(2000);
+    // clear_all_leds();
+
+    // printf("REFEREE SERVE LEFT!\n");
+    // referee_indicate_server(LEFT);
+    // sleep_ms(2000);
+    // clear_all_leds();
+
+    // printf("REFEREE SERVE RIGHT!\n");
+    // referee_indicate_server(RIGHT);
+    // sleep_ms(2000);
+    // clear_all_leds();
+}
+
+void run_hat_id_test_mode()
+{
+    // Determine game mode
+    GameMode detected_mode = hat_id_read_mode();
+    if (detected_mode != State.game_mode)
+    {
+        set_game_mode(detected_mode);
+    }
 }

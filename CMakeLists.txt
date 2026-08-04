@@ -57,11 +57,13 @@ if(CrossCompiling)
         src/drivers/bluetooth/bluetooth.cpp
         src/drivers/motor/motor.cpp
         src/drivers/hat_id/hat_id.cpp
+        src/drivers/user_buttons/user_buttons.cpp
 
         src/helpers/colours/colour.cpp
         src/helpers/game_settings/game_settings.cpp
 
         src/programs/referee_reactions/refereee_reactions.cpp
+        src/programs/button_controller/button_controller.cpp
 
         src/game/gamestate.cpp
         src/game/setup_game.cpp
@@ -129,11 +131,13 @@ else()
         src/drivers/bluetooth/bluetooth.cpp
         src/drivers/motor/motor.cpp
         src/drivers/hat_id/hat_id.cpp
+        src/drivers/user_buttons/user_buttons.cpp
 
         src/helpers/colours/colour.cpp
         src/helpers/game_settings/game_settings.cpp
 
         src/programs/referee_reactions/refereee_reactions.cpp
+        src/programs/button_controller/button_controller.cpp
 
         src/game/gamestate.cpp
         src/game/setup_game.cpp
