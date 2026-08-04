@@ -18,6 +18,7 @@
 #include "drivers/motor/motor.h" //
 #include "drivers/leds/leds.h"
 #include "drivers/hat_id/hat_id.h" //
+#include "drivers/user_buttons/user_buttons.h" //
 
 // Helpers and programs ============================================================================================================
 #include "programs/referee_reactions/referee_reactions.h" //
@@ -58,10 +59,10 @@ void init_board()
 
     display_init(SDA_MOSI_PIN, SCL_SCLK_PIN);
     display_clear();
+    user_buttons_init();
 
     motor_pwr_ctrl_init();
     motor_init();
-
     hat_id_init();
 }
 
@@ -166,6 +167,15 @@ int main()
                     mode_change_logged = true;
                 }
                 run_hat_id_test_mode();
+                break;
+
+            case USER_BUTTON_TEST_MODE:
+                if (!mode_change_logged)
+                {
+                    log(INFORMATION, "Mode Changed: Mode = Test user buttons Mode");
+                    mode_change_logged = true;
+                }
+                run_user_buttons_test_mode();
                 break;
             }
         }

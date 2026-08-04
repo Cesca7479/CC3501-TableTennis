@@ -2,9 +2,9 @@
 
 enum UserButton
 {
-    LEFT_BUTTON,
-    SELECT_BUTTON,
     RIGHT_BUTTON,
+    SELECT_BUTTON,
+    LEFT_BUTTON,
 };
 
 /**
@@ -37,3 +37,10 @@ bool is_button_pressed(UserButton button);
  * @param button Button to check (LEFT_BUTTON, SELECT_BUTTON, RIGHT_BUTTON)
  */
 bool is_button_released(UserButton button);
+
+/**
+ * @brief Return the name of a user button
+ *
+ * @param button Button to get name from (LEFT_BUTTON, SELECT_BUTTON, RIGHT_BUTTON)
+ */
+char *user_button_to_string(UserButton button);
