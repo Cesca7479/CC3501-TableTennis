@@ -98,3 +98,21 @@ bool is_button_released(UserButton button)
 
     return event_occurred;
 }
+
+char *user_button_to_string(UserButton button)
+{
+    switch (button)
+    {
+    case LEFT_BUTTON:
+        return "LEFT BUTTON";
+
+    case SELECT_BUTTON:
+        return "CENTRE BUTTON";
+
+    case RIGHT_BUTTON:
+        return "RIGHT BUTTON";
+
+    default:
+        return "UNKNOWN BUTTON";
+    }
+}

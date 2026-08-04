@@ -2,8 +2,10 @@
 
 #include "drivers/hat_id/hat_id.h"
 #include "game/setup_game.h"
+#include "drivers/user_buttons/user_buttons.h"
 
 uint8_t mode = MUSIC_TEST_MODE;
+uint8_t mode = USER_BUTTON_TEST_MODE;
 bool mode_change_logged = false;
 
 // Define functions for mode cycling================================================================================================
@@ -82,6 +84,23 @@ void run_piezo_test_mode()
                 if (sleep_ms_with_checking(100, PIEZO_TEST_MODE))
                     return;
             }
+        if (result1 > sum_piezo1 / 10 + SENSITIVITY_THRESHOLD_TABLE || result1 < sum_piezo1 / 10 - SENSITIVITY_THRESHOLD_TABLE)
+        {
+            if (side == PLAYER_1)
+            {
+                bounces++;
+                // Piezo1.play_victory_sequence();
+            }
+            else
+            {
+                bounces = 1;
+                side = PLAYER_1;
+            }
+            printf("BOUNCE1: %d, Distance: %d\r\n", bounces, result1 - sum_piezo1 / 10);
+            printf("BOUNCE1: %d, Distance: %d\r\n", bounces, result1 - sum_piezo1 / 10);
+            if (sleep_ms_with_checking(100, PIEZO_TEST_MODE))
+                return;
+        }
 
         if (result2 > sum_piezo2 / 10 + SENSITIVITY_THRESHOLD_TABLE || result2 < sum_piezo2 / 10 - SENSITIVITY_THRESHOLD_TABLE)
             if (result2 > sum_piezo2 / 10 + SENSITIVITY_THRESHOLD_TABLE || result2 < sum_piezo2 / 10 - SENSITIVITY_THRESHOLD_TABLE)
@@ -101,11 +120,36 @@ void run_piezo_test_mode()
                 if (sleep_ms_with_checking(100, PIEZO_TEST_MODE))
                     return;
             }
+        if (result2 > sum_piezo2 / 10 + SENSITIVITY_THRESHOLD_TABLE || result2 < sum_piezo2 / 10 - SENSITIVITY_THRESHOLD_TABLE)
+        {
+            if (side == PLAYER_2)
+            {
+                bounces++;
+                // Piezo2.play_victory_sequence();
+            }
+            else
+            {
+                bounces = 1;
+                side = PLAYER_2;
+            }
+            printf("BOUNCE2: %d, Distance: %d\r\n", bounces, result2 - sum_piezo2 / 10);
+            printf("BOUNCE2: %d, Distance: %d\r\n", bounces, result2 - sum_piezo2 / 10);
+            if (sleep_ms_with_checking(100, PIEZO_TEST_MODE))
+                return;
+        }
 
         if (result3 > sum_piezo3 / 10 + SENSITIVITY_THRESHOLD_NET || result3 < sum_piezo3 / 10 - SENSITIVITY_THRESHOLD_NET)
             if (result3 > sum_piezo3 / 10 + SENSITIVITY_THRESHOLD_NET || result3 < sum_piezo3 / 10 - SENSITIVITY_THRESHOLD_NET)
             {
+                if (result3 > sum_piezo3 / 10 + SENSITIVITY_THRESHOLD_NET || result3 < sum_piezo3 / 10 - SENSITIVITY_THRESHOLD_NET)
+                {
 
+                    printf("BOUNCE3: %d, Distance: %d\r\n", bounces, result3 - sum_piezo3 / 10);
+                    printf("BOUNCE3: %d, Distance: %d\r\n", bounces, result3 - sum_piezo3 / 10);
+                    // Piezo3.play_victory_sequence();
+                    if (sleep_ms_with_checking(100, PIEZO_TEST_MODE))
+                        return;
+                }
                 printf("BOUNCE3: %d, Distance: %d\r\n", bounces, result3 - sum_piezo3 / 10);
                 printf("BOUNCE3: %d, Distance: %d\r\n", bounces, result3 - sum_piezo3 / 10);
                 // Piezo3.play_victory_sequence();
@@ -256,4 +300,23 @@ void run_music_test_mode()
     sleep_ms(500);
     Piezos[2].play_select();
     sleep_ms(500);
+}
+
+void run_user_buttons_test_mode()
+{
+    user_buttons_update();
+    for (uint8_t i = 0; i < 3; i++)
+    {
+        UserButton button = static_cast<UserButton>(i);
+
+        if (is_button_pressed(button))
+        {
+            printf("%s pressed\n", user_button_to_string(button));
+        }
+
+        if (is_button_released(button))
+        {
+            printf("%s released\n", user_button_to_string(button));
+        }
+    }
 }

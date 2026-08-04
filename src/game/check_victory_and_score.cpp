@@ -25,6 +25,8 @@ void run_check_victory_and_score_mode()
 
     if (is_win) {
         printf("Player %d has won!\r\n", winner + 1);
+        msg = "Won: Player" + std::to_string(winner) + "\n";
+        bluetooth_send(msg.c_str());
         State.mode = SETUP_GAME;
     }
     // referee_dance();
