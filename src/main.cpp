@@ -140,11 +140,38 @@ int main()
                 }
                 run_motor_test_mode();
                 break;
+
+            case LED_TEST_MODE:
+                if (!mode_change_logged)
+                {
+                    log(INFORMATION, "Mode Changed: Mode = Test LED Mode");
+                    mode_change_logged = true;
+                }
+                run_led_test_mode();
+                break;
+
+            case REFEREE_TEST_MODE:
+                if (!mode_change_logged)
+                {
+                    log(INFORMATION, "Mode Changed: Mode = Test LED Mode");
+                    mode_change_logged = true;
+                }
+                run_referee_test_mode();
+                break;
+
+            case HAT_ID_TEST_MODE:
+                if (!mode_change_logged)
+                {
+                    log(INFORMATION, "Mode Changed: Mode = Test hat ID Mode");
+                    mode_change_logged = true;
+                }
+                run_hat_id_test_mode();
+                break;
             }
         }
         else
         {
-            handle_bluetooth_message();
+            bluetooth_handle_message();
             switch (State.mode)
             {
             case SETUP_GAME:

@@ -1,5 +1,8 @@
 #include "testing.h"
 
+#include "drivers/hat_id/hat_id.h"
+#include "game/setup_game.h"
+
 uint8_t mode = BLUETOOTH_TEST_MODE;
 bool mode_change_logged = false;
 
