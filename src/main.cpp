@@ -177,6 +177,14 @@ int main()
                 }
                 run_user_buttons_test_mode();
                 break;
+            case MUSIC_TEST_MODE:
+                if (!mode_change_logged)
+                {
+                    log(INFORMATION, "Mode Changed: Mode = Test music Mode");
+                    mode_change_logged = true;
+                }
+                run_music_test_mode();
+                break;
             }
         }
         else
