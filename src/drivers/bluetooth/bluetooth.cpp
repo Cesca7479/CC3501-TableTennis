@@ -1,6 +1,7 @@
 #include "drivers/bluetooth/bluetooth.h"
 #include <cstring>
 #include "hardware/uart.h"
+#include "bluetooth.h"
 
 uint8_t BT_RESET;
 
@@ -17,7 +18,7 @@ void bluetooth_init(uint8_t tx_pin, uint8_t rx_pin, uint8_t reset_pin)
     gpio_put(reset_pin, 1);
 }
 
-void reset_bluetooth()
+void bluetooth_reset()
 {
     gpio_put(BT_RESET, 0);
     printf("Bluetooth Disconnected\n");
@@ -26,7 +27,7 @@ void reset_bluetooth()
     printf("Ready to pair\n");
 }
 
-void handle_bluetooth_message()
+void bluetooth_handle_message()
 {
     static char buffer[64];
     static uint8_t index = 0;
@@ -38,23 +39,7 @@ void handle_bluetooth_message()
         if (c == '\n' || c == '\r')
         {
             buffer[index] = '\0';
-            if (strcmp(buffer, "Reboot") == 0)
-            {
-                reset_bluetooth();
-            }
-            if (strcmp(buffer, "Bounce") == 0)
-            {
-                printf("IT BOUNCED!!!!\n");
-            }
-            if (strcmp(buffer, "PING") == 0)
-            {
-                printf("Bluetooth Connected\n");
-                bluetooth_send("PONG\n");
-            }
-            if (strcmp(buffer, "Something") == 0)
-            {
-                printf("Something\n");
-            }
+            bluetooth_compare_message(buffer);
             // Reset for next message
             index = 0;
         }
@@ -65,7 +50,40 @@ void handle_bluetooth_message()
     }
 }
 
-void clear_bluetooth_buffer()
+void bluetooth_compare_message(char buffer[64])
+{
+    if (strcmp(buffer, "Reboot") == 0)
+    {
+        bluetooth_reset();
+    }
+    // if (strcmp(buffer, "Bounce") == 0)
+    // {
+    //     printf("IT BOUNCED!!!!\n");
+    // }
+    if (strcmp(buffer, "PING") == 0)
+    {
+        printf("Bluetooth Connected\n");
+        bluetooth_send("PONG\n");
+    }
+    if (strcmp(buffer, "Left") == 0)
+    {
+        printf("Left\n");
+    }
+    if (strcmp(buffer, "Right") == 0)
+    {
+        printf("Right\n");
+    }
+    if (strcmp(buffer, "Edge") == 0)
+    {
+        printf("Edge\n");
+    }
+    if (strcmp(buffer, "Center") == 0)
+    {
+        printf("Center\n");
+    }
+}
+
+void bluetooth_clear_buffer()
 {
     while (uart_is_readable(BT_UART))
     {
