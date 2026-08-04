@@ -68,19 +68,25 @@ void bluetooth_compare_message(char buffer[64])
     if (strcmp(buffer, "Left") == 0)
     {
         printf("Left\n");
+        State.ball_location = PLAYER_1;
     }
     if (strcmp(buffer, "Right") == 0)
     {
         printf("Right\n");
+        State.ball_location = PLAYER_2;
     }
     if (strcmp(buffer, "Edge") == 0)
     {
         printf("Edge\n");
+        State.ball_is_center = false;
     }
     if (strcmp(buffer, "Center") == 0)
     {
         printf("Center\n");
+        State.ball_is_center = true;
     }
+    // State.ball_location = PLAYER_1 or PLAYER_2 (PLAYER_1 should be on the left facing our robot guy, left or right depends on where you want to setup the rpi)
+    // State.ball_is_center = bool
 }
 
 void bluetooth_clear_buffer()

@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <stdio.h>
 #include "pico/stdlib.h"
+#include "game/gamestate.h"
 
 #define BT_UART uart1 // Board-specific
 
