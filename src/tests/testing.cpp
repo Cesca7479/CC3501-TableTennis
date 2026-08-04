@@ -275,19 +275,19 @@ void run_music_test_mode()
 
 void run_user_buttons_test_mode()
 {
-    user_buttons_update();
-    for (uint8_t i = 0; i < 3; i++)
-    {
-        UserButton button = static_cast<UserButton>(i);
+    // user_buttons_update();
+    // for (uint8_t i = 0; i < 3; i++)
+    // {
+    //     UserButton button = static_cast<UserButton>(i);
 
-        if (is_button_pressed(button))
-        {
-            printf("%s pressed\n", user_button_to_string(button));
-        }
+    //     if (is_button_pressed(button))
+    //     {
+    //         printf("%s pressed\n", user_button_to_string(button));
+    //     }
 
-        if (is_button_released(button))
-        {
-            printf("%s released\n", user_button_to_string(button));
-        }
-    }
+    //     if (is_button_released(button))
+    //     {
+    //         printf("%s released\n", user_button_to_string(button));
+    //     }
+    // }
 }
