@@ -2,6 +2,7 @@
 
 void run_check_victory_and_score_mode()
 {
+    printf("Player 1: %d, Player 2: %d\r\n", State.player_score[PLAYER_1], State.player_score[PLAYER_2]);
     display_player_score(State.player_score[PLAYER_1], State.player_score[PLAYER_2]); // DISPLAY POINTS
     std::string msg;
     msg = "Player1: " + std::to_string(State.player_score[PLAYER_1]) + ", Player2: " + std::to_string(State.player_score[PLAYER_2]) + "\n";
@@ -27,6 +28,7 @@ void run_check_victory_and_score_mode()
         printf("Player %d has won!\r\n", winner + 1);
         msg = "Won: Player" + std::to_string(winner) + "\n";
         bluetooth_send(msg.c_str());
+        State.game_number++;
         State.mode = SETUP_GAME;
     }
     // referee_dance();

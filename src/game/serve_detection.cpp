@@ -30,12 +30,18 @@ void run_serve_detection_mode()
     }
 
     // Ignores "bounces" if they do not occur where the ball is positioned - rejects accidental contacts
-    isBounce[PLAYER_1] = (State.ball_location == PLAYER_1 || !State.rpi_connected) ? isBounce[PLAYER_1] : false; 
-    isBounce[PLAYER_2] = (State.ball_location == PLAYER_2 || !State.rpi_connected) ? isBounce[PLAYER_2] : false;
-    isBounce[NET] = (State.ball_is_center || !State.rpi_connected) ? isBounce[NET] : false;
+    if (State.ball_location != PLAYER_1 && State.rpi_connected) isBounce[PLAYER_1] = false;
+    if (State.ball_location != PLAYER_2 && State.rpi_connected) isBounce[PLAYER_2] = false;
+    if (!State.ball_is_center && State.rpi_connected) isBounce[NET] = false;
 
-    if (isBounce[PLAYER_1] || isBounce[PLAYER_2]) isBounce[NET] = false;
+    // Ignores net bounce if occurs just after table bounce (due to net clamps the net piezos pick up the vibration too)
+    if (absolute_time_diff_us(State.prev_bounce_time, current_time) < 100000) isBounce[NET] = false;
 
+   
+    if (isBounce[PLAYER_1] || isBounce[PLAYER_2]) {
+            isBounce[NET] = false;
+            State.prev_bounce_time = current_time;
+        }
     
     if (isBounce[PLAYER_1]) printf("Player 1 side hit\r\n");
     else if (isBounce[PLAYER_2]) printf("Player 2 side hit\r\n");
@@ -49,6 +55,7 @@ void run_serve_detection_mode()
     }
     else return;
 
+     
 
     if (isBounce[State.player_serving]) // Detects hitting server side table
     {
@@ -56,6 +63,8 @@ void run_serve_detection_mode()
         has_hit_table = true; 
         State.prev_bounce_time = current_time;
     }
+
+    
     
     if (has_hit_table && isBounce[NET]) // Detects hitting the net
     {
