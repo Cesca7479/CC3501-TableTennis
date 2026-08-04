@@ -98,15 +98,12 @@ void motor_set_position(ServoPosition position)
     {
     case LEFT:
         pwm_set_gpio_level(MOTOR_IN_PIN, MOTOR_LEFT_PULSE_US);
-        log(LogLevel::INFORMATION, "Motor set to LEFT position.");
         break;
     case CENTRE:
         pwm_set_gpio_level(MOTOR_IN_PIN, MOTOR_CENTRE_PULSE_US);
-        log(LogLevel::INFORMATION, "Motor set to CENTRE position.");
         break;
     case RIGHT:
         pwm_set_gpio_level(MOTOR_IN_PIN, MOTOR_RIGHT_PULSE_US);
-        log(LogLevel::INFORMATION, "Motor set to RIGHT position.");
         break;
     default:
         log(LogLevel::ERROR, "Invalid motor position specified.");

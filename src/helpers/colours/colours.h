@@ -35,14 +35,14 @@ enum LedColour
 /// Stores a range of colours, where each colour is stored by its name and its rgb values
 static const ColourInfo colour_info_table[] =
     {
-        {"RED", {10, 0, 0}},
-        {"ORANGE", {10, 3, 0}},
-        {"YELLOW", {10, 10, 0}},
-        {"GREEN", {0, 10, 0}},
-        {"BLUE", {0, 0, 10}},
-        {"PURPLE", {5, 0, 10}},
-        {"PINK", {10, 0, 5}},
-        {"WHITE", {10, 10, 10}},
+        {"RED", {100, 0, 0}},
+        {"ORANGE", {100, 30, 0}},
+        {"YELLOW", {10, 100, 0}},
+        {"GREEN", {0, 100, 0}},
+        {"BLUE", {0, 0, 100}},
+        {"PURPLE", {50, 0, 100}},
+        {"PINK", {100, 0, 50}},
+        {"WHITE", {100, 100, 100}},
         {"OFF", {0, 0, 0}}};
 
 static const LedColour rainbow[7] =
@@ -53,7 +53,8 @@ static const LedColour rainbow[7] =
         GREEN,
         BLUE,
         PURPLE,
-        PINK};
+        PINK
+    };
         
 /**
  * @brief Get the rgb values of a given colour

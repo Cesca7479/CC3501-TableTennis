@@ -1,6 +1,7 @@
 #pragma once
 
 #include "drivers/motor/motor.h"
+#include "helpers/colours/colours.h"
 
 /** 
  * @brief Flashes LEDs in a rainbow pattern
@@ -30,10 +31,19 @@ void referee_indicate_server(ServoPosition side_serving);
 void referee_point_scored(ServoPosition side_scored);
 
 /**
+ * @brief Perform one dance move, which moves arm once and changes colour 4 times
+ * @param position Side to move motor to
+ * @param duration_ms The duration of the dance in milliseconds
+ * @param rainbow_index Reference to rainbow index
+ * @param move_time Time for one dance move (time to move motor once)
+ */
+bool perform_dance_move(ServoPosition position, absolute_time_t duration_ms, uint8_t &rainbow_index, uint move_time);
+
+/**
  * @brief Referee reaction for a dance 
  * @param duration_ms The duration of the dance in milliseconds
  */
-void referee_dance(uint duration_ms);
+void referee_dance(uint duration_ms, uint move_time);
 
 
 /**
