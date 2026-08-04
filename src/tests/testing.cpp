@@ -1,6 +1,6 @@
 #include "testing.h"
 
-uint8_t mode = BLUETOOTH_TEST_MODE;
+uint8_t mode = PIEZO_TEST_MODE;
 bool mode_change_logged = false;
 
 // Define functions for mode cycling================================================================================================
@@ -60,6 +60,7 @@ void run_piezo_test_mode()
         result2 = Piezos[2].read();
         result3 = Piezos[3].read();
 
+
         // printf("%d:%d:%d\r\n", result1, result2,result3);
         if (result1 > sum_piezo1 / 10 + SENSITIVITY_THRESHOLD_TABLE || result1 < sum_piezo1 / 10 - SENSITIVITY_THRESHOLD_TABLE)
         {
@@ -78,7 +79,8 @@ void run_piezo_test_mode()
                 return;
         }
 
-        if (result2 > sum_piezo2 / 10 + SENSITIVITY_THRESHOLD_TABLE || result2 < sum_piezo2 / 10 - SENSITIVITY_THRESHOLD_TABLE)
+        // printf("result2: %d\r\n", result2);
+        if (result2 > sum_piezo2/10 + SENSITIVITY_THRESHOLD_TABLE || result2 < sum_piezo2/10 - SENSITIVITY_THRESHOLD_TABLE)
         {
             if (side == PLAYER_2)
             {

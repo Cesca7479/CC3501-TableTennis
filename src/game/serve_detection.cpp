@@ -102,6 +102,6 @@ void run_serve_detection_mode()
         State.mode = BOUNCE_LISTEN;
     }
 
-    State.camera_check_return_to_mode = SERVE_DETECTION;
-    State.mode = CAMERA_CHECK;
+    // State.camera_check_return_to_mode = SERVE_DETECTION;
+    // State.mode = CAMERA_CHECK;
 }
