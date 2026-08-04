@@ -25,6 +25,7 @@ enum Mode
     LED_TEST_MODE,
     REFEREE_TEST_MODE,
     HAT_ID_TEST_MODE,
+    MUSIC_TEST_MODE,
     NUM_MODES
 };
 
@@ -48,3 +49,4 @@ void run_motor_test_mode();
 void run_led_test_mode();
 void run_referee_test_mode();
 void run_hat_id_test_mode();
+void run_music_test_mode();
