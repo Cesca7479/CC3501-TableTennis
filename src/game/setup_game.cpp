@@ -3,20 +3,6 @@
 
 void set_game_mode(GameMode mode)
 {
-    if (mode == GameMode::NO_MODE_SELECTED || mode == GameMode::UNKNOWN)
-    {
-        if (mode == GameMode::UNKNOWN)
-        {
-            log(LogLevel::ERROR, "Invalid adc reading from hat ID system. Game mode unable to be determined. Defaulting to CASUAL mode.");
-        }
-        else
-        {
-            log(LogLevel::WARNING, "No hat found in hat ID system. Defaulting to CASUAL mode.");
-        }
-        State.game_mode = GameMode::CASUAL;
-        State.settings = get_game_mode_settings(State.game_mode);
-        return;
-    }
     State.game_mode = mode;
     State.settings = get_game_mode_settings(State.game_mode);
 }
@@ -51,7 +37,6 @@ void run_setup_game_mode()
 
     printf("DC Biases: %d, %d, %d\r\n", State.piezo_dc_biases[0], State.piezo_dc_biases[1], State.piezo_dc_biases[2]);
 
-    // On middle pushbutton press -> do the raise arm stuff & change state.mode to BOUNCE_LISTEN
     State.mode = SETUP_ROUND;
     return;
 }
