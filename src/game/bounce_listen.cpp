@@ -16,6 +16,12 @@ void run_bounce_listening_mode()
         }
     }
 
+    // Ignores "bounces" if they do not occur where the ball is positioned - rejects accidental contacts
+    isBounce[PLAYER_1] = (State.ball_location == PLAYER_1 || !State.rpi_connected) ? isBounce[PLAYER_1] : false; 
+    isBounce[PLAYER_2] = (State.ball_location == PLAYER_2 || !State.rpi_connected) ? isBounce[PLAYER_2] : false;
+    isBounce[NET] = (State.ball_is_center || !State.rpi_connected) ? isBounce[NET] : false;
+
+
     if (isBounce[PLAYER_1] && State.prev_bounce_side == PLAYER_1) // Detects double bounce in player 1 side
     {
         printf("Double bounce in Player 1 side\r\n");
@@ -45,5 +51,10 @@ void run_bounce_listening_mode()
         printf("Ball went out\r\n");
         State.player_score[(State.prev_bounce_side == PLAYER_1) ? PLAYER_2 : PLAYER_1]++;
         State.mode = CHECK_VICTORY_AND_SCORE;
-    }        
+    } 
+    
+    if (State.rpi_connected) {
+        State.camera_check_return_to_mode = BOUNCE_LISTEN;
+        State.mode = CAMERA_CHECK;
+    }
 }

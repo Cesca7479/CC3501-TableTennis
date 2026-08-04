@@ -1,6 +1,7 @@
 #include "drivers/bluetooth/bluetooth.h"
 #include <cstring>
 #include "hardware/uart.h"
+#include "bluetooth.h"
 
 uint8_t BT_RESET;
 
@@ -17,7 +18,7 @@ void bluetooth_init(uint8_t tx_pin, uint8_t rx_pin, uint8_t reset_pin)
     gpio_put(reset_pin, 1);
 }
 
-void reset_bluetooth()
+void bluetooth_reset()
 {
     gpio_put(BT_RESET, 0);
     printf("Bluetooth Disconnected\n");
@@ -26,7 +27,7 @@ void reset_bluetooth()
     printf("Ready to pair\n");
 }
 
-void handle_bluetooth_message()
+void bluetooth_handle_message()
 {
     static char buffer[64];
     static uint8_t index = 0;
@@ -38,19 +39,7 @@ void handle_bluetooth_message()
         if (c == '\n' || c == '\r')
         {
             buffer[index] = '\0';
-            if (strcmp(buffer, "Reboot") == 0)
-            {
-                reset_bluetooth();
-            }
-            else if (strcmp(buffer, "Bounce") == 0)
-            {
-                printf("IT BOUNCED!!!!\n");
-            }
-            else if (strcmp(buffer, "PING") == 0)
-            {
-                printf("Bluetooth Connected\n");
-                bluetooth_send("PONG\n");
-            }
+            bluetooth_compare_message(buffer);
             // Reset for next message
             index = 0;
         }
@@ -61,7 +50,48 @@ void handle_bluetooth_message()
     }
 }
 
-void clear_bluetooth_buffer()
+void bluetooth_compare_message(char buffer[64])
+{
+    if (strcmp(buffer, "Reboot") == 0)
+    {
+        bluetooth_reset();
+        State.rpi_connected = false;
+    }
+    // if (strcmp(buffer, "Bounce") == 0)
+    // {
+    //     printf("IT BOUNCED!!!!\n");
+    // }
+    if (strcmp(buffer, "PING") == 0)
+    {
+        printf("Bluetooth Connected\n");
+        bluetooth_send("PONG\n");
+        State.rpi_connected = true;
+    }
+    if (strcmp(buffer, "Left") == 0)
+    {
+        printf("Left\n");
+        State.ball_location = PLAYER_1;
+    }
+    if (strcmp(buffer, "Right") == 0)
+    {
+        printf("Right\n");
+        State.ball_location = PLAYER_2;
+    }
+    if (strcmp(buffer, "Edge") == 0)
+    {
+        printf("Edge\n");
+        State.ball_is_center = false;
+    }
+    if (strcmp(buffer, "Center") == 0)
+    {
+        printf("Center\n");
+        State.ball_is_center = true;
+    }
+    // State.ball_location = PLAYER_1 or PLAYER_2 (PLAYER_1 should be on the left facing our robot guy, left or right depends on where you want to setup the rpi)
+    // State.ball_is_center = bool
+}
+
+void bluetooth_clear_buffer()
 {
     while (uart_is_readable(BT_UART))
     {

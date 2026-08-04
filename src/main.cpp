@@ -1,18 +1,18 @@
 #include "board.h" //
 
-#include <stdio.h> //
-#include "pico/stdlib.h" //
+#include <stdio.h>         //
+#include "pico/stdlib.h"   //
 #include "hardware/gpio.h" //
-#include "hardware/i2c.h" //
-#include "hardware/pio.h" //
-#include <cstring> //
-#include <iterator> //
+#include "hardware/i2c.h"  //
+#include "hardware/pio.h"  //
+#include <cstring>         //
+#include <iterator>        //
 
 #include "WS2812.pio.h" //
 
 // Drivers =========================================================================================================================
 #include "drivers/logging/logging.h" //
-#include "drivers/piezos/piezos.h" //
+#include "drivers/piezos/piezos.h"   //
 #include "drivers/display/display.h" //
 #include "drivers/bluetooth/bluetooth.h"
 #include "drivers/motor/motor.h" //
@@ -21,22 +21,29 @@
 
 // Helpers and programs ============================================================================================================
 #include "programs/referee_reactions/referee_reactions.h" //
-#include "helpers/game_settings/game_settings.h" //
+#include "helpers/game_settings/game_settings.h"          //
 
 // Game Modes
-#include "game/gamestate.h" //
+#include "game/gamestate.h"
+
+#include "game/setup_round.h"
+#include "game/setup_game.h"
+#include "game/serve_detection.h"
+#include "game/bounce_listen.h"
+#include "game/check_victory_and_score.h"
+#include "game/camera_check.h"
 
 // Testing Files
 #include "tests/testing.h"
 
 // Global Variables ================================================================================================================
-bool Testing = false;
+bool Testing = true;
 
 // Init board =====================================================================================================================
 void init_board()
 {
     stdio_init_all();
-    
+
     for (size_t i = 0; i < 3; i++)
     {
         Piezos[i].init_sensing();
@@ -46,6 +53,9 @@ void init_board()
     gpio_set_dir(ON_BOARD_SW_PIN, GPIO_IN);
     gpio_set_irq_enabled_with_callback(ON_BOARD_SW_PIN, GPIO_IRQ_EDGE_RISE, true, &on_board_button_callback);
     bluetooth_init(BT_UART_TX_PIN, BT_UART_RX_PIN, BT_RESET_PIN);
+
+    // TODO: Update State.rpi_connected and State.camera_connected
+
     display_init(SDA_MOSI_PIN, SCL_SCLK_PIN);
     display_clear();
 
@@ -54,7 +64,6 @@ void init_board()
 
     hat_id_init();
 }
-
 
 // Define GAME mode functions
 
@@ -115,7 +124,12 @@ int main()
                     log(INFORMATION, "Mode Changed: Mode = Test Bluetooth Mode");
                     mode_change_logged = true;
                 }
-                handle_bluetooth_message();
+                bluetooth_handle_message();
+                bluetooth_send("Player1: 53, Player2: 24\n");
+                sleep_ms(2000);
+                bluetooth_send("Won: Player2\n");
+                sleep_ms(2000);
+
                 break;
 
             case MOTOR_TEST_MODE:
@@ -130,6 +144,7 @@ int main()
         }
         else
         {
+            handle_bluetooth_message();
             switch (State.mode)
             {
             case SETUP_GAME:
@@ -144,17 +159,17 @@ int main()
             case BOUNCE_LISTEN:
                 run_bounce_listening_mode();
                 break;
-            // case CAMERA_CHECK:
-            //     run_camera_check_mode();
-            //     break;
+            case CAMERA_CHECK:
+                run_camera_check_mode();
+                break;
             case CHECK_VICTORY_AND_SCORE:
                 run_check_victory_and_score_mode();
                 break;
-            // case FOUL:
-            //     run_foul_mode();
-            //     break;
+                // case FOUL:
+                //     run_foul_mode();
+                //     break;
 
-            // camera check and foul mode are not currently being used but can be added
+                // camera check and foul mode are not currently being used but can be added
             }
         }
     }

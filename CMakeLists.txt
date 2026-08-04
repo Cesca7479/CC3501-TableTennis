@@ -71,6 +71,7 @@ if(CrossCompiling)
         src/game/serve_detection.cpp
         src/game/bounce_listen.cpp
         src/game/check_victory_and_score.cpp
+        src/game/camera_check.cpp
 
         src/tests/testing.cpp
     )
@@ -144,6 +145,7 @@ else()
         src/game/serve_detection.cpp
         src/game/bounce_listen.cpp
         src/game/check_victory_and_score.cpp
+        src/game/camera_check.cpp
 
         src/tests/testing.cpp
     )
