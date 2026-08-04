@@ -30,9 +30,9 @@ void run_serve_detection_mode()
     }
 
     // Ignores "bounces" if they do not occur where the ball is positioned - rejects accidental contacts
-    isBounce[PLAYER_1] = (State.ball_location == PLAYER_1 || !State.camera_connected) ? isBounce[PLAYER_1] : false; 
-    isBounce[PLAYER_2] = (State.ball_location == PLAYER_2 || !State.camera_connected) ? isBounce[PLAYER_2] : false;
-    isBounce[NET] = (State.ball_is_center || !State.camera_connected) ? isBounce[NET] : false;
+    isBounce[PLAYER_1] = (State.ball_location == PLAYER_1 || !State.rpi_connected) ? isBounce[PLAYER_1] : false; 
+    isBounce[PLAYER_2] = (State.ball_location == PLAYER_2 || !State.rpi_connected) ? isBounce[PLAYER_2] : false;
+    isBounce[NET] = (State.ball_is_center || !State.rpi_connected) ? isBounce[NET] : false;
 
     if (isBounce[PLAYER_1] || isBounce[PLAYER_2]) isBounce[NET] = false;
 

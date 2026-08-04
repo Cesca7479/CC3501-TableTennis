@@ -32,7 +32,6 @@ class Piezo {
             GPIO_buzzer_pin = buzzer_pin;
             ADC_input = GPIO_sensing_pin - 26;
         };
-
 };
 
 extern Piezo Piezos[3];

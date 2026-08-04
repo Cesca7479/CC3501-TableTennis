@@ -145,6 +145,7 @@ int main()
         }
         else
         {
+            handle_bluetooth_message();
             switch (State.mode)
             {
             case SETUP_GAME:
