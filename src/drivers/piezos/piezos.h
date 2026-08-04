@@ -18,8 +18,6 @@ private:
     uint slice_num;
     int GPIO_sensing_pin;
     int GPIO_buzzer_pin;
-    void init_buzzer();
-    void stop_buzzer();
 
 public:
     bool buzzer_on = false;
@@ -31,6 +29,8 @@ public:
     void play_serve();
     void play_select();
     uint16_t read();
+    void init_buzzer();
+    void stop_buzzer();
     Piezo(int sensing_pin, int buzzer_pin)
     {
         GPIO_sensing_pin = sensing_pin;
@@ -38,5 +38,9 @@ public:
         ADC_input = GPIO_sensing_pin - 26;
     };
 };
+
+const uint32_t notes5[7] = {523, 587, 659, 698, 784, 879, 988};
+const uint32_t notes6[7] = {1047, 1175, 1319, 1397, 1568, 1760, 1976};
+const uint32_t notes7[7] = {2093, 2349, 2637, 2794, 3136, 3520, 3951};
 
 extern Piezo Piezos[3];

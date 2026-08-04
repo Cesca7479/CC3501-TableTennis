@@ -5,10 +5,6 @@ Piezo Piezos[3] = {
     Piezo(VIBRATION_OUTPUT2_PIN, BUZZER2_PIN),
     Piezo(VIBRATION_OUTPUT3_PIN, BUZZER3_PIN)};
 
-const uint32_t notes5[7] = {523, 587, 659, 698, 784, 879, 988};
-const uint32_t notes6[7] = {1047, 1175, 1319, 1397, 1568, 1760, 1976};
-const uint32_t notes7[7] = {2093, 2349, 2637, 2794, 3136, 3520, 3951};
-
 void Piezo::init_sensing()
 {
     adc_init();
