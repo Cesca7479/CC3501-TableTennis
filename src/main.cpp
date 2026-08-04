@@ -125,7 +125,7 @@ int main()
                     log(INFORMATION, "Mode Changed: Mode = Test Bluetooth Mode");
                     mode_change_logged = true;
                 }
-                handle_bluetooth_message();
+                bluetooth_handle_message();
                 break;
 
             case MOTOR_TEST_MODE:
