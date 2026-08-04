@@ -1,6 +1,5 @@
 #include "setup_game.h"
 
-
 void set_game_mode(GameMode mode)
 {
     State.game_mode = mode;
@@ -17,7 +16,7 @@ void run_setup_game_mode()
     }
 
     // Determine piezo DC biases
-    uint32_t sum_piezos[3] = {0,0,0};
+    uint32_t sum_piezos[3] = {0, 0, 0};
     uint16_t result;
 
     for (size_t i = 0; i < 10; i++)
@@ -29,10 +28,10 @@ void run_setup_game_mode()
         }
         sleep_ms(100);
     }
-    
+
     for (size_t i = 0; i < 3; i++)
     {
-        State.piezo_dc_biases[i] = sum_piezos[i]/10;
+        State.piezo_dc_biases[i] = sum_piezos[i] / 10;
     }
 
     printf("DC Biases: %d, %d, %d\r\n", State.piezo_dc_biases[0], State.piezo_dc_biases[1], State.piezo_dc_biases[2]);

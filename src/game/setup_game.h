@@ -3,6 +3,7 @@
 #include "gamestate.h"
 #include "drivers/hat_id/hat_id.h"
 #include "drivers/logging/logging.h"
+#include "drivers/display/display.h"
 #include "stdio.h"
 
 /**
