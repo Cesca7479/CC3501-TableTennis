@@ -265,6 +265,7 @@ void run_music_test_mode()
     // sleep_ms(500);
     // Piezos[2].play_select();
     // sleep_ms(500);
+    display_flat_lines();
     referee_angry(10000);
     sleep_ms(1000);
     referee_indicate_server(LEFT);

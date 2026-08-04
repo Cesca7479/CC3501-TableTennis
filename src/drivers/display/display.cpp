@@ -196,3 +196,16 @@ void display_clear_individual_score(uint8_t player_number)
         display_clear_digits(3, 4);
     }
 }
+
+void display_flat_lines()
+{
+    uint8_t tx[9] = {0};
+    tx[0] = 0x00;
+
+    tx[1] = 0b01000000;
+    tx[3] = 0b01000000;
+    tx[5] = 0b01000000;
+    tx[7] = 0b01000000;
+
+    i2c_write_blocking(I2C_PORT, HT16K33_ADDR, tx, sizeof(tx), false);
+}
