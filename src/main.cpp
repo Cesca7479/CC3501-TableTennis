@@ -126,6 +126,11 @@ int main()
                     mode_change_logged = true;
                 }
                 bluetooth_handle_message();
+                bluetooth_send("Player1: 53, Player2: 24\n");
+                sleep_ms(2000);
+                bluetooth_send("Won: Player2\n");
+                sleep_ms(2000);
+
                 break;
 
             case MOTOR_TEST_MODE:

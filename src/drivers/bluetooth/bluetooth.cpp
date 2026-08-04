@@ -55,6 +55,7 @@ void bluetooth_compare_message(char buffer[64])
     if (strcmp(buffer, "Reboot") == 0)
     {
         bluetooth_reset();
+        State.rpi_connected = false;
     }
     // if (strcmp(buffer, "Bounce") == 0)
     // {
@@ -64,6 +65,7 @@ void bluetooth_compare_message(char buffer[64])
     {
         printf("Bluetooth Connected\n");
         bluetooth_send("PONG\n");
+        State.rpi_connected = true;
     }
     if (strcmp(buffer, "Left") == 0)
     {
