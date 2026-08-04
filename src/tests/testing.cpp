@@ -4,7 +4,7 @@
 #include "game/setup_game.h"
 #include "drivers/user_buttons/user_buttons.h"
 
-uint8_t mode = PIEZO_TEST_MODE;
+uint8_t mode = MUSIC_TEST_MODE;
 bool mode_change_logged = false;
 
 // Define functions for mode cycling================================================================================================
@@ -48,7 +48,8 @@ void run_piezo_test_mode()
     uint16_t result2;
     uint16_t result3;
 
-    if (!has_calculated_dc) {
+    if (!has_calculated_dc)
+    {
         for (size_t i = 0; i < 10; i++)
         {
             result1 = Piezos[0].read();
@@ -66,55 +67,62 @@ void run_piezo_test_mode()
         has_calculated_dc = true;
     }
 
-
     if (!Piezos[0].buzzer_on || !Piezos[1].buzzer_on)
     {
         result1 = Piezos[0].read();
         result2 = Piezos[1].read();
         result3 = Piezos[2].read();
-        
 
         // printf("%d:%d:%d\r\n", result1, result2,result3);
-        if (result1 > dc_bias[0] + SENSITIVITY_THRESHOLD_TABLE || result1 < dc_bias[0] - SENSITIVITY_THRESHOLD_TABLE) {
-            if (side == PLAYER_1) {
+        if (result1 > dc_bias[0] + SENSITIVITY_THRESHOLD_TABLE || result1 < dc_bias[0] - SENSITIVITY_THRESHOLD_TABLE)
+        {
+            if (side == PLAYER_1)
+            {
                 bounces++;
             }
-            else {
+            else
+            {
                 bounces = 1;
                 side = PLAYER_1;
             }
             printf("BOUNCE1: %d, Distance: %d\r\n", bounces, result1 - dc_bias[0]);
             if (sleep_ms_with_checking(100, PIEZO_TEST_MODE))
-                    return;
+                return;
         }
 
-        if (result2 > dc_bias[1] + SENSITIVITY_THRESHOLD_TABLE || result2 < dc_bias[1] - SENSITIVITY_THRESHOLD_TABLE) {
-            if (side == PLAYER_2) {
+        if (result2 > dc_bias[1] + SENSITIVITY_THRESHOLD_TABLE || result2 < dc_bias[1] - SENSITIVITY_THRESHOLD_TABLE)
+        {
+            if (side == PLAYER_2)
+            {
                 bounces++;
             }
-            else {
+            else
+            {
                 bounces = 1;
                 side = PLAYER_2;
             }
             printf("BOUNCE2: %d, Distance: %d\r\n", bounces, result2 - dc_bias[1]);
             if (sleep_ms_with_checking(100, PIEZO_TEST_MODE))
-                    return;
+                return;
         }
-        
-        if (result3 > dc_bias[2] + SENSITIVITY_THRESHOLD_TABLE || result3 < dc_bias[2] - SENSITIVITY_THRESHOLD_TABLE){
-            if (side == NET) {
+
+        if (result3 > dc_bias[2] + SENSITIVITY_THRESHOLD_TABLE || result3 < dc_bias[2] - SENSITIVITY_THRESHOLD_TABLE)
+        {
+            if (side == NET)
+            {
                 bounces++;
             }
-            else {
+            else
+            {
                 bounces = 1;
                 side = NET;
             }
             printf("BOUNCE3: %d, Distance: %d\r\n", bounces, result3 - dc_bias[2]);
             if (sleep_ms_with_checking(100, PIEZO_TEST_MODE))
-                    return;
+                return;
         }
-        
-    return;
+
+        return;
     }
 }
 
@@ -247,16 +255,21 @@ void run_hat_id_test_mode()
 void run_music_test_mode()
 {
     printf("musssiiiiiic\n");
-    Piezos[2].play_victory_sequence();
-    sleep_ms(500);
-    Piezos[2].play_angry_sounds();
-    sleep_ms(500);
-    Piezos[2].play_point();
-    sleep_ms(500);
-    Piezos[2].play_serve();
-    sleep_ms(500);
-    Piezos[2].play_select();
-    sleep_ms(500);
+    // Piezos[2].play_victory_sequence();
+    // sleep_ms(500);
+    // Piezos[2].play_angry_sounds();
+    // sleep_ms(500);
+    // Piezos[2].play_point();
+    // sleep_ms(500);
+    // Piezos[2].play_serve();
+    // sleep_ms(500);
+    // Piezos[2].play_select();
+    // sleep_ms(500);
+    referee_angry(10000);
+    sleep_ms(1000);
+    referee_indicate_server(LEFT);
+    sleep_ms(1000);
+    referee_point_scored(LEFT);
 }
 
 void run_user_buttons_test_mode()

@@ -53,18 +53,20 @@ void Piezo::stop_buzzer()
 void Piezo::play_victory_sequence()
 {
     init_buzzer();
-    play_tone(notes6[5]);
-    sleep_ms(800);
-    play_tone(notes6[3]);
-    sleep_ms(400);
-    play_tone(notes6[4]);
-    sleep_ms(400);
-    play_tone(notes6[5]);
-    sleep_ms(400);
+    play_tone(notes6[2]);
+    sleep_ms(200);
+    play_tone(notes6[0]);
+    sleep_ms(200);
+    play_tone(notes6[2]);
+    sleep_ms(200);
     play_tone(notes6[4]);
     sleep_ms(200);
-    play_tone(notes6[5]);
-    sleep_ms(600);
+    play_tone(notes6[2]);
+    sleep_ms(200);
+    play_tone(notes6[4]);
+    sleep_ms(200);
+    play_tone(notes7[0]);
+    sleep_ms(800);
 
     // for (size_t i = 0; i < 7; i++)
     // {
