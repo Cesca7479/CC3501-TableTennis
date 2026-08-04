@@ -33,10 +33,3 @@ enum Pins
     VIBRATION_OUTPUT1_PIN,
     VIBRATION_OUTPUT2_PIN
 };
-
-enum Bounce_Location
-{
-    PLAYER_1,
-    PLAYER_2,
-    NET
-};

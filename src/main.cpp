@@ -53,6 +53,9 @@ void init_board()
     gpio_set_dir(ON_BOARD_SW_PIN, GPIO_IN);
     gpio_set_irq_enabled_with_callback(ON_BOARD_SW_PIN, GPIO_IRQ_EDGE_RISE, true, &on_board_button_callback);
     bluetooth_init(BT_UART_TX_PIN, BT_UART_RX_PIN, BT_RESET_PIN);
+
+    // TODO: Update State.rpi_connected and State.camera_connected
+
     display_init(SDA_MOSI_PIN, SCL_SCLK_PIN);
     display_clear();
 

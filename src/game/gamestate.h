@@ -33,6 +33,8 @@ enum Bounce_Location
 struct GameState
 {
     uint8_t mode = SETUP_GAME;
+    bool camera_connected = false;
+    bool rpi_connected = false;
     uint8_t camera_check_return_to_mode = SERVE_DETECTION;
     GameMode game_mode = GameMode::NO_MODE_SELECTED;
     uint8_t game_number = 0;

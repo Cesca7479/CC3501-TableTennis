@@ -24,10 +24,15 @@ void run_serve_detection_mode()
         if (absolute_time_diff_us(State.last_read_time[i], current_time) > BOUNCE_SAMPLING_RATE_MS * 1000) {
             result = Piezos[i].read();
             threshold = (i == NET) ? SENSITIVITY_THRESHOLD_NET : SENSITIVITY_THRESHOLD_TABLE;
-            isBounce[i] = result > State.piezo_dc_biases[i] + threshold || result < State.piezo_dc_biases[i] - threshold;
+            isBounce[i] = (result > State.piezo_dc_biases[i] + threshold || result < State.piezo_dc_biases[i] - threshold);
             if (isBounce[i]) State.last_read_time[i] = current_time;
         }
     }
+
+    // Ignores "bounces" if they do not occur where the ball is positioned - rejects accidental contacts
+    isBounce[PLAYER_1] = (State.ball_location == PLAYER_1 || !State.camera_connected) ? isBounce[PLAYER_1] : false; 
+    isBounce[PLAYER_2] = (State.ball_location == PLAYER_2 || !State.camera_connected) ? isBounce[PLAYER_2] : false;
+    isBounce[NET] = (State.ball_is_center || !State.camera_connected) ? isBounce[NET] : false;
 
     if (isBounce[PLAYER_1] || isBounce[PLAYER_2]) isBounce[NET] = false;
 
@@ -96,4 +101,7 @@ void run_serve_detection_mode()
         State.prev_bounce_time = current_time;
         State.mode = BOUNCE_LISTEN;
     }
+
+    State.camera_check_return_to_mode = SERVE_DETECTION;
+    State.mode = CAMERA_CHECK;
 }
