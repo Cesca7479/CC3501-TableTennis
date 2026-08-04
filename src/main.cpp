@@ -1,18 +1,18 @@
 #include "board.h" //
 
-#include <stdio.h> //
-#include "pico/stdlib.h" //
+#include <stdio.h>         //
+#include "pico/stdlib.h"   //
 #include "hardware/gpio.h" //
-#include "hardware/i2c.h" //
-#include "hardware/pio.h" //
-#include <cstring> //
-#include <iterator> //
+#include "hardware/i2c.h"  //
+#include "hardware/pio.h"  //
+#include <cstring>         //
+#include <iterator>        //
 
 #include "WS2812.pio.h" //
 
 // Drivers =========================================================================================================================
 #include "drivers/logging/logging.h" //
-#include "drivers/piezos/piezos.h" //
+#include "drivers/piezos/piezos.h"   //
 #include "drivers/display/display.h" //
 #include "drivers/bluetooth/bluetooth.h"
 #include "drivers/motor/motor.h" //
@@ -21,10 +21,10 @@
 
 // Helpers and programs ============================================================================================================
 #include "programs/referee_reactions/referee_reactions.h" //
-#include "helpers/game_settings/game_settings.h" //
+#include "helpers/game_settings/game_settings.h"          //
 
 // Game Modes
-#include "game/gamestate.h" 
+#include "game/gamestate.h"
 
 #include "game/setup_round.h"
 #include "game/setup_game.h"
@@ -37,13 +37,13 @@
 #include "tests/testing.h"
 
 // Global Variables ================================================================================================================
-bool Testing = false;
+bool Testing = true;
 
 // Init board =====================================================================================================================
 void init_board()
 {
     stdio_init_all();
-    
+
     for (size_t i = 0; i < 3; i++)
     {
         Piezos[i].init_sensing();
@@ -64,7 +64,6 @@ void init_board()
 
     hat_id_init();
 }
-
 
 // Define GAME mode functions
 
@@ -161,11 +160,11 @@ int main()
             case CHECK_VICTORY_AND_SCORE:
                 run_check_victory_and_score_mode();
                 break;
-            // case FOUL:
-            //     run_foul_mode();
-            //     break;
+                // case FOUL:
+                //     run_foul_mode();
+                //     break;
 
-            // camera check and foul mode are not currently being used but can be added
+                // camera check and foul mode are not currently being used but can be added
             }
         }
     }

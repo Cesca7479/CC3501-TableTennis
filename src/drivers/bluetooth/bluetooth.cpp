@@ -42,14 +42,18 @@ void handle_bluetooth_message()
             {
                 reset_bluetooth();
             }
-            else if (strcmp(buffer, "Bounce") == 0)
+            if (strcmp(buffer, "Bounce") == 0)
             {
                 printf("IT BOUNCED!!!!\n");
             }
-            else if (strcmp(buffer, "PING") == 0)
+            if (strcmp(buffer, "PING") == 0)
             {
                 printf("Bluetooth Connected\n");
                 bluetooth_send("PONG\n");
+            }
+            if (strcmp(buffer, "Something") == 0)
+            {
+                printf("Something\n");
             }
             // Reset for next message
             index = 0;
