@@ -24,7 +24,14 @@
 #include "helpers/game_settings/game_settings.h" //
 
 // Game Modes
-#include "game/gamestate.h" //
+#include "game/gamestate.h" 
+
+#include "game/setup_round.h"
+#include "game/setup_game.h"
+#include "game/serve_detection.h"
+#include "game/bounce_listen.h"
+#include "game/check_victory_and_score.h"
+#include "game/camera_check.h"
 
 // Testing Files
 #include "tests/testing.h"
@@ -145,9 +152,9 @@ int main()
             case BOUNCE_LISTEN:
                 run_bounce_listening_mode();
                 break;
-            // case CAMERA_CHECK:
-            //     run_camera_check_mode();
-            //     break;
+            case CAMERA_CHECK:
+                run_camera_check_mode();
+                break;
             case CHECK_VICTORY_AND_SCORE:
                 run_check_victory_and_score_mode();
                 break;

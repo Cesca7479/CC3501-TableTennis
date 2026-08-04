@@ -3,6 +3,7 @@
 #include "pico/stdlib.h"
 #include "stdio.h"
 #include "drivers/piezos/piezos.h"
+#include "drivers/display/display.h"
 #include "game/gamestate.h"
 #include <cstring>
 #include <iterator>

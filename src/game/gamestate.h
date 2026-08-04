@@ -6,12 +6,7 @@
 #include "drivers/piezos/piezos.h"
 
 
-// Mode definitions
-#include "setup_round.h"
-#include "setup_game.h"
-#include "serve_detection.h"
-#include "bounce_listen.h"
-#include "check_victory_and_score.h"
+
 
 
 #define SENSITIVITY_THRESHOLD_TABLE 80
@@ -30,6 +25,13 @@ enum State
     FOUL  
 };
 
+enum Location {
+    BALL_LEFT,
+    BALL_CENTER_LEFT,
+    BALL_CENTER_RIGHT,
+    BALL_RIGHT
+};
+
 
 struct GameState
 {
@@ -39,6 +41,7 @@ struct GameState
     uint8_t player_score[2] = {0, 0};
     uint8_t player_serving = PLAYER_1;
     uint8_t prev_bounce_side;
+    uint8_t ball_location = PLAYER_1;
     absolute_time_t prev_bounce_time;
     absolute_time_t last_read_time[3] = {0,0,0};
     GameSettings settings = GameSettings{};
