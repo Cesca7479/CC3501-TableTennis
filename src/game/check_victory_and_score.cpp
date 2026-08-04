@@ -1,4 +1,5 @@
 #include "check_victory_and_score.h"
+#include "programs/referee_reactions/referee_reactions.h"
 
 void run_check_victory_and_score_mode()
 {
@@ -24,13 +25,16 @@ void run_check_victory_and_score_mode()
         State.mode = SETUP_ROUND;
     }
 
-    if (is_win) {
+    if (is_win)
+    {
         printf("Player %d has won!\r\n", winner + 1);
+        Piezos[NET].play_victory_sequence();
         msg = "Won: Player" + std::to_string(winner) + "\n";
         bluetooth_send(msg.c_str());
         State.game_number++;
         State.mode = SETUP_GAME;
+        referee_dance(1000, 500);
+        referee_dance(500, 250);
     }
-    // referee_dance();
     return;
 }

@@ -1,4 +1,5 @@
 #include "serve_detection.h"
+#include "programs/referee_reactions/referee_reactions.h"
 
 void reset_serve_state(uint8_t &serve_attempts, bool &has_hit_table, bool &has_hit_net) // Resets serve state
 {
@@ -55,6 +56,7 @@ void run_serve_detection_mode()
     {
         printf("Served but went out\r\n");
         State.player_score[opposing_player]++;
+        referee_point_scored((opposing_player == PLAYER_1) ? LEFT : RIGHT);
         reset_serve_state(serve_attempts, has_hit_table, has_hit_net);
         State.mode = CHECK_VICTORY_AND_SCORE;
     }
@@ -85,6 +87,7 @@ void run_serve_detection_mode()
         {
             printf("Too many lets in a row: %d\r\n", serve_attempts);
             State.player_score[opposing_player]++;
+            referee_point_scored((opposing_player == PLAYER_1) ? LEFT : RIGHT);
             State.mode = CHECK_VICTORY_AND_SCORE;
             serve_attempts = 0;
         }
@@ -100,6 +103,7 @@ void run_serve_detection_mode()
     {
         printf("Point to Player %d, hit net fall back\r\n", opposing_player + 1);
         State.player_score[opposing_player]++;
+        referee_point_scored((opposing_player == PLAYER_1) ? LEFT : RIGHT);
         reset_serve_state(serve_attempts, has_hit_table, has_hit_net);
         State.mode = CHECK_VICTORY_AND_SCORE;
     }
