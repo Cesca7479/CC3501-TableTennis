@@ -17,7 +17,7 @@
 #include "drivers/bluetooth/bluetooth.h"
 #include "drivers/motor/motor.h" //
 #include "drivers/leds/leds.h"
-#include "drivers/hat_id/hat_id.h" //
+#include "drivers/hat_id/hat_id.h"             //
 #include "drivers/user_buttons/user_buttons.h" //
 
 // Helpers and programs ============================================================================================================

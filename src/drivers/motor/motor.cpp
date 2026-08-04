@@ -16,8 +16,8 @@ Use units of us as the PWM register uses an integer count and to simplify calcul
 */
 
 #define CLK_SYS_HZ 125000000 // Default system clock frequency
-#define COUNTER_HZ 1000000  // How many times the PWM counter increments per second
-#define PWM_PERIOD_US 20000 // 20ms
+#define COUNTER_HZ 1000000   // How many times the PWM counter increments per second
+#define PWM_PERIOD_US 20000  // 20ms
 
 #define MOTOR_LEFT_PULSE_US 1550
 #define MOTOR_CENTRE_PULSE_US 1750
