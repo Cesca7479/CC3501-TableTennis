@@ -39,12 +39,14 @@ void light_player_side(ServoPosition player_side, rgb_colour colour)
 
 void referee_indicate_server(ServoPosition side_serving)
 {
+    Piezos[1].play_serve();
     motor_move_motor_safely(side_serving);
     light_player_side(side_serving, get_rgb(WHITE));
 }
 
 void referee_point_scored(ServoPosition side_scored)
 {
+    Piezos[1].play_point();
     motor_move_motor_safely(side_scored);
     light_player_side(side_scored, get_rgb(GREEN));
 }
@@ -105,6 +107,7 @@ void referee_dance(uint duration_ms, uint move_time)
 
 void referee_angry(uint duration_ms)
 {
+    Piezos[1].play_angry_sounds();
     absolute_time_t end_time = make_timeout_time_ms(duration_ms);
     while (!time_reached(end_time))
     {
