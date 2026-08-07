@@ -40,7 +40,7 @@
 
 // Global Variables ================================================================================================================
 bool Testing = true;
-uint8_t mode = REFEREE_TEST_MODE;
+uint8_t mode = DISPLAY_TEST_MODE;
 
 // Init board =====================================================================================================================
 void init_board()
@@ -133,7 +133,6 @@ int main()
                 sleep_ms(2000);
                 bluetooth_send("Won: Player2\n");
                 sleep_ms(2000);
-
                 break;
 
             case MOTOR_TEST_MODE:
@@ -157,7 +156,7 @@ int main()
             case REFEREE_TEST_MODE:
                 if (!mode_change_logged)
                 {
-                    log(INFORMATION, "Mode Changed: Mode = Test LED Mode");
+                    log(INFORMATION, "Mode Changed: Mode = Test referee Mode");
                     mode_change_logged = true;
                 }
                 run_referee_test_mode();
