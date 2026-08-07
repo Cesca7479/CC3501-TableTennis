@@ -11,6 +11,7 @@ void set_game_mode(GameMode mode)
 
 void run_setup_game_mode()
 {
+    display_loading(125); // Transition to new display mode
     display_mode(State.game_mode); // Retain previous game mode on display
     // Loop until game mode is confirmed
     while (!is_button_pressed(SELECT_BUTTON))
@@ -26,6 +27,8 @@ void run_setup_game_mode()
 
     set_dc_biases();
 
+    display_loading(125); // Transition to new display mode
+    
     State.player_score[PLAYER_1] = 0;
     State.player_score[PLAYER_2] = 0;
     display_player_score(State.player_score[0], State.player_score[1]);

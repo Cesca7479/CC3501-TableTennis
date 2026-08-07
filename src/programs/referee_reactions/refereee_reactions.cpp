@@ -129,6 +129,7 @@ void referee_indicate_server(ServoPosition side_serving)
     buzzer_play_tone(notes6[4]);
     sleep_ms(200);
     buzzer_stop();
+    // needs to drop arm and turn light off after ball bounce 
 }
 
 void referee_point_scored(ServoPosition side_scored)
@@ -139,6 +140,7 @@ void referee_point_scored(ServoPosition side_scored)
     buzzer_play_tone(notes7[2]);
     sleep_ms(200);
     buzzer_stop();
+    // Needs to drop arm and turn light off atp
 }
 
 void referee_dance_sequence()
@@ -151,10 +153,12 @@ void referee_dance_sequence()
     referee_dance(500, 250);
     sleep_ms(250);
     motor_move_motor_safely(CENTRE);
+    // Incorporate sound and movement
 }
 
 void referee_angry(uint duration_ms)
 {
+    set_all_leds(get_rgb(RED));
     buzzer_play_angry_sounds();
     absolute_time_t end_time = make_timeout_time_ms(duration_ms);
     while (!time_reached(end_time))
