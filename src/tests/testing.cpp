@@ -3,6 +3,7 @@
 #include "drivers/hat_id/hat_id.h"
 #include "game/setup_game.h"
 #include "drivers/user_buttons/user_buttons.h"
+#include "game/change_score.h"
 
 uint8_t mode = MUSIC_TEST_MODE;
 bool mode_change_logged = false;
@@ -216,10 +217,10 @@ void run_referee_test_mode()
     // referee_angry(2000);
     // sleep_ms(1000);
 
-    // Cha cha dance
-    printf("REFEREE DANCE!\n");
-    referee_dance(1000, 500);
-    referee_dance(500, 250);
+    // // Cha cha dance
+    // printf("REFEREE DANCE!\n");
+    // referee_dance(1000, 500);
+    // referee_dance(500, 250);
 
     // printf("REFEREE POINT LEFT\n");
     // referee_point_scored(LEFT);
@@ -231,15 +232,19 @@ void run_referee_test_mode()
     // sleep_ms(2000);
     // clear_all_leds();
 
-    // printf("REFEREE SERVE LEFT!\n");
-    // referee_indicate_server(LEFT);
-    // sleep_ms(2000);
-    // clear_all_leds();
+    printf("REFEREE SERVE LEFT!\n");
+    referee_indicate_server(LEFT);
+    sleep_ms(2000);
+    clear_all_leds();
 
-    // printf("REFEREE SERVE RIGHT!\n");
-    // referee_indicate_server(RIGHT);
-    // sleep_ms(2000);
-    // clear_all_leds();
+    printf("REFEREE SERVE RIGHT!\n");
+    referee_indicate_server(RIGHT);
+    sleep_ms(2000);
+    clear_all_leds();
+}
+
+void run_change_score_test() {
+    run_change_score_mode();
 }
 
 void run_hat_id_test_mode()
@@ -255,7 +260,7 @@ void run_hat_id_test_mode()
 void run_music_test_mode()
 {
     printf("musssiiiiiic\n");
-    // Piezos[2].play_victory_sequence();
+    Piezos[2].play_victory_sequence();
     // sleep_ms(500);
     // Piezos[2].play_angry_sounds();
     // sleep_ms(500);
@@ -266,11 +271,17 @@ void run_music_test_mode()
     // Piezos[2].play_select();
     // sleep_ms(500);
     display_flat_lines();
-    referee_angry(10000);
+    Piezos[2].play_angry_sounds();
     sleep_ms(1000);
-    referee_indicate_server(LEFT);
+    Piezos[2].play_point();
     sleep_ms(1000);
-    referee_point_scored(LEFT);
+    Piezos[2].play_select();
+    sleep_ms(1000);
+    Piezos[2].play_serve();
+    sleep_ms(1000);
+    Piezos[2].play_victory_sequence();
+    sleep_ms(1000);
+
 }
 
 void run_user_buttons_test_mode()
