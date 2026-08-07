@@ -6,7 +6,7 @@ enum Pins
     RX_PIN,
     BUZZER1_PIN,
     BUZZER2_PIN,
-    GPIO_4_PIN,
+    BUZZER4_PIN,
     EXTERNAL_LED_IN_PIN,
     GPIO_6_PIN,
     GPIO_7_PIN,

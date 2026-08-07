@@ -116,30 +116,31 @@ static void light_player_side(ServoPosition player_side, rgb_colour colour)
 
 void referee_indicate_server(ServoPosition side_serving)
 {
-    Piezos[2].init_buzzer();
-    Piezos[2].play_tone(notes6[0]);
+    PiezoBuzzer.init_buzzer();
+    PiezoBuzzer.play_tone(notes6[0]);
     sleep_ms(200);
-    Piezos[2].play_tone(notes6[2]);
+    PiezoBuzzer.play_tone(notes6[2]);
     motor_move_motor_safely(side_serving);
     light_player_side(side_serving, get_rgb(WHITE));
-    Piezos[2].play_tone(notes6[4]);
+    PiezoBuzzer.play_tone(notes6[4]);
     sleep_ms(200);
-    Piezos[2].stop_buzzer();
+    PiezoBuzzer.stop_buzzer();
 }
 
 void referee_point_scored(ServoPosition side_scored)
 {
-    Piezos[2].init_buzzer();
-    Piezos[2].play_tone(notes6[6]);
+    PiezoBuzzer.init_buzzer();
+    PiezoBuzzer.play_tone(notes6[6]);
     motor_move_motor_safely(side_scored);
     light_player_side(side_scored, get_rgb(GREEN));
-    Piezos[2].play_tone(notes7[2]);
+    PiezoBuzzer.play_tone(notes7[2]);
     sleep_ms(200);
-    Piezos[2].stop_buzzer();
+    PiezoBuzzer.stop_buzzer();
 }
 
 void referee_dance_sequence()
 {
+    PiezoBuzzer.play_victory_sequence();
     referee_dance(1000, 500);
     referee_dance(500, 250);
     sleep_ms(250);
@@ -150,8 +151,7 @@ void referee_dance_sequence()
 }
 
 void referee_angry(uint duration_ms)
-{
-    Piezos[1].play_angry_sounds();
+{PiezoBuzzer.play_angry_sounds();
     absolute_time_t end_time = make_timeout_time_ms(duration_ms);
     while (!time_reached(end_time))
     {
@@ -165,12 +165,12 @@ void referee_angry(uint duration_ms)
         update_all_leds();
         for (uint8_t i = 0; i < 5; i++)
         {
-            Piezos[2].play_tone(notes7[0]);
+            PiezoBuzzer.play_tone(notes7[0]);
             sleep_ms(20);
-            Piezos[2].play_tone(notes6[6]);
+            PiezoBuzzer.play_tone(notes6[6]);
             sleep_ms(20);
         }
     }
     motor_move_motor_safely(CENTRE);
-    Piezos[2].stop_buzzer();
+    PiezoBuzzer.stop_buzzer();
 }

@@ -64,3 +64,4 @@ const uint32_t notes6[7] = {1047, 1175, 1319, 1397, 1568, 1760, 1976};
 const uint32_t notes7[7] = {2093, 2349, 2637, 2794, 3136, 3520, 3951};
 
 extern Piezo Piezos[3];
+extern Piezo PiezoBuzzer;

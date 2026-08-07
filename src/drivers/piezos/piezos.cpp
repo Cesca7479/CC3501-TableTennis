@@ -6,6 +6,8 @@ Piezo Piezos[3] = {
     Piezo(VIBRATION_OUTPUT2_PIN, BUZZER2_PIN),
     Piezo(VIBRATION_OUTPUT3_PIN, BUZZER3_PIN)};
 
+Piezo PiezoBuzzer(GPIO_6_PIN, BUZZER4_PIN);
+
 void Piezo::init_sensing()
 {
     adc_init();
@@ -68,32 +70,7 @@ void Piezo::play_victory_sequence()
     sleep_ms(100);
     play_tone(notes7[0]);
     sleep_ms(300);
-
-    // for (size_t i = 0; i < 7; i++)
-    // {
-    //     play_tone(notes5[i]);
-    //     sleep_ms(500);
-    // }
     stop_buzzer();
-    sleep_ms(2000);
-    // Determine piezo DC biases
-    uint32_t sum_piezos[3] = {0, 0, 0};
-    uint16_t result;
-
-    for (size_t i = 0; i < 10; i++)
-    {
-        for (size_t j = 0; j < 3; j++)
-        {
-            result = Piezos[j].read();
-            sum_piezos[j] += result;
-        }
-        sleep_ms(100);
-    }
-
-    for (size_t i = 0; i < 3; i++)
-    {
-        State.piezo_dc_biases[i] = sum_piezos[i] / 10;
-    }
 }
 
 void Piezo::play_angry_sounds()
@@ -107,24 +84,6 @@ void Piezo::play_angry_sounds()
         sleep_ms(20);
     }
     stop_buzzer();
-        // Determine piezo DC biases
-    uint32_t sum_piezos[3] = {0, 0, 0};
-    uint16_t result;
-
-    for (size_t i = 0; i < 10; i++)
-    {
-        for (size_t j = 0; j < 3; j++)
-        {
-            result = Piezos[j].read();
-            sum_piezos[j] += result;
-        }
-        sleep_ms(100);
-    }
-
-    for (size_t i = 0; i < 3; i++)
-    {
-        State.piezo_dc_biases[i] = sum_piezos[i] / 10;
-    }
 }
 
 void Piezo::play_point()
@@ -135,24 +94,6 @@ void Piezo::play_point()
     play_tone(notes7[2]);
     sleep_ms(200);
     stop_buzzer();
-        // Determine piezo DC biases
-    uint32_t sum_piezos[3] = {0, 0, 0};
-    uint16_t result;
-
-    for (size_t i = 0; i < 10; i++)
-    {
-        for (size_t j = 0; j < 3; j++)
-        {
-            result = Piezos[j].read();
-            sum_piezos[j] += result;
-        }
-        sleep_ms(100);
-    }
-
-    for (size_t i = 0; i < 3; i++)
-    {
-        State.piezo_dc_biases[i] = sum_piezos[i] / 10;
-    }
 }
 
 void Piezo::play_serve()
@@ -164,24 +105,6 @@ void Piezo::play_serve()
         sleep_ms(200);
     }
     stop_buzzer();
-        // Determine piezo DC biases
-    uint32_t sum_piezos[3] = {0, 0, 0};
-    uint16_t result;
-
-    for (size_t i = 0; i < 10; i++)
-    {
-        for (size_t j = 0; j < 3; j++)
-        {
-            result = Piezos[j].read();
-            sum_piezos[j] += result;
-        }
-        sleep_ms(100);
-    }
-
-    for (size_t i = 0; i < 3; i++)
-    {
-        State.piezo_dc_biases[i] = sum_piezos[i] / 10;
-    }
 }
 
 void Piezo::play_select()
@@ -195,23 +118,4 @@ void Piezo::play_select()
         sleep_ms(50);
     }
     stop_buzzer();
-    sleep_ms(800);
-    // Determine piezo DC biases
-    uint32_t sum_piezos[3] = {0, 0, 0};
-    uint16_t result;
-
-    for (size_t i = 0; i < 10; i++)
-    {
-        for (size_t j = 0; j < 3; j++)
-        {
-            result = Piezos[j].read();
-            sum_piezos[j] += result;
-        }
-        sleep_ms(100);
-    }
-
-    for (size_t i = 0; i < 3; i++)
-    {
-        State.piezo_dc_biases[i] = sum_piezos[i] / 10;
-    }
 }

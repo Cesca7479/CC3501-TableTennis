@@ -5,7 +5,6 @@
 #include "drivers/user_buttons/user_buttons.h"
 #include "game/change_score.h"
 
-uint8_t mode = MUSIC_TEST_MODE;
 bool mode_change_logged = false;
 
 // Define functions for mode cycling================================================================================================
@@ -195,55 +194,55 @@ void run_motor_test_mode()
     motor_move_motor_safely(CENTRE);
     sleep_ms(1000);
     motor_move_motor_safely(LEFT);
-    sleep_ms(2000);
+    sleep_ms(1000);
+    motor_move_motor_safely(RIGHT);
+    sleep_ms(1000);
 }
 
 void run_led_test_mode()
 {
-    for (;;)
+    for (uint i = 0; i < 7; i++)
     {
-        for (uint i = 0; i < 7; i++)
-        {
-            set_single_led(0, get_rgb(rainbow[i]));
-            update_all_leds();
-            sleep_ms(1000);
-        }
+        set_all_leds(get_rgb(rainbow[i]));
+        update_all_leds();
+        sleep_ms(50);
     }
 }
 
 void run_referee_test_mode()
 {
-    // printf("REFEREE ANGY!\n");
-    // referee_angry(2000);
-    // sleep_ms(1000);
+    printf("REFEREE ANGY!\n");
+    referee_angry(2000);
+    sleep_ms(1000);
 
-    // // Cha cha dance
-    // printf("REFEREE DANCE!\n");
-    // referee_dance(1000, 500);
-    // referee_dance(500, 250);
+    // Cha cha dance
+    printf("REFEREE DANCE!\n");
+    referee_dance_sequence();
+    sleep_ms(1000);
 
-    // printf("REFEREE POINT LEFT\n");
-    // referee_point_scored(LEFT);
-    // sleep_ms(2000);
-    // clear_all_leds();
+    printf("REFEREE POINT LEFT\n");
+    referee_point_scored(LEFT);
+    clear_all_leds();
+    sleep_ms(1000);
 
-    // printf("REFEREE POINT RIGHT\n");
-    // referee_point_scored(RIGHT);
-    // sleep_ms(2000);
-    // clear_all_leds();
+    printf("REFEREE POINT RIGHT\n");
+    referee_point_scored(RIGHT);
+    clear_all_leds();
+    sleep_ms(1000);
 
     printf("REFEREE SERVE LEFT!\n");
     referee_indicate_server(LEFT);
-    sleep_ms(2000);
     clear_all_leds();
+    sleep_ms(1000);
 
     printf("REFEREE SERVE RIGHT!\n");
     referee_indicate_server(RIGHT);
-    sleep_ms(2000);
     clear_all_leds();
+    sleep_ms(1000);
 }
 
-void run_change_score_test() {
+void run_change_score_test()
+{
     run_change_score_mode();
 }
 
@@ -259,29 +258,21 @@ void run_hat_id_test_mode()
 
 void run_music_test_mode()
 {
-    printf("musssiiiiiic\n");
-    Piezos[2].play_victory_sequence();
-    // sleep_ms(500);
-    // Piezos[2].play_angry_sounds();
-    // sleep_ms(500);
-    // Piezos[2].play_point();
-    // sleep_ms(500);
-    // Piezos[2].play_serve();
-    // sleep_ms(500);
-    // Piezos[2].play_select();
-    // sleep_ms(500);
-    display_flat_lines();
-    Piezos[2].play_angry_sounds();
-    sleep_ms(1000);
-    Piezos[2].play_point();
-    sleep_ms(1000);
-    Piezos[2].play_select();
-    sleep_ms(1000);
-    Piezos[2].play_serve();
-    sleep_ms(1000);
-    Piezos[2].play_victory_sequence();
-    sleep_ms(1000);
-
+    printf("victory\n");
+    PiezoBuzzer.play_victory_sequence();
+    sleep_ms(2000);
+    printf("angry\n");
+    PiezoBuzzer.play_angry_sounds();
+    sleep_ms(2000);
+    printf("point\n");
+    PiezoBuzzer.play_point();
+    sleep_ms(2000);
+    printf("select\n");
+    PiezoBuzzer.play_select();
+    sleep_ms(2000);
+    printf("serve\n");
+    PiezoBuzzer.play_serve();
+    sleep_ms(2000);
 }
 
 void run_user_buttons_test_mode()
