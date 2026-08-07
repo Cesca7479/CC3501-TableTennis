@@ -30,3 +30,5 @@ bool is_button_on(UserButton button);
  * @param button Button to get name from (LEFT_BUTTON, SELECT_BUTTON, RIGHT_BUTTON)
  */
 const char *user_button_to_string(UserButton button);
+
+void wait_for_select_release();

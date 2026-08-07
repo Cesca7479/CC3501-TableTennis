@@ -103,3 +103,18 @@ const char *user_button_to_string(UserButton button)
         return "UNKNOWN BUTTON";
     }
 }
+
+void wait_for_select_release()
+{
+    // Clear the event that opened this mode
+    (void)is_button_pressed(SELECT_BUTTON);
+
+    // Do not continue until the physical button is released
+    while (is_button_on(SELECT_BUTTON))
+    {
+        sleep_ms(1);
+    }
+
+    // Clear any bounce event produced during release
+    (void)is_button_pressed(SELECT_BUTTON);
+}
