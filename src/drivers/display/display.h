@@ -79,4 +79,8 @@ void display_flat_lines();
  */
 void display_mode(GameMode mode);
 
+/**
+ * @brief Display a loading screen on the digital display
+ * @param wait_time time (in ms) between each segment appearing on the screen
+ */
 void display_loading(int wait_time);
