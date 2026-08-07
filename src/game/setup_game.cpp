@@ -1,4 +1,6 @@
 #include "setup_game.h"
+#include "drivers/hat_id/hat_id.h"
+#include "drivers/user_buttons/user_buttons.h"
 
 void set_game_mode(GameMode mode)
 {
@@ -8,11 +10,17 @@ void set_game_mode(GameMode mode)
 
 void run_setup_game_mode()
 {
-    // Determine game mode
-    GameMode detected_mode = hat_id_read_mode();
-    if (detected_mode != State.game_mode)
+    display_mode(State.game_mode); // Retain previous game mode on display
+    // Loop until game mode is confirmed
+    while (!is_button_pressed(SELECT_BUTTON))
     {
-        set_game_mode(detected_mode);
+        wait_for_select_release();
+        GameMode detected_mode = hat_id_read_mode();
+        if (detected_mode != State.game_mode)
+        {
+            set_game_mode(detected_mode);
+            display_mode(detected_mode);
+        }
     }
 
     // Determine piezo DC biases
@@ -38,6 +46,7 @@ void run_setup_game_mode()
 
     State.player_score[PLAYER_1] = 0;
     State.player_score[PLAYER_2] = 0;
+    display_player_score(State.player_score[0], State.player_score[1]);
     State.mode = SETUP_ROUND;
     return;
 }
