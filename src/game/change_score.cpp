@@ -35,6 +35,8 @@ static void show_score_selection(bool visible)
 
 void run_change_score_mode()
 {
+    display_loading(125); // Transition to new display mode
+
     uint8_t max_score = State.settings.points_to_win;
     wait_for_select_release();
     bool selected_score_visible = true;
