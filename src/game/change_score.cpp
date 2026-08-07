@@ -33,7 +33,7 @@ static void show_score_selection(bool visible)
     }
 }
 
-void run_change_score_mode()
+void run_change_score_phase()
 {
     display_loading(125); // Transition to new display mode
 
@@ -112,5 +112,5 @@ void run_change_score_mode()
         }
     }
     buzzer_play_select_pressed();
-    State.mode = CHECK_VICTORY_AND_SCORE;
+    State.phase = CHECK_VICTORY_AND_SCORE;
 }

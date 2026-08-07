@@ -244,7 +244,7 @@ void run_referee_test_mode()
 
 void run_change_score_test()
 {
-    run_change_score_mode();
+    run_change_score_phase();
 }
 
 void run_hat_id_test_mode()

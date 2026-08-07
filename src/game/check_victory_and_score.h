@@ -7,4 +7,4 @@
 #include "drivers/bluetooth/bluetooth.h"
 #include <string>
 
-void run_check_victory_and_score_mode();
+void run_check_victory_and_score_phase();

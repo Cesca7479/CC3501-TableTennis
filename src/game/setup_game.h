@@ -12,4 +12,4 @@
  */
 void set_game_mode(GameMode mode);
 
-void run_setup_game_mode();
+void run_setup_game_phase();

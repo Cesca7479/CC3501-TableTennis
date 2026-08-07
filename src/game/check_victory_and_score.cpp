@@ -3,7 +3,7 @@
 #include "programs/referee_reactions/referee_reactions.h"
 #include "drivers/buzzer/buzzer.h"
 
-void run_check_victory_and_score_mode()
+void run_check_victory_and_score_phase()
 {
     printf("Player 1: %d, Player 2: %d\r\n", State.player_score[PLAYER_1], State.player_score[PLAYER_2]);
     display_player_score(State.player_score[PLAYER_1], State.player_score[PLAYER_2]); // DISPLAY POINTS
@@ -24,7 +24,7 @@ void run_check_victory_and_score_mode()
     }
     else
     {
-        State.mode = SETUP_ROUND;
+        State.phase = SETUP_ROUND;
     }
 
     if (is_win)
@@ -46,13 +46,13 @@ void run_check_victory_and_score_mode()
             {
                 bluetooth_send(msg.c_str());
                 State.game_number++;
-                State.mode = SETUP_GAME;
+                State.phase = SETUP_GAME;
                 return;
             }
 
             if (left_pressed || right_pressed)
             {
-                State.mode = CHANGE_SCORE;
+                State.phase = CHANGE_SCORE;
                 return;
             }
         }

@@ -40,7 +40,7 @@
 #include "tests/testing.h"
 
 // Global Variables ================================================================================================================
-bool Testing = true;
+bool Testing = false;
 uint8_t mode = REFEREE_TEST_MODE;
 
 // Init board =====================================================================================================================
@@ -195,28 +195,28 @@ int main()
         else
         {
             bluetooth_handle_message();
-            switch (State.mode)
+            switch (State.phase)
             {
             case SETUP_GAME:
-                run_setup_game_mode();
+                run_setup_game_phase();
                 break;
             case SETUP_ROUND:
-                run_setup_round_mode();
+                run_setup_round_phase();
                 break;
             case SERVE_DETECTION:
-                run_serve_detection_mode();
+                run_serve_detection_phase();
                 break;
             case BOUNCE_LISTEN:
-                run_bounce_listening_mode();
+                run_bounce_listening_phase();
                 break;
             case CAMERA_CHECK:
-                run_camera_check_mode();
+                run_camera_check_phase();
                 break;
             case CHECK_VICTORY_AND_SCORE:
-                run_check_victory_and_score_mode();
+                run_check_victory_and_score_phase();
                 break;
             case CHANGE_SCORE:
-                run_change_score_mode();
+                run_change_score_phase();
                 break;
                 // case FOUL:
                 //     run_foul_mode();

@@ -8,7 +8,7 @@ void reset_serve_state(uint8_t &serve_attempts, bool &has_hit_table, bool &has_h
     has_hit_net = false;
 }
 
-void run_serve_detection_mode()
+void run_serve_detection_phase()
 {
     static uint8_t serve_attempts = 0;
     static bool has_hit_table = false;
@@ -58,7 +58,7 @@ void run_serve_detection_mode()
         State.player_score[opposing_player]++;
         referee_point_scored((opposing_player == PLAYER_1) ? LEFT : RIGHT);
         reset_serve_state(serve_attempts, has_hit_table, has_hit_net);
-        State.mode = CHECK_VICTORY_AND_SCORE;
+        State.phase = CHECK_VICTORY_AND_SCORE;
     }
     else
         return;
@@ -68,6 +68,7 @@ void run_serve_detection_mode()
         printf("Serving side %d hit\r\n", State.player_serving + 1);
         has_hit_table = true;
         State.prev_bounce_time = current_time;
+        // CLEAR LED
     }
 
     if (has_hit_table && isBounce[NET]) // Detects hitting the net
@@ -88,11 +89,11 @@ void run_serve_detection_mode()
             printf("Too many lets in a row: %d\r\n", serve_attempts);
             State.player_score[opposing_player]++;
             referee_point_scored((opposing_player == PLAYER_1) ? LEFT : RIGHT);
-            State.mode = CHECK_VICTORY_AND_SCORE;
+            State.phase = CHECK_VICTORY_AND_SCORE;
             serve_attempts = 0;
         }
         else
-            State.mode = SETUP_ROUND;
+            State.phase = SETUP_ROUND;
         display_player_score(State.player_score[0], State.player_score[2]);
 
         has_hit_table = false;
@@ -105,7 +106,7 @@ void run_serve_detection_mode()
         State.player_score[opposing_player]++;
         referee_point_scored((opposing_player == PLAYER_1) ? LEFT : RIGHT);
         reset_serve_state(serve_attempts, has_hit_table, has_hit_net);
-        State.mode = CHECK_VICTORY_AND_SCORE;
+        State.phase = CHECK_VICTORY_AND_SCORE;
     }
 
     else if (has_hit_table && !has_hit_net && isBounce[opposing_player]) // Hits server side, then opposing player side without touching net -> Serve successful
@@ -114,9 +115,9 @@ void run_serve_detection_mode()
         reset_serve_state(serve_attempts, has_hit_table, has_hit_net);
         State.prev_bounce_side = opposing_player;
         State.prev_bounce_time = current_time;
-        State.mode = BOUNCE_LISTEN;
+        State.phase = BOUNCE_LISTEN;
     }
 
     // State.camera_check_return_to_mode = SERVE_DETECTION;
-    // State.mode = CAMERA_CHECK;
+    // State.phase = CAMERA_CHECK;
 }

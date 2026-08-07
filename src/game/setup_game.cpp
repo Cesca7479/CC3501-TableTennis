@@ -8,7 +8,7 @@ void set_game_mode(GameMode mode)
     State.settings = get_game_mode_settings(State.game_mode);
 }
 
-void run_setup_game_mode()
+void run_setup_game_phase()
 {
     display_loading(125); // Transition to new display mode
     display_mode(State.game_mode); // Retain previous game mode on display
@@ -46,10 +46,9 @@ void run_setup_game_mode()
     printf("DC Biases: %d, %d, %d\r\n", State.piezo_dc_biases[0], State.piezo_dc_biases[1], State.piezo_dc_biases[2]);
 
     display_loading(125); // Transition to new display mode
-    
     State.player_score[PLAYER_1] = 0;
     State.player_score[PLAYER_2] = 0;
     display_player_score(State.player_score[0], State.player_score[1]);
-    State.mode = SETUP_ROUND;
+    State.phase = SETUP_ROUND;
     return;
 }

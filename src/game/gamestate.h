@@ -11,7 +11,7 @@
 #define BOUNCE_SAMPLING_RATE_MS 100 // Sample max once every 100ms per sensor to prevent overcounting bounces
 #define TIME_OUT_THRESHOLD_MS 2000
 
-enum State
+enum GamePhase
 {
     SETUP_GAME,
     SETUP_ROUND,
@@ -33,7 +33,7 @@ enum Bounce_Location
 
 struct GameState
 {
-    uint8_t mode = SETUP_GAME;
+    uint8_t phase = SETUP_GAME;
     bool rpi_connected = false;
     uint8_t camera_check_return_to_mode = SERVE_DETECTION;
     GameMode game_mode = GameMode::NO_MODE_SELECTED;
