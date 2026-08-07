@@ -4,9 +4,9 @@ enum Pins
 {
     TX_PIN,
     RX_PIN,
-    BUZZER_PIN,
+    GPIO_2_PIN,
     GPIO_3_PIN,
-    GPIO_4_PIN,
+    BUZZER_PIN,
     EXTERNAL_LED_IN_PIN,
     GPIO_6_PIN,
     GPIO_7_PIN,

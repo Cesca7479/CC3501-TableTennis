@@ -7,7 +7,7 @@ Piezo Piezos[3] = {
     Piezo(VIBRATION_OUTPUT3_PIN)};
 
 
-void Piezo::init_sensing()
+void Piezo::init()
 {
     adc_init();
     adc_gpio_init(GPIO_sensing_pin);
