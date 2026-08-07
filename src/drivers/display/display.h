@@ -79,4 +79,4 @@ void display_flat_lines();
  */
 void display_mode(GameMode mode);
 
-void display_loading(int wait_time);
+void display_loading(uint wait_time);
