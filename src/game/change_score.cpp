@@ -6,6 +6,7 @@
 #include "drivers/user_buttons/user_buttons.h"
 #include "drivers/display/display.h"
 #include "game/gamestate.h"
+#include "programs/referee_reactions/referee_reactions.h"
 
 #define SCORE_BLINK_INTERVAL_MS 300
 
@@ -33,13 +34,13 @@ static void show_score_selection(bool visible)
 
 void run_change_score_mode()
 {
+    uint8_t max_score = State.settings.points_to_win;
     wait_for_select_release();
     bool selected_score_visible = true;
     absolute_time_t next_blink_time = make_timeout_time_ms(SCORE_BLINK_INTERVAL_MS);
     show_score_selection(selected_score_visible);
 
-    // Select player to change
-    printf("SELECT PLAYER\n");
+    log(LogLevel::INFORMATION, "Player select active");
     while (!is_button_pressed(SELECT_BUTTON))
     {
         if (is_button_pressed(LEFT_BUTTON))
@@ -50,8 +51,7 @@ void run_change_score_mode()
             printf("PLAYER 1\n");
             show_score_selection(true);
 
-            next_blink_time =
-                make_timeout_time_ms(SCORE_BLINK_INTERVAL_MS);
+            next_blink_time = make_timeout_time_ms(SCORE_BLINK_INTERVAL_MS);
         }
         if (is_button_pressed(RIGHT_BUTTON))
         {
@@ -61,42 +61,53 @@ void run_change_score_mode()
             printf("PLAYER 2\n");
             show_score_selection(true);
 
-            next_blink_time =
-                make_timeout_time_ms(SCORE_BLINK_INTERVAL_MS);
+            next_blink_time = make_timeout_time_ms(SCORE_BLINK_INTERVAL_MS);
         }
         if (time_reached(next_blink_time))
         {
-            selected_score_visible =
-                !selected_score_visible;
+            selected_score_visible = !selected_score_visible;
 
-            show_score_selection(
-                selected_score_visible);
+            show_score_selection(selected_score_visible);
 
-            next_blink_time =
-                make_timeout_time_ms(
-                    SCORE_BLINK_INTERVAL_MS);
+            next_blink_time = make_timeout_time_ms(SCORE_BLINK_INTERVAL_MS);
         }
     }
 
+    show_score_selection(true);
     Piezos[2].play_select();
 
-    // Change score
-    printf("CHANGE SCORE\n");
+    log(LogLevel::INFORMATION, "Score change");
     while (!is_button_pressed(SELECT_BUTTON))
     {
+        uint8_t current_selected_score = State.player_score[selected_player];
         if (is_button_pressed(LEFT_BUTTON))
         {
-            State.player_score[selected_player]--;
-            printf("SCORE DECREASED\n");
+            if (current_selected_score != 0)
+            {
+                State.player_score[selected_player]--;
+                display_player_score(State.player_score[PLAYER_1], State.player_score[PLAYER_2]);
+                log(LogLevel::INFORMATION, "Score decrease");
+            }
+            else
+            {
+                referee_angry(1000);
+            }
         }
+
         if (is_button_pressed(RIGHT_BUTTON))
         {
-            State.player_score[selected_player]++;
-            printf("SCORE INCREASED\n");
+            if (current_selected_score != max_score)
+            {
+                State.player_score[selected_player]++;
+                display_player_score(State.player_score[PLAYER_1], State.player_score[PLAYER_2]);
+                log(LogLevel::INFORMATION, "Score increase");
+            }
+            else
+            {
+                referee_angry(1000);
+            }
         }
-        display_player_score(State.player_score[PLAYER_1], State.player_score[PLAYER_2]);
     }
-
     Piezos[2].play_select();
     State.mode = CHECK_VICTORY_AND_SCORE;
 }
