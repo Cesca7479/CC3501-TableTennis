@@ -1,4 +1,6 @@
 #include "check_victory_and_score.h"
+#include "drivers/user_buttons/user_buttons.h"
+#include "programs/referee_reactions/referee_reactions.h"
 
 void run_check_victory_and_score_mode()
 {
@@ -24,13 +26,34 @@ void run_check_victory_and_score_mode()
         State.mode = SETUP_ROUND;
     }
 
-    if (is_win) {
+    if (is_win)
+    {
         printf("Player %d has won!\r\n", winner + 1);
         msg = "Won: Player" + std::to_string(winner) + "\n";
-        bluetooth_send(msg.c_str());
-        State.game_number++;
-        State.mode = SETUP_GAME;
+        referee_dance_sequence();
+
+        while (true)
+        {
+            bool left_pressed = is_button_pressed(LEFT_BUTTON);
+
+            bool select_pressed = is_button_pressed(SELECT_BUTTON);
+
+            bool right_pressed = is_button_pressed(RIGHT_BUTTON);
+
+            if (select_pressed)
+            {
+                bluetooth_send(msg.c_str());
+                State.game_number++;
+                State.mode = SETUP_GAME;
+                return;
+            }
+
+            if (left_pressed || right_pressed)
+            {
+                State.mode = CHANGE_SCORE;
+                return;
+            }
+        }
+        return;
     }
-    // referee_dance();
-    return;
 }
