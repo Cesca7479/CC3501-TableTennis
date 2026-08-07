@@ -1,6 +1,7 @@
 #include "check_victory_and_score.h"
 #include "drivers/user_buttons/user_buttons.h"
 #include "programs/referee_reactions/referee_reactions.h"
+#include "drivers/buzzer/buzzer.h"
 
 void run_check_victory_and_score_mode()
 {
@@ -29,7 +30,7 @@ void run_check_victory_and_score_mode()
     if (is_win)
     {
         printf("Player %d has won!\r\n", winner + 1);
-        Piezos[NET].play_victory_sequence();
+        buzzer_play_victory_sequence();
         msg = "Won: Player" + std::to_string(winner) + "\n";
         referee_dance_sequence();
 
