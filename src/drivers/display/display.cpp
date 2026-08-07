@@ -209,3 +209,30 @@ void display_flat_lines()
 
     i2c_write_blocking(I2C_PORT, HT16K33_ADDR, tx, sizeof(tx), false);
 }
+
+void display_mode(GameMode mode)
+{
+    display_clear();
+    switch (mode)
+    {
+    case GameMode::CASUAL:
+        display_word("cas.");
+        break;
+
+    case GameMode::PROFESSIONAL_SHORT:
+        display_word("pro.s");
+        break;
+
+    case GameMode::PROFESSIONAL_LONG:
+        display_word("pro.l");
+        break;
+
+    case GameMode::NO_SOUND:
+        display_word("no.so");
+        break;
+
+    default:
+        display_word("none");
+        break;
+    }
+}

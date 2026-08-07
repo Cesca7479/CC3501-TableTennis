@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <stdio.h>
 #include "pico/stdlib.h"
+#include "game/gamestate.h"
 
 #define I2C_PORT i2c0
 #define HT16K33_ADDR 0x70
@@ -32,3 +33,4 @@ void display_player_score(uint8_t player_1_score, uint8_t player_2_score);
 void display_word(const char *word);
 void display_clear_individual_score(uint8_t player_number);
 void display_flat_lines();
+void display_mode(GameMode mode);
