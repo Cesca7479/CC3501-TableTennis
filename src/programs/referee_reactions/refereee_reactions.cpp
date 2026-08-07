@@ -101,7 +101,7 @@ static void flash_leds_rainbow(uint time_interval_ms)
     }
 }
 
-/** 
+/**
  * @brief Light led on side of specified player
  * @param player_side The side the specified player is on
  * @param colour The colour to light the led

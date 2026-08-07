@@ -40,8 +40,8 @@
 #include "tests/testing.h"
 
 // Global Variables ================================================================================================================
-bool Testing = false;
-uint8_t mode = DEFAULT_MODE;
+bool Testing = true;
+uint8_t mode = REFEREE_TEST_MODE;
 
 // Init board =====================================================================================================================
 void init_board()
