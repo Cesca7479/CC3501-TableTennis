@@ -12,54 +12,14 @@ uint8_t RAINBOW_COLOUR_COUNT = 7;
 uint32_t DANCE_COLOUR_INTERVAL_MS = 75;
 uint32_t DANCE_UPDATE_INTERVAL_MS = 5;
 
-void flash_leds_rainbow(uint time_interval_ms)
-{
-    for (uint i = 0; i < 7; i++)
-    {
-        set_all_leds(get_rgb(rainbow[i]));
-        update_all_leds();
-        sleep_ms(time_interval_ms);
-    }
-}
-
-void light_player_side(ServoPosition player_side, rgb_colour colour)
-{
-    if (player_side == LEFT)
-    {
-        set_single_led(1, colour);
-    }
-    if (player_side == RIGHT)
-    {
-        set_single_led(0, colour);
-    }
-    update_all_leds();
-}
-
-void referee_indicate_server(ServoPosition side_serving)
-{
-    Piezos[2].init_buzzer();
-    Piezos[2].play_tone(notes6[0]);
-    sleep_ms(200);
-    Piezos[2].play_tone(notes6[2]);
-    motor_move_motor_safely(side_serving);
-    light_player_side(side_serving, get_rgb(WHITE));
-    Piezos[2].play_tone(notes6[4]);
-    sleep_ms(200);
-    Piezos[2].stop_buzzer();
-}
-
-void referee_point_scored(ServoPosition side_scored)
-{
-    Piezos[2].init_buzzer();
-    Piezos[2].play_tone(notes6[6]);
-    motor_move_motor_safely(side_scored);
-    light_player_side(side_scored, get_rgb(GREEN));
-    Piezos[2].play_tone(notes7[2]);
-    sleep_ms(200);
-    Piezos[2].stop_buzzer();
-}
-
-bool perform_dance_move(ServoPosition position, absolute_time_t duration_ms, uint8_t &rainbow_index, uint move_time)
+/**
+ * @brief Perform one dance move, which moves arm once and changes colour 4 times
+ * @param position Side to move motor to
+ * @param duration_ms The duration of the dance in milliseconds
+ * @param rainbow_index Reference to rainbow index
+ * @param move_time Time for one dance move (time to move motor once)
+ */
+static bool perform_dance_move(ServoPosition position, absolute_time_t duration_ms, uint8_t &rainbow_index, uint move_time)
 {
     motor_set_position(position);
 
@@ -96,7 +56,12 @@ bool perform_dance_move(ServoPosition position, absolute_time_t duration_ms, uin
     return true;
 }
 
-void referee_dance(uint duration_ms, uint move_time)
+/**
+ * @brief Referee reaction for a dance
+ * @param duration_ms The duration of the dance in milliseconds
+ * @param move_time Time for each movement in perform_dance_move
+ */
+static void referee_dance(uint duration_ms, uint move_time)
 {
     absolute_time_t dance_end = make_timeout_time_ms(duration_ms);
     ServoPosition position = LEFT;
@@ -111,6 +76,75 @@ void referee_dance(uint duration_ms, uint move_time)
         position = (position == LEFT) ? RIGHT : LEFT;
     }
     clear_all_leds();
+}
+
+/**
+ * @brief Flashes LEDs in a rainbow pattern
+ *
+ * Note: move this function to an appropriate file in the future, as it is not specific to referee reactions
+ * @param time_interval_ms The time interval between each color change in milliseconds
+ */
+static void flash_leds_rainbow(uint time_interval_ms)
+{
+    for (uint i = 0; i < 7; i++)
+    {
+        set_all_leds(get_rgb(rainbow[i]));
+        update_all_leds();
+        sleep_ms(time_interval_ms);
+    }
+}
+
+/** 
+ * @brief Light led on side of specified player
+ * @param player_side The side the specified player is on
+ * @param colour The colour to light the led
+ */
+static void light_player_side(ServoPosition player_side, rgb_colour colour)
+{
+    if (player_side == LEFT)
+    {
+        set_single_led(1, colour);
+    }
+    if (player_side == RIGHT)
+    {
+        set_single_led(0, colour);
+    }
+    update_all_leds();
+}
+
+void referee_indicate_server(ServoPosition side_serving)
+{
+    Piezos[2].init_buzzer();
+    Piezos[2].play_tone(notes6[0]);
+    sleep_ms(200);
+    Piezos[2].play_tone(notes6[2]);
+    motor_move_motor_safely(side_serving);
+    light_player_side(side_serving, get_rgb(WHITE));
+    Piezos[2].play_tone(notes6[4]);
+    sleep_ms(200);
+    Piezos[2].stop_buzzer();
+}
+
+void referee_point_scored(ServoPosition side_scored)
+{
+    Piezos[2].init_buzzer();
+    Piezos[2].play_tone(notes6[6]);
+    motor_move_motor_safely(side_scored);
+    light_player_side(side_scored, get_rgb(GREEN));
+    Piezos[2].play_tone(notes7[2]);
+    sleep_ms(200);
+    Piezos[2].stop_buzzer();
+}
+
+void referee_dance_sequence()
+{
+    referee_dance(1000, 500);
+    referee_dance(500, 250);
+    sleep_ms(250);
+    referee_dance(1000, 500);
+    referee_dance(500, 250);
+    sleep_ms(250);
+    motor_move_motor_safely(CENTRE);
 }
 
 void referee_angry(uint duration_ms)
@@ -145,7 +179,6 @@ void referee_angry(uint duration_ms)
             Piezos[2].play_tone(notes6[6]);
             sleep_ms(20);
         }
-        Piezos[2].stop_buzzer();
     }
     motor_move_motor_safely(CENTRE);
 }
