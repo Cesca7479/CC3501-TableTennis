@@ -62,6 +62,7 @@ void init_board()
     display_clear();
     user_buttons_init();
 
+    init_leds();
     motor_pwr_ctrl_init();
     motor_init();
     hat_id_init();
