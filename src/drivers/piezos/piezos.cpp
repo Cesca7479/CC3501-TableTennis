@@ -54,19 +54,19 @@ void Piezo::play_victory_sequence()
 {
     init_buzzer();
     play_tone(notes6[2]);
-    sleep_ms(200);
+    sleep_ms(100);
     play_tone(notes6[0]);
-    sleep_ms(200);
+    sleep_ms(100);
     play_tone(notes6[2]);
-    sleep_ms(200);
+    sleep_ms(100);
     play_tone(notes6[4]);
-    sleep_ms(200);
+    sleep_ms(100);
     play_tone(notes6[2]);
-    sleep_ms(200);
+    sleep_ms(100);
     play_tone(notes6[4]);
-    sleep_ms(200);
+    sleep_ms(100);
     play_tone(notes7[0]);
-    sleep_ms(800);
+    sleep_ms(300);
 
     // for (size_t i = 0; i < 7; i++)
     // {

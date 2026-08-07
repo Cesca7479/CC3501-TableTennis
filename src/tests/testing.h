@@ -42,13 +42,33 @@ bool sleep_ms_with_checking(uint16_t ms, uint8_t expected_mode);
 
 void run_default_mode();
 void run_piezo_test_mode();
-void run_display_test_mode();
-void run_display_test_scores();
-void run_test_letters();
-void run_test_words();
 void run_motor_test_mode();
 void run_led_test_mode();
 void run_referee_test_mode();
 void run_hat_id_test_mode();
 void run_user_buttons_test_mode();
+
+/**
+ * @brief Test display functionality, also test bluetooth functionality
+ */
+void run_display_test_mode();
+
+/**
+ * @brief Test sending player scores to the display
+ */
+void run_display_test_scores();
+
+/**
+ * @brief Test letters to be sent through to the display
+ */
+void run_test_letters();
+
+/**
+ * @brief Test sending words to the display
+ */
+void run_test_words();
+
+/**
+ * @brief Test buzzer and tunes
+ */
 void run_music_test_mode();
