@@ -181,4 +181,5 @@ void referee_angry(uint duration_ms)
         }
     }
     motor_move_motor_safely(CENTRE);
+    Piezos[2].stop_buzzer();
 }
