@@ -78,3 +78,5 @@ void display_flat_lines();
  * @param mode Selected mode
  */
 void display_mode(GameMode mode);
+
+void display_loading(int wait_time);

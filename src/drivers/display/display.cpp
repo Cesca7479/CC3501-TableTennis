@@ -201,11 +201,10 @@ void display_flat_lines()
 {
     uint8_t tx[9] = {0};
     tx[0] = 0x00;
-
-    tx[1] = 0b01000000;
-    tx[3] = 0b01000000;
-    tx[5] = 0b01000000;
-    tx[7] = 0b01000000;
+    for (uint8_t i = 1; i < 8; i += 2)
+    {
+        tx[i] = 0b01000000;
+    }
 
     i2c_write_blocking(I2C_PORT, HT16K33_ADDR, tx, sizeof(tx), false);
 }
@@ -235,4 +234,38 @@ void display_mode(GameMode mode)
         display_word("none");
         break;
     }
+}
+
+void display_loading(uint wait_time)
+{
+    uint8_t tx[9] = {0};
+    tx[0] = 0x00; // Is this necessary?
+    uint8_t flat_line = 0b01000000;
+    for (uint8_t i = 1; i < 8; i += 2)
+    {
+        tx[i] = flat_line;
+        i2c_write_blocking(I2C_PORT, HT16K33_ADDR, tx, sizeof(tx), false);
+        sleep_ms(wait_time);
+    }
+    // Optional to make it also 'load' off the screen
+    // for (uint8_t i = 1; i < 8; i += 2)
+    // {
+    //     tx[i] = 0;
+    //     i2c_write_blocking(I2C_PORT, HT16K33_ADDR, tx, sizeof(tx), false);
+    //     sleep_ms(wait_time);
+    // }
+
+    // This is if the above is backwards
+    // for (uint8_t i = 7; i > 0; i -= 2)
+    // {
+    //     tx[i] = flat_line;
+    //     i2c_write_blocking(I2C_PORT, HT16K33_ADDR, tx, sizeof(tx), false);
+    //     sleep_ms(wait_time);
+    // }
+    // for (uint8_t i = 7; i > 0; i -= 2)
+    // {
+    //     tx[i] = 0;
+    //     i2c_write_blocking(I2C_PORT, HT16K33_ADDR, tx, sizeof(tx), false);
+    //     sleep_ms(wait_time);
+    // }
 }
