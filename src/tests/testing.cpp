@@ -140,12 +140,13 @@ void run_display_test_mode()
 
 void run_display_test_scores()
 {
-    uint8_t player_1_score = 20;
-    uint8_t player_2_score = 19;
-    display_player_score(player_1_score, player_2_score);
-    sleep_ms(2000);
-    display_clear_individual_score(1);
-    sleep_ms(2000);
+    // uint8_t player_1_score = 20;
+    // uint8_t player_2_score = 19;
+    // display_player_score(player_1_score, player_2_score);
+    // sleep_ms(2000);
+    // display_clear_individual_score(1);
+    // sleep_ms(2000);
+    display_loading(1000);
 }
 
 void run_test_letters()
