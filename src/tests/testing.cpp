@@ -4,6 +4,7 @@
 #include "game/setup_game.h"
 #include "drivers/user_buttons/user_buttons.h"
 #include "game/change_score.h"
+#include "drivers/buzzer/buzzer.h"
 
 bool mode_change_logged = false;
 
@@ -67,63 +68,62 @@ void run_piezo_test_mode()
         has_calculated_dc = true;
     }
 
-    if (!Piezos[0].buzzer_on || !Piezos[1].buzzer_on)
+    
+    result1 = Piezos[0].read();
+    result2 = Piezos[1].read();
+    result3 = Piezos[2].read();
+
+    // printf("%d:%d:%d\r\n", result1, result2,result3);
+    if (result1 > dc_bias[0] + SENSITIVITY_THRESHOLD_TABLE || result1 < dc_bias[0] - SENSITIVITY_THRESHOLD_TABLE)
     {
-        result1 = Piezos[0].read();
-        result2 = Piezos[1].read();
-        result3 = Piezos[2].read();
-
-        // printf("%d:%d:%d\r\n", result1, result2,result3);
-        if (result1 > dc_bias[0] + SENSITIVITY_THRESHOLD_TABLE || result1 < dc_bias[0] - SENSITIVITY_THRESHOLD_TABLE)
+        if (side == PLAYER_1)
         {
-            if (side == PLAYER_1)
-            {
-                bounces++;
-            }
-            else
-            {
-                bounces = 1;
-                side = PLAYER_1;
-            }
-            printf("BOUNCE1: %d, Distance: %d\r\n", bounces, result1 - dc_bias[0]);
-            if (sleep_ms_with_checking(100, PIEZO_TEST_MODE))
-                return;
+            bounces++;
         }
-
-        if (result2 > dc_bias[1] + SENSITIVITY_THRESHOLD_TABLE || result2 < dc_bias[1] - SENSITIVITY_THRESHOLD_TABLE)
+        else
         {
-            if (side == PLAYER_2)
-            {
-                bounces++;
-            }
-            else
-            {
-                bounces = 1;
-                side = PLAYER_2;
-            }
-            printf("BOUNCE2: %d, Distance: %d\r\n", bounces, result2 - dc_bias[1]);
-            if (sleep_ms_with_checking(100, PIEZO_TEST_MODE))
-                return;
+            bounces = 1;
+            side = PLAYER_1;
         }
-
-        if (result3 > dc_bias[2] + SENSITIVITY_THRESHOLD_TABLE || result3 < dc_bias[2] - SENSITIVITY_THRESHOLD_TABLE)
-        {
-            if (side == NET)
-            {
-                bounces++;
-            }
-            else
-            {
-                bounces = 1;
-                side = NET;
-            }
-            printf("BOUNCE3: %d, Distance: %d\r\n", bounces, result3 - dc_bias[2]);
-            if (sleep_ms_with_checking(100, PIEZO_TEST_MODE))
-                return;
-        }
-
-        return;
+        printf("BOUNCE1: %d, Distance: %d\r\n", bounces, result1 - dc_bias[0]);
+        if (sleep_ms_with_checking(100, PIEZO_TEST_MODE))
+            return;
     }
+
+    if (result2 > dc_bias[1] + SENSITIVITY_THRESHOLD_TABLE || result2 < dc_bias[1] - SENSITIVITY_THRESHOLD_TABLE)
+    {
+        if (side == PLAYER_2)
+        {
+            bounces++;
+        }
+        else
+        {
+            bounces = 1;
+            side = PLAYER_2;
+        }
+        printf("BOUNCE2: %d, Distance: %d\r\n", bounces, result2 - dc_bias[1]);
+        if (sleep_ms_with_checking(100, PIEZO_TEST_MODE))
+            return;
+    }
+
+    if (result3 > dc_bias[2] + SENSITIVITY_THRESHOLD_TABLE || result3 < dc_bias[2] - SENSITIVITY_THRESHOLD_TABLE)
+    {
+        if (side == NET)
+        {
+            bounces++;
+        }
+        else
+        {
+            bounces = 1;
+            side = NET;
+        }
+        printf("BOUNCE3: %d, Distance: %d\r\n", bounces, result3 - dc_bias[2]);
+        if (sleep_ms_with_checking(100, PIEZO_TEST_MODE))
+            return;
+    }
+
+    return;
+    
 }
 
 void run_display_test_mode()
@@ -259,19 +259,19 @@ void run_hat_id_test_mode()
 void run_music_test_mode()
 {
     printf("victory\n");
-    PiezoBuzzer.play_victory_sequence();
+    buzzer_play_victory_sequence();
     sleep_ms(2000);
     printf("angry\n");
-    PiezoBuzzer.play_angry_sounds();
+    buzzer_play_angry_sounds();
     sleep_ms(2000);
     printf("point\n");
-    PiezoBuzzer.play_point();
+    buzzer_play_point_scored();
     sleep_ms(2000);
     printf("select\n");
-    PiezoBuzzer.play_select();
+    buzzer_play_select_pressed();
     sleep_ms(2000);
     printf("serve\n");
-    PiezoBuzzer.play_serve();
+    buzzer_play_serve();
     sleep_ms(2000);
 }
 

@@ -58,6 +58,7 @@ if(CrossCompiling)
         src/drivers/motor/motor.cpp
         src/drivers/hat_id/hat_id.cpp
         src/drivers/user_buttons/user_buttons.cpp
+        src/drivers/buzzer/buzzer.cpp
 
         src/helpers/colours/colour.cpp
         src/helpers/game_settings/game_settings.cpp
@@ -132,6 +133,7 @@ else()
         src/drivers/motor/motor.cpp
         src/drivers/hat_id/hat_id.cpp
         src/drivers/user_buttons/user_buttons.cpp
+        src/drivers/buzzer/buzzer.cpp
 
         src/helpers/colours/colour.cpp
         src/helpers/game_settings/game_settings.cpp

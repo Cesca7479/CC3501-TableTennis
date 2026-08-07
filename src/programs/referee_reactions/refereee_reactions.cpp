@@ -7,12 +7,17 @@
 #include "helpers/colours/colours.h"
 #include "drivers/logging/logging.h"
 #include "drivers/piezos/piezos.h"
+#include "drivers/buzzer/buzzer.h"
 
 #include "game/gamestate.h"
 
 uint8_t RAINBOW_COLOUR_COUNT = 7;
 uint32_t DANCE_COLOUR_INTERVAL_MS = 75;
 uint32_t DANCE_UPDATE_INTERVAL_MS = 5;
+
+const uint32_t notes5[7] = {523, 587, 659, 698, 784, 879, 988};
+const uint32_t notes6[7] = {1047, 1175, 1319, 1397, 1568, 1760, 1976};
+const uint32_t notes7[7] = {2093, 2349, 2637, 2794, 3136, 3520, 3951};
 
 /**
  * @brief Perform one dance move, which moves arm once and changes colour 4 times
@@ -116,31 +121,29 @@ static void light_player_side(ServoPosition player_side, rgb_colour colour)
 
 void referee_indicate_server(ServoPosition side_serving)
 {
-    PiezoBuzzer.init_buzzer();
-    PiezoBuzzer.play_tone(notes6[0]);
+    buzzer_play_tone(notes6[0]);
     sleep_ms(200);
-    PiezoBuzzer.play_tone(notes6[2]);
+    buzzer_play_tone(notes6[2]);
     motor_move_motor_safely(side_serving);
     light_player_side(side_serving, get_rgb(WHITE));
-    PiezoBuzzer.play_tone(notes6[4]);
+    buzzer_play_tone(notes6[4]);
     sleep_ms(200);
-    PiezoBuzzer.stop_buzzer();
+    buzzer_stop();
 }
 
 void referee_point_scored(ServoPosition side_scored)
 {
-    PiezoBuzzer.init_buzzer();
-    PiezoBuzzer.play_tone(notes6[6]);
+    buzzer_play_tone(notes6[6]);
     motor_move_motor_safely(side_scored);
     light_player_side(side_scored, get_rgb(GREEN));
-    PiezoBuzzer.play_tone(notes7[2]);
+    buzzer_play_tone(notes7[2]);
     sleep_ms(200);
-    PiezoBuzzer.stop_buzzer();
+    buzzer_stop();
 }
 
 void referee_dance_sequence()
 {
-    PiezoBuzzer.play_victory_sequence();
+    buzzer_play_victory_sequence();
     referee_dance(1000, 500);
     referee_dance(500, 250);
     sleep_ms(250);
@@ -151,7 +154,8 @@ void referee_dance_sequence()
 }
 
 void referee_angry(uint duration_ms)
-{PiezoBuzzer.play_angry_sounds();
+{
+    buzzer_play_angry_sounds();
     absolute_time_t end_time = make_timeout_time_ms(duration_ms);
     while (!time_reached(end_time))
     {
@@ -165,12 +169,12 @@ void referee_angry(uint duration_ms)
         update_all_leds();
         for (uint8_t i = 0; i < 5; i++)
         {
-            PiezoBuzzer.play_tone(notes7[0]);
+            buzzer_play_tone(notes7[0]);
             sleep_ms(20);
-            PiezoBuzzer.play_tone(notes6[6]);
+            buzzer_play_tone(notes6[6]);
             sleep_ms(20);
         }
     }
     motor_move_motor_safely(CENTRE);
-    PiezoBuzzer.stop_buzzer();
+    buzzer_stop();
 }

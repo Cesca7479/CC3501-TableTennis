@@ -19,6 +19,7 @@
 #include "drivers/leds/leds.h"
 #include "drivers/hat_id/hat_id.h"             //
 #include "drivers/user_buttons/user_buttons.h" //
+#include "drivers/buzzer/buzzer.h"
 
 // Helpers and programs ============================================================================================================
 #include "programs/referee_reactions/referee_reactions.h" //
@@ -40,6 +41,7 @@
 
 // Global Variables ================================================================================================================
 bool Testing = false;
+uint8_t mode = DEFAULT_MODE;
 
 // Init board =====================================================================================================================
 void init_board()
@@ -50,6 +52,7 @@ void init_board()
     {
         Piezos[i].init_sensing();
     }
+    buzzer_init(BUZZER_PIN);
 
     gpio_init(ON_BOARD_SW_PIN);
     gpio_set_dir(ON_BOARD_SW_PIN, GPIO_IN);
@@ -66,6 +69,7 @@ void init_board()
     motor_pwr_ctrl_init();
     motor_init();
     hat_id_init();
+
 }
 
 // Define GAME mode functions

@@ -7,6 +7,7 @@
 #include "drivers/display/display.h"
 #include "game/gamestate.h"
 #include "programs/referee_reactions/referee_reactions.h"
+#include "drivers/buzzer/buzzer.h"
 
 #define SCORE_BLINK_INTERVAL_MS 300
 
@@ -74,7 +75,7 @@ void run_change_score_mode()
     }
 
     show_score_selection(true);
-    Piezos[2].play_select();
+    buzzer_play_select_pressed();
 
     log(LogLevel::INFORMATION, "Score change");
     while (!is_button_pressed(SELECT_BUTTON))
@@ -108,6 +109,6 @@ void run_change_score_mode()
             }
         }
     }
-    Piezos[2].play_select();
+    buzzer_play_select_pressed();
     State.mode = CHECK_VICTORY_AND_SCORE;
 }
