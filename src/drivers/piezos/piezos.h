@@ -23,10 +23,30 @@ public:
     bool buzzer_on = false;
     void init_sensing();
     void play_tone(uint32_t frequency);
+
+    /**
+     * @brief Play victory sequence tune - Appegiated movement going upwards starting from the 3rd
+     */
     void play_victory_sequence();
+
+    /**
+     * @brief Play angry sounds - 2 notes rapdily changing between themselves, one semitone apart
+     */
     void play_angry_sounds();
+
+    /**
+     * @brief Play point tune - short 2 note phrase, going upwards from the 5th to the 1st of a major scale
+     */
     void play_point();
+
+    /**
+     * @brief Play serve tune - short 3 note phrase, playing the 1st, 3rd and 5th of a major scale
+     */
     void play_serve();
+
+    /**
+     * @brief Play select tune - quick 4 note phrase, repeated from the 3rd to the 1st in the octave above
+     */
     void play_select();
     uint16_t read();
     void init_buzzer();
