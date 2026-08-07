@@ -29,6 +29,7 @@ void run_check_victory_and_score_mode()
     if (is_win)
     {
         printf("Player %d has won!\r\n", winner + 1);
+        Piezos[NET].play_victory_sequence();
         msg = "Won: Player" + std::to_string(winner) + "\n";
         referee_dance_sequence();
 

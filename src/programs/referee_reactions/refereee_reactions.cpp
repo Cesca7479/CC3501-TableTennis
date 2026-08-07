@@ -8,6 +8,8 @@
 #include "drivers/logging/logging.h"
 #include "drivers/piezos/piezos.h"
 
+#include "game/gamestate.h"
+
 uint8_t RAINBOW_COLOUR_COUNT = 7;
 uint32_t DANCE_COLOUR_INTERVAL_MS = 75;
 uint32_t DANCE_UPDATE_INTERVAL_MS = 5;
@@ -149,27 +151,16 @@ void referee_dance_sequence()
 
 void referee_angry(uint duration_ms)
 {
+    Piezos[1].play_angry_sounds();
     absolute_time_t end_time = make_timeout_time_ms(duration_ms);
     while (!time_reached(end_time))
     {
-        Piezos[2].init_buzzer();
-        // motor_move_motor_safely(LEFT);
-        motor_set_position(LEFT);
-        motor_enable();
+        motor_move_motor_safely(LEFT);
         set_all_leds(get_rgb(RED));
         update_all_leds();
-        for (uint8_t i = 0; i < 5; i++)
-        {
-            Piezos[2].play_tone(notes7[0]);
-            sleep_ms(20);
-            Piezos[2].play_tone(notes6[6]);
-            sleep_ms(20);
-        }
         motor_disable();
 
-        // motor_move_motor_safely(RIGHT);
-        motor_set_position(RIGHT);
-        motor_enable();
+        motor_move_motor_safely(RIGHT);
         set_all_leds(get_rgb(OFF));
         update_all_leds();
         for (uint8_t i = 0; i < 5; i++)
