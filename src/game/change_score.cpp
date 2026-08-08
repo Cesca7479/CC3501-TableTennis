@@ -38,7 +38,8 @@ static void show_score_selection(bool visible)
 
 void run_change_score_phase()
 {
-    clear_all_leds();     // Clear any leds indicating point or serve
+    buzzer_play_select_pressed();
+    clear_all_leds(); // Clear any leds indicating point or serve
     display_loading(125); // Transition to new display mode
 
     uint8_t max_score = State.settings.points_to_win;

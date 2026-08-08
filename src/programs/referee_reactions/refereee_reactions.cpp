@@ -138,7 +138,6 @@ void referee_indicate_server(ServoPosition side_serving)
     if (sleep_ms_with_button_checking(500))
         return;
     motor_move_motor_safely(CENTRE);
-    // needs to drop arm and turn light off after ball bounce
 }
 
 void referee_point_scored(ServoPosition side_scored)
@@ -151,7 +150,7 @@ void referee_point_scored(ServoPosition side_scored)
         return;
     buzzer_stop();
     motor_move_motor_safely(CENTRE);
-    // Needs to drop arm and turn light off atp
+    clear_all_leds();
 }
 
 void referee_dance_sequence()
