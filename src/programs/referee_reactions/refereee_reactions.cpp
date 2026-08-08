@@ -21,6 +21,12 @@ const uint32_t notes5[7] = {523, 587, 659, 698, 784, 879, 988};
 const uint32_t notes6[7] = {1047, 1175, 1319, 1397, 1568, 1760, 1976};
 const uint32_t notes7[7] = {2093, 2349, 2637, 2794, 3136, 3520, 3951};
 
+
+static ServoPosition convert_player_to_side(uint8_t player) {
+    return (player == PLAYER_1) ? LEFT : RIGHT;
+}
+
+
 /**
  * @brief Perform one dance move, which moves arm once and changes colour 4 times
  * @param position Side to move motor to
@@ -147,8 +153,9 @@ static void light_player_side(ServoPosition player_side, rgb_colour colour)
     update_all_leds();
 }
 
-void referee_indicate_server(ServoPosition side_serving)
+void referee_indicate_server(uint8_t player)
 {
+    ServoPosition side_serving = convert_player_to_side(player);
     buzzer_play_tone(notes6[0]);
     if (sleep_ms_with_button_checking(200))
         return;
@@ -165,8 +172,9 @@ void referee_indicate_server(ServoPosition side_serving)
     // needs to drop arm and turn light off after ball bounce
 }
 
-void referee_point_scored(ServoPosition side_scored)
+void referee_point_scored(uint8_t player)
 {
+    ServoPosition side_scored  = convert_player_to_side(player);
     buzzer_play_tone(notes6[6]);
     motor_move_motor_safely(side_scored);
     light_player_side(side_scored, get_rgb(GREEN));

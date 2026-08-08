@@ -1,8 +1,9 @@
 #include "serve_detection.h"
 #include "programs/referee_reactions/referee_reactions.h"
 #include "drivers/leds/leds.h"
+#include "helpers/scoring/scoring.h"
 
-void reset_serve_state(uint8_t &serve_attempts, bool &has_hit_table, bool &has_hit_net) // Resets serve state
+static void reset_serve_state(uint8_t &serve_attempts, bool &has_hit_table, bool &has_hit_net) // Resets serve state
 {
     serve_attempts = 0;
     has_hit_table = false;
@@ -59,10 +60,8 @@ void run_serve_detection_phase()
     else if (has_hit_table && absolute_time_diff_us(State.prev_bounce_time, current_time) > TIME_OUT_THRESHOLD_MS * 1000) // If served but went out (doesn't matter if it hit the net or not)
     {
         printf("Served but went out\r\n");
-        State.player_score[opposing_player]++;
-        referee_point_scored((opposing_player == PLAYER_1) ? LEFT : RIGHT);
+        score_point(opposing_player);
         reset_serve_state(serve_attempts, has_hit_table, has_hit_net);
-        State.phase = CHECK_VICTORY_AND_SCORE;
     }
     else
         return;
@@ -91,9 +90,7 @@ void run_serve_detection_phase()
         if (serve_attempts > State.settings.num_lets_allowed && State.settings.limited_lets) // If too many lets in a row are served -> point for opposing player
         {
             printf("Too many lets in a row: %d\r\n", serve_attempts);
-            State.player_score[opposing_player]++;
-            referee_point_scored((opposing_player == PLAYER_1) ? LEFT : RIGHT);
-            State.phase = CHECK_VICTORY_AND_SCORE;
+            score_point(opposing_player);
             serve_attempts = 0;
         }
         else
@@ -107,10 +104,8 @@ void run_serve_detection_phase()
     else if (has_hit_table && has_hit_net && isBounce[State.player_serving]) // Hits server side, then hits net, then falls back onto server side -> point for opposing player
     {
         printf("Point to Player %d, hit net fall back\r\n", opposing_player + 1);
-        State.player_score[opposing_player]++;
-        referee_point_scored((opposing_player == PLAYER_1) ? LEFT : RIGHT);
+        score_point(opposing_player);
         reset_serve_state(serve_attempts, has_hit_table, has_hit_net);
-        State.phase = CHECK_VICTORY_AND_SCORE;
     }
 
     else if (has_hit_table && !has_hit_net && isBounce[opposing_player]) // Hits server side, then opposing player side without touching net -> Serve successful

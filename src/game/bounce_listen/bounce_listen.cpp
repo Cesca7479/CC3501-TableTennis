@@ -1,5 +1,6 @@
 #include "bounce_listen.h"
 #include "programs/referee_reactions/referee_reactions.h"
+#include "helpers/scoring/scoring.h"
 
 void run_bounce_listening_phase()
 {
@@ -25,16 +26,12 @@ void run_bounce_listening_phase()
     if (isBounce[PLAYER_1] && State.prev_bounce_side == PLAYER_1) // Detects double bounce in player 1 side
     {
         printf("Double bounce in Player 1 side\r\n");
-        State.player_score[PLAYER_2]++;
-        referee_point_scored(RIGHT);
-        State.phase = CHECK_VICTORY_AND_SCORE;
+        score_point(PLAYER_2);
     }
     else if (isBounce[PLAYER_2] && State.prev_bounce_side == PLAYER_2) // Detects double bounce in player 2 side
     {
         printf("Double bounce in Player 2 side\r\n");
-        State.player_score[PLAYER_1]++;
-        referee_point_scored(LEFT);
-        State.phase = CHECK_VICTORY_AND_SCORE;
+        score_point(PLAYER_1);
     }
     else if (isBounce[PLAYER_1]) // Sets previous bounce side and time
     {
@@ -51,9 +48,7 @@ void run_bounce_listening_phase()
     else if (absolute_time_diff_us(State.prev_bounce_time, current_time) >= TIME_OUT_THRESHOLD_MS * 1000) // Detects ball gone out by time threshold
     {
         printf("Ball went out\r\n");
-        State.player_score[(State.prev_bounce_side == PLAYER_1) ? PLAYER_2 : PLAYER_1]++;
-        referee_point_scored((State.prev_bounce_side == PLAYER_1) ? LEFT : RIGHT );
-        State.phase = CHECK_VICTORY_AND_SCORE;
+        score_point((State.prev_bounce_side == PLAYER_1) ? PLAYER_2 : PLAYER_1);
     } 
     
     if (State.rpi_connected) {
