@@ -63,6 +63,7 @@ if(CrossCompiling)
         src/helpers/colours/colour.cpp
         src/helpers/game_settings/game_settings.cpp
         src/helpers/dc_bias/dc_bias.cpp
+        src/helpers/timing/timing.cpp
 
         src/programs/referee_reactions/refereee_reactions.cpp
 
@@ -139,6 +140,7 @@ else()
         src/helpers/colours/colour.cpp
         src/helpers/game_settings/game_settings.cpp
         src/helpers/dc_bias/dc_bias.cpp
+        src/helpers/timing/timing.cpp
 
         src/programs/referee_reactions/refereee_reactions.cpp
 
