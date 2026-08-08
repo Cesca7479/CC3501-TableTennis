@@ -30,7 +30,6 @@ void run_check_victory_and_score_phase()
     if (is_win)
     {
         printf("Player %d has won!\r\n", winner + 1);
-        buzzer_play_victory_sequence();
         msg = "Won: Player" + std::to_string(winner) + "\n";
         referee_dance_sequence();
 
