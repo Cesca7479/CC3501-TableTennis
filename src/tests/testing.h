@@ -32,14 +32,6 @@ enum Mode
 
 void on_board_button_callback(uint gpio, uint32_t events);
 
-/**
- * @brief This function allows for mode changes during sleeping
- * @param ms, milliseconds to sleep for (will round down to multiple of 10)
- * @param expected_mode expected mode when called
- * @return Returns true if mode changed, false otherwise
- */
-bool sleep_ms_with_checking(uint16_t ms, uint8_t expected_mode);
-
 void run_default_mode();
 void run_piezo_test_mode();
 void run_motor_test_mode();

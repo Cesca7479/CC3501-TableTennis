@@ -5,6 +5,7 @@
 #include "drivers/user_buttons/user_buttons.h"
 #include "game/change_score.h"
 #include "drivers/buzzer/buzzer.h"
+#include "helpers/timing/timing.h"
 
 bool mode_change_logged = false;
 
@@ -15,21 +16,10 @@ void on_board_button_callback(uint gpio, uint32_t events)
     mode_change_logged = false;
 }
 
-bool sleep_ms_with_checking(uint16_t ms, uint8_t expected_mode)
-{
-    for (size_t i = 0; i < (ms / 10); i++)
-    {
-        sleep_ms(10);
-        if (mode != expected_mode)
-            return true;
-    }
-    return false;
-}
-
 void run_default_mode()
 {
     printf("Default mode running\r\n"); // placeholder
-    if (sleep_ms_with_checking(5000, DEFAULT_MODE))
+    if (sleep_ms_with_test_mode_checking(5000, DEFAULT_MODE))
         return;                                      // placeholder
     printf("This can be stopped from printing\r\n"); // placeholder
     return;
@@ -86,7 +76,7 @@ void run_piezo_test_mode()
             side = PLAYER_1;
         }
         printf("BOUNCE1: %d, Distance: %d\r\n", bounces, result1 - dc_bias[0]);
-        if (sleep_ms_with_checking(100, PIEZO_TEST_MODE))
+        if (sleep_ms_with_test_mode_checking(100, PIEZO_TEST_MODE))
             return;
     }
 
@@ -102,7 +92,7 @@ void run_piezo_test_mode()
             side = PLAYER_2;
         }
         printf("BOUNCE2: %d, Distance: %d\r\n", bounces, result2 - dc_bias[1]);
-        if (sleep_ms_with_checking(100, PIEZO_TEST_MODE))
+        if (sleep_ms_with_test_mode_checking(100, PIEZO_TEST_MODE))
             return;
     }
 
@@ -118,7 +108,7 @@ void run_piezo_test_mode()
             side = NET;
         }
         printf("BOUNCE3: %d, Distance: %d\r\n", bounces, result3 - dc_bias[2]);
-        if (sleep_ms_with_checking(100, PIEZO_TEST_MODE))
+        if (sleep_ms_with_test_mode_checking(100, PIEZO_TEST_MODE))
             return;
     }
 
@@ -192,10 +182,13 @@ void run_test_words()
 
 void run_motor_test_mode()
 {
+    printf("CENTRE\n");
     motor_move_motor_safely(CENTRE);
     sleep_ms(1000);
+    printf("LEFT\n");
     motor_move_motor_safely(LEFT);
     sleep_ms(1000);
+    printf("RIGHT\n");
     motor_move_motor_safely(RIGHT);
     sleep_ms(1000);
 }
