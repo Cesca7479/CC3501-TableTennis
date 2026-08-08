@@ -71,6 +71,7 @@ void init_board()
     motor_init();
     hat_id_init();
 
+    sleep_ms(500);
     set_dc_biases();
 
 }
@@ -113,6 +114,7 @@ int main()
                 {
                     log(INFORMATION, "Mode Changed: Mode = Test Piezo Mode");
                     mode_change_logged = true;
+                    set_dc_biases();
                     // Piezo2.play_victory_sequence();
                 }
                 run_piezo_test_mode();

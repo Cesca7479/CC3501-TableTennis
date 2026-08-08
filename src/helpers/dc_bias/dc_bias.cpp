@@ -9,6 +9,7 @@ void set_dc_biases()
     {
         for (size_t j = 0; j < 3; j++)
         {
+            Piezos[j].read(); // Ignore first read after swapping ADC channels for accurate results
             result = Piezos[j].read();
             sum_piezos[j] += result;
         }

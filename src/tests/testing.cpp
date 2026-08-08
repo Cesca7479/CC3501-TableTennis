@@ -39,32 +39,13 @@ void run_piezo_test_mode()
     uint16_t result2;
     uint16_t result3;
 
-    if (!has_calculated_dc)
-    {
-        for (size_t i = 0; i < 10; i++)
-        {
-            result1 = Piezos[0].read();
-            result2 = Piezos[1].read();
-            result3 = Piezos[2].read();
-
-            sum_piezo1 += result1;
-            sum_piezo2 += result2;
-            sum_piezo3 += result3;
-            sleep_ms(100);
-        }
-        dc_bias[0] = sum_piezo1 / 10;
-        dc_bias[1] = sum_piezo2 / 10;
-        dc_bias[2] = sum_piezo3 / 10;
-        has_calculated_dc = true;
-    }
-
     
     result1 = Piezos[0].read();
     result2 = Piezos[1].read();
     result3 = Piezos[2].read();
 
     // printf("%d:%d:%d\r\n", result1, result2,result3);
-    if (result1 > dc_bias[0] + SENSITIVITY_THRESHOLD_TABLE || result1 < dc_bias[0] - SENSITIVITY_THRESHOLD_TABLE)
+    if (result1 > State.piezo_dc_biases[0] + SENSITIVITY_THRESHOLD_TABLE || result1 < State.piezo_dc_biases[0] - SENSITIVITY_THRESHOLD_TABLE)
     {
         if (side == PLAYER_1)
         {
@@ -75,12 +56,11 @@ void run_piezo_test_mode()
             bounces = 1;
             side = PLAYER_1;
         }
-        printf("BOUNCE1: %d, Distance: %d\r\n", bounces, result1 - dc_bias[0]);
-        if (sleep_ms_with_test_mode_checking(100, PIEZO_TEST_MODE))
-            return;
+        printf("BOUNCE1: %d, Distance: %d\r\n", bounces, result1 - State.piezo_dc_biases[0]);
+        sleep_ms(100);
     }
 
-    if (result2 > dc_bias[1] + SENSITIVITY_THRESHOLD_TABLE || result2 < dc_bias[1] - SENSITIVITY_THRESHOLD_TABLE)
+    if (result2 > State.piezo_dc_biases[1] + SENSITIVITY_THRESHOLD_TABLE || result2 < State.piezo_dc_biases[1] - SENSITIVITY_THRESHOLD_TABLE)
     {
         if (side == PLAYER_2)
         {
@@ -91,12 +71,11 @@ void run_piezo_test_mode()
             bounces = 1;
             side = PLAYER_2;
         }
-        printf("BOUNCE2: %d, Distance: %d\r\n", bounces, result2 - dc_bias[1]);
-        if (sleep_ms_with_test_mode_checking(100, PIEZO_TEST_MODE))
-            return;
+        printf("BOUNCE2: %d, Distance: %d\r\n", bounces, result2 - State.piezo_dc_biases[1]);
+        sleep_ms(100);
     }
 
-    if (result3 > dc_bias[2] + SENSITIVITY_THRESHOLD_TABLE || result3 < dc_bias[2] - SENSITIVITY_THRESHOLD_TABLE)
+    if (result3 > State.piezo_dc_biases[2] + SENSITIVITY_THRESHOLD_TABLE || result3 < State.piezo_dc_biases[2] - SENSITIVITY_THRESHOLD_TABLE)
     {
         if (side == NET)
         {
@@ -107,9 +86,8 @@ void run_piezo_test_mode()
             bounces = 1;
             side = NET;
         }
-        printf("BOUNCE3: %d, Distance: %d\r\n", bounces, result3 - dc_bias[2]);
-        if (sleep_ms_with_test_mode_checking(100, PIEZO_TEST_MODE))
-            return;
+        printf("BOUNCE3: %d, Distance: %d\r\n", bounces, result3 - State.piezo_dc_biases[2]);
+        sleep_ms(100);
     }
 
     return;
