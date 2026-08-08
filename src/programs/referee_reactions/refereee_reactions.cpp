@@ -40,6 +40,18 @@ static bool perform_dance_move(ServoPosition position, absolute_time_t duration_
     absolute_time_t move_end = make_timeout_time_ms(move_time);
 
     absolute_time_t next_colour_time = get_absolute_time(); // Change the first colour immediately.
+
+    const uint32_t tune[] = {notes6[2],
+                             notes6[0],
+                             notes6[2],
+                             notes6[4],
+                             notes6[2],
+                             notes6[4],
+                             notes7[0],
+                             notes7[0],
+                             notes7[0]};
+    uint8_t tune_index = 0;
+    absolute_time_t next_note_time = get_absolute_time();
     while (!time_reached(move_end) && !time_reached(duration_ms))
     {
         if (is_motor_fault_active())
@@ -59,8 +71,20 @@ static bool perform_dance_move(ServoPosition position, absolute_time_t duration_
             next_colour_time = make_timeout_time_ms(DANCE_COLOUR_INTERVAL_MS);
         }
 
+        if (time_reached(next_note_time))
+        {
+            buzzer_play_tone(tune[tune_index]);
+
+            tune_index = (tune_index + 1) % 4;
+
+            next_note_time = make_timeout_time_ms(120); // 120 ms per note
+        }
+
         if (sleep_ms_with_button_checking(DANCE_UPDATE_INTERVAL_MS))
+        {
+            buzzer_stop();
             return false;
+        }
     }
     motor_disable();
     return true;
