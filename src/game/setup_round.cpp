@@ -1,5 +1,6 @@
 #include "setup_round.h"
 #include "programs/referee_reactions/referee_reactions.h"
+#include "helpers/dc_bias/dc_bias.h"
 
 void run_setup_round_phase()
 {
@@ -10,4 +11,6 @@ void run_setup_round_phase()
     State.ball_location = State.player_serving;
     State.ball_is_center = false;
     State.phase = SERVE_DETECTION;
+
+    set_dc_biases();
 }
