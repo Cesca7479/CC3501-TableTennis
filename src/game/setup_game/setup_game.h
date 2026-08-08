@@ -1,6 +1,6 @@
 #pragma once
 
-#include "gamestate.h"
+#include "game/gamestate.h"
 #include "drivers/hat_id/hat_id.h"
 #include "drivers/logging/logging.h"
 #include "drivers/display/display.h"
