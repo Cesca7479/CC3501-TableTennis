@@ -79,4 +79,8 @@ void display_flat_lines();
  */
 void display_mode(GameMode mode);
 
+/**
+ * @brief Display a loading screen on the display
+ * @param wait_time Time between changes on the loading screen
+ */
 void display_loading(uint wait_time);
