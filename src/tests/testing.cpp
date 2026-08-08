@@ -182,34 +182,34 @@ void run_led_test_mode()
 
 void run_referee_test_mode()
 {
-    printf("REFEREE ANGY!\n");
-    referee_angry(2000);
-    sleep_ms(1000);
+    // printf("REFEREE ANGY!\n");
+    // referee_angry(2000);
+    // sleep_ms(1000);
 
-    // Cha cha dance
-    printf("REFEREE DANCE!\n");
-    referee_dance_sequence();
-    sleep_ms(1000);
+    // // // Cha cha dance
+    // // printf("REFEREE DANCE!\n");
+    // // referee_dance_sequence(0);
+    // // sleep_ms(1000);
 
-    printf("REFEREE POINT LEFT\n");
-    referee_point_scored(LEFT);
-    clear_all_leds();
-    sleep_ms(1000);
+    // printf("REFEREE POINT LEFT\n");
+    // referee_point_scored(LEFT);
+    // clear_all_leds();
+    // sleep_ms(1000);
 
-    printf("REFEREE POINT RIGHT\n");
-    referee_point_scored(RIGHT);
-    clear_all_leds();
-    sleep_ms(1000);
+    // printf("REFEREE POINT RIGHT\n");
+    // referee_point_scored(RIGHT);
+    // clear_all_leds();
+    // sleep_ms(1000);
 
-    printf("REFEREE SERVE LEFT!\n");
-    referee_indicate_server(LEFT);
-    clear_all_leds();
-    sleep_ms(1000);
+    // printf("REFEREE SERVE LEFT!\n");
+    // referee_indicate_server(LEFT);
+    // clear_all_leds();
+    // sleep_ms(1000);
 
-    printf("REFEREE SERVE RIGHT!\n");
-    referee_indicate_server(RIGHT);
-    clear_all_leds();
-    sleep_ms(1000);
+    // printf("REFEREE SERVE RIGHT!\n");
+    // referee_indicate_server(RIGHT);
+    // clear_all_leds();
+    // sleep_ms(1000);
 }
 
 void run_change_score_test()
