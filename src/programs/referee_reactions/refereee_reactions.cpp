@@ -9,6 +9,8 @@
 #include "drivers/piezos/piezos.h"
 #include "drivers/buzzer/buzzer.h"
 
+#include "helpers/timing/timing.h"
+
 #include "game/gamestate.h"
 
 uint8_t RAINBOW_COLOUR_COUNT = 7;
@@ -57,7 +59,8 @@ static bool perform_dance_move(ServoPosition position, absolute_time_t duration_
             next_colour_time = make_timeout_time_ms(DANCE_COLOUR_INTERVAL_MS);
         }
 
-        sleep_ms(DANCE_UPDATE_INTERVAL_MS);
+        if (sleep_ms_with_button_checking(DANCE_UPDATE_INTERVAL_MS))
+            return false;
     }
     motor_disable();
     return true;
@@ -97,7 +100,8 @@ static void flash_leds_rainbow(uint time_interval_ms)
     {
         set_all_leds(get_rgb(rainbow[i]));
         update_all_leds();
-        sleep_ms(time_interval_ms);
+        if (sleep_ms_with_button_checking(time_interval_ms))
+            return;
     }
 }
 
@@ -122,14 +126,19 @@ static void light_player_side(ServoPosition player_side, rgb_colour colour)
 void referee_indicate_server(ServoPosition side_serving)
 {
     buzzer_play_tone(notes6[0]);
-    sleep_ms(200);
+    if (sleep_ms_with_button_checking(200))
+        return;
     buzzer_play_tone(notes6[2]);
     motor_move_motor_safely(side_serving);
     light_player_side(side_serving, get_rgb(WHITE));
     buzzer_play_tone(notes6[4]);
-    sleep_ms(200);
+    if (sleep_ms_with_button_checking(200))
+        return;
     buzzer_stop();
-    // needs to drop arm and turn light off after ball bounce 
+    if (sleep_ms_with_button_checking(500))
+        return;
+    motor_move_motor_safely(CENTRE);
+    // needs to drop arm and turn light off after ball bounce
 }
 
 void referee_point_scored(ServoPosition side_scored)
@@ -138,8 +147,10 @@ void referee_point_scored(ServoPosition side_scored)
     motor_move_motor_safely(side_scored);
     light_player_side(side_scored, get_rgb(GREEN));
     buzzer_play_tone(notes7[2]);
-    sleep_ms(200);
+    if (sleep_ms_with_button_checking(200))
+        return;
     buzzer_stop();
+    motor_move_motor_safely(CENTRE);
     // Needs to drop arm and turn light off atp
 }
 
@@ -148,10 +159,12 @@ void referee_dance_sequence()
     buzzer_play_victory_sequence();
     referee_dance(1000, 500);
     referee_dance(500, 250);
-    sleep_ms(250);
+    if (sleep_ms_with_button_checking(250))
+        return;
     referee_dance(1000, 500);
     referee_dance(500, 250);
-    sleep_ms(250);
+    if (sleep_ms_with_button_checking(250))
+        return;
     motor_move_motor_safely(CENTRE);
     // Incorporate sound and movement
 }
@@ -159,6 +172,7 @@ void referee_dance_sequence()
 void referee_angry(uint duration_ms)
 {
     set_all_leds(get_rgb(RED));
+    update_all_leds();
     buzzer_play_angry_sounds();
     absolute_time_t end_time = make_timeout_time_ms(duration_ms);
     while (!time_reached(end_time))
@@ -174,9 +188,11 @@ void referee_angry(uint duration_ms)
         for (uint8_t i = 0; i < 5; i++)
         {
             buzzer_play_tone(notes7[0]);
-            sleep_ms(20);
+            if (sleep_ms_with_button_checking(20))
+                return;
             buzzer_play_tone(notes6[6]);
-            sleep_ms(20);
+            if (sleep_ms_with_button_checking(20))
+                return;
         }
     }
     motor_move_motor_safely(CENTRE);
