@@ -33,7 +33,7 @@
 #include "game/setup_game/setup_game.h"
 #include "game/serve_detection/serve_detection.h"
 #include "game/bounce_listen/bounce_listen.h"
-#include "game/check_victory/check_victory_and_score.h"
+#include "game/check_victory_and_score/check_victory_and_score.h"
 #include "game/camera_check/camera_check.h"
 #include "game/change_score/change_score.h"
 

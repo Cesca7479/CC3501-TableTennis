@@ -1,6 +1,6 @@
 #pragma once
 
-#include "gamestate.h"
+#include "game/gamestate.h"
 
 #include "pico/stdlib.h"
 #include "stdio.h"

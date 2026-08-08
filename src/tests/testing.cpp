@@ -1,9 +1,9 @@
 #include "testing.h"
 
 #include "drivers/hat_id/hat_id.h"
-#include "game/setup_game.h"
+#include "game/setup_game/setup_game.h"
 #include "drivers/user_buttons/user_buttons.h"
-#include "game/change_score.h"
+#include "game/change_score/change_score.h"
 #include "drivers/buzzer/buzzer.h"
 #include "helpers/timing/timing.h"
 
