@@ -30,7 +30,6 @@ void run_piezo_test_mode()
     static uint8_t bounces = 0;
     static uint8_t side = PLAYER_1;
     static bool has_calculated_dc = false;
-    static int16_t dc_bias[3];
     uint32_t sum_piezo1 = 0;
     uint32_t sum_piezo2 = 0;
     uint32_t sum_piezo3 = 0;
