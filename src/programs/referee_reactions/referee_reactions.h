@@ -18,7 +18,7 @@ void referee_point_scored(uint8_t player);
 /**
  * @brief Pre-choreographed dance sequence for victory 
  */
-void referee_dance_sequence();
+void referee_dance_sequence(uint8_t winner);
 
 /**
  * @brief Referee reaction for when a player's been BAD

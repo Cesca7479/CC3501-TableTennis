@@ -31,7 +31,7 @@ void run_check_victory_and_score_phase()
     {
         printf("Player %d has won!\r\n", winner + 1);
         msg = "Won: Player" + std::to_string(winner) + "\n";
-        referee_dance_sequence();
+        referee_dance_sequence(winner);
 
         // Wait for confirmation of score to continue
         while (!is_button_pressed(SELECT_BUTTON))

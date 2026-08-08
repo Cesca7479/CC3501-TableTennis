@@ -21,11 +21,10 @@ const uint32_t notes5[7] = {523, 587, 659, 698, 784, 879, 988};
 const uint32_t notes6[7] = {1047, 1175, 1319, 1397, 1568, 1760, 1976};
 const uint32_t notes7[7] = {2093, 2349, 2637, 2794, 3136, 3520, 3951};
 
-
-static ServoPosition convert_player_to_side(uint8_t player) {
+static ServoPosition convert_player_to_side(uint8_t player)
+{
     return (player == PLAYER_1) ? LEFT : RIGHT;
 }
-
 
 /**
  * @brief Perform one dance move, which moves arm once and changes colour 4 times
@@ -102,7 +101,7 @@ static bool perform_dance_move(ServoPosition position, absolute_time_t duration_
  * @param duration_ms The duration of the dance in milliseconds
  * @param move_time Time for each movement in perform_dance_move
  */
-static void referee_dance(uint duration_ms, uint move_time)
+static void referee_dance(uint duration_ms, uint move_time, ServoPosition start_position)
 {
     absolute_time_t dance_end = make_timeout_time_ms(duration_ms);
     ServoPosition position = LEFT;
@@ -136,18 +135,19 @@ static void flash_leds_rainbow(uint time_interval_ms)
     }
 }
 
-void referee_dance_sequence()
+void referee_dance_sequence(uint8_t winner)
 {
-    referee_dance(1000, 500);
-    referee_dance(500, 250);
+    ServoPosition winner_side = convert_player_to_side(winner);
+    referee_dance(1000, 500, winner_side);
+    referee_dance(500, 250, winner_side);
     if (sleep_ms_with_button_checking(250))
         return;
-    referee_dance(1000, 500);
-    referee_dance(500, 250);
+    referee_dance(1000, 500, winner_side);
+    referee_dance(500, 250, winner_side);
     if (sleep_ms_with_button_checking(250))
         return;
-    
-    buzzer_play_victory_sequence();
+    convert_player_to_side();
+    referee_dance(1000, 1000, winner_side);
     motor_move_motor_safely(CENTRE);
 }
 
@@ -169,9 +169,8 @@ static void light_player_side(ServoPosition player_side, rgb_colour colour)
     update_all_leds();
 }
 
-void referee_indicate_server(uint8_t player)
+void referee_indicate_server(ServoPosition side_serving)
 {
-    ServoPosition side_serving = convert_player_to_side(player);
     buzzer_play_tone(notes6[0]);
     if (sleep_ms_with_button_checking(200))
         return;
@@ -187,9 +186,8 @@ void referee_indicate_server(uint8_t player)
     motor_move_motor_safely(CENTRE);
 }
 
-void referee_point_scored(uint8_t player)
+void referee_point_scored(ServoPosition side_scored)
 {
-    ServoPosition side_scored  = convert_player_to_side(player);
     buzzer_play_tone(notes6[6]);
     motor_move_motor_safely(side_scored);
     light_player_side(side_scored, get_rgb(GREEN));
