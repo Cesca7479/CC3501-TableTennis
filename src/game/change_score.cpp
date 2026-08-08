@@ -3,11 +3,14 @@
 #include "pico/stdlib.h"
 
 #include "change_score.h"
+
 #include "drivers/user_buttons/user_buttons.h"
 #include "drivers/display/display.h"
+#include "drivers/buzzer/buzzer.h"
+#include "drivers/leds/leds.h"
+
 #include "game/gamestate.h"
 #include "programs/referee_reactions/referee_reactions.h"
-#include "drivers/buzzer/buzzer.h"
 
 #define SCORE_BLINK_INTERVAL_MS 300
 
@@ -35,6 +38,7 @@ static void show_score_selection(bool visible)
 
 void run_change_score_phase()
 {
+    clear_all_leds();     // Clear any leds indicating point or serve
     display_loading(125); // Transition to new display mode
 
     uint8_t max_score = State.settings.points_to_win;

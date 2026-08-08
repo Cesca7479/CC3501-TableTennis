@@ -34,28 +34,22 @@ void run_check_victory_and_score_phase()
         msg = "Won: Player" + std::to_string(winner) + "\n";
         referee_dance_sequence();
 
-        while (true)
+        // Wait for confirmation of score to continue
+        while (!is_button_pressed(SELECT_BUTTON))
         {
-            bool left_pressed = is_button_pressed(LEFT_BUTTON);
-
-            bool select_pressed = is_button_pressed(SELECT_BUTTON);
-
-            bool right_pressed = is_button_pressed(RIGHT_BUTTON);
-
-            if (select_pressed)
+            // Condition to change score (exception to default condition to change score)
+            if (is_button_pressed(LEFT_BUTTON) || is_button_pressed(RIGHT_BUTTON))
             {
-                bluetooth_send(msg.c_str());
-                State.game_number++;
-                State.phase = SETUP_GAME;
-                return;
-            }
-
-            if (left_pressed || right_pressed)
-            {
-                State.phase = CHANGE_SCORE;
-                return;
+                {
+                    State.phase = CHANGE_SCORE;
+                    return;
+                }
             }
         }
-        return;
+
+        // Confirmed to upload results and move on
+        bluetooth_send(msg.c_str());
+        State.game_number++;
+        State.phase = SETUP_GAME;
     }
 }

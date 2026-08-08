@@ -1,5 +1,6 @@
 #include "serve_detection.h"
 #include "programs/referee_reactions/referee_reactions.h"
+#include "drivers/leds/leds.h"
 
 void reset_serve_state(uint8_t &serve_attempts, bool &has_hit_table, bool &has_hit_net) // Resets serve state
 {
@@ -33,19 +34,22 @@ void run_serve_detection_phase()
     }
 
     // Ignores "bounces" if they do not occur where the ball is positioned - rejects accidental contacts
-    if (State.ball_location != PLAYER_1 && State.rpi_connected) isBounce[PLAYER_1] = false;
-    if (State.ball_location != PLAYER_2 && State.rpi_connected) isBounce[PLAYER_2] = false;
-    if (!State.ball_is_center && State.rpi_connected) isBounce[NET] = false;
+    if (State.ball_location != PLAYER_1 && State.rpi_connected)
+        isBounce[PLAYER_1] = false;
+    if (State.ball_location != PLAYER_2 && State.rpi_connected)
+        isBounce[PLAYER_2] = false;
+    if (!State.ball_is_center && State.rpi_connected)
+        isBounce[NET] = false;
 
     // Ignores net bounce if occurs just after table bounce (due to net clamps the net piezos pick up the vibration too)
-    if (absolute_time_diff_us(State.prev_bounce_time, current_time) < 100000) isBounce[NET] = false;
+    if (absolute_time_diff_us(State.prev_bounce_time, current_time) < 100000)
+        isBounce[NET] = false;
 
-   
     if (isBounce[PLAYER_1] || isBounce[PLAYER_2])
-        {
-            isBounce[NET] = false;
-            State.prev_bounce_time = current_time;
-        }
+    {
+        isBounce[NET] = false;
+        State.prev_bounce_time = current_time;
+    }
     if (isBounce[PLAYER_1])
         printf("Player 1 side hit\r\n");
     else if (isBounce[PLAYER_2])
@@ -68,7 +72,7 @@ void run_serve_detection_phase()
         printf("Serving side %d hit\r\n", State.player_serving + 1);
         has_hit_table = true;
         State.prev_bounce_time = current_time;
-        // CLEAR LED
+        clear_all_leds(); // Turns off led that was indicating serve side
     }
 
     if (has_hit_table && isBounce[NET]) // Detects hitting the net
