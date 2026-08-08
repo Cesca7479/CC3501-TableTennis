@@ -101,7 +101,7 @@ static bool perform_dance_move(ServoPosition position, absolute_time_t duration_
  * @param duration_ms The duration of the dance in milliseconds
  * @param move_time Time for each movement in perform_dance_move
  */
-static void referee_dance(uint duration_ms, uint move_time, ServoPosition start_position)
+static void referee_dance(uint duration_ms, uint move_time)
 {
     absolute_time_t dance_end = make_timeout_time_ms(duration_ms);
     ServoPosition position = LEFT;
@@ -138,17 +138,21 @@ static void flash_leds_rainbow(uint time_interval_ms)
 void referee_dance_sequence(uint8_t winner)
 {
     ServoPosition winner_side = convert_player_to_side(winner);
-    referee_dance(1000, 500, winner_side);
-    referee_dance(500, 250, winner_side);
+    referee_dance(1000, 500);
+    referee_dance(500, 250);
     if (sleep_ms_with_button_checking(250))
         return;
-    referee_dance(1000, 500, winner_side);
-    referee_dance(500, 250, winner_side);
+    referee_dance(1000, 500);
+    referee_dance(500, 250);
     if (sleep_ms_with_button_checking(250))
         return;
-    convert_player_to_side();
-    referee_dance(1000, 1000, winner_side);
+    clear_all_leds();
+    motor_move_motor_safely(winner_side);
+    set_single_led(winner, get_rgb(YELLOW));
+    update_all_leds();
+    buzzer_play_victory_sequence();
     motor_move_motor_safely(CENTRE);
+    clear_all_leds();
 }
 
 /**
@@ -169,8 +173,9 @@ static void light_player_side(ServoPosition player_side, rgb_colour colour)
     update_all_leds();
 }
 
-void referee_indicate_server(ServoPosition side_serving)
+void referee_indicate_server(uint8_t player)
 {
+    ServoPosition side_serving = convert_player_to_side(player);
     buzzer_play_tone(notes6[0]);
     if (sleep_ms_with_button_checking(200))
         return;
@@ -186,8 +191,9 @@ void referee_indicate_server(ServoPosition side_serving)
     motor_move_motor_safely(CENTRE);
 }
 
-void referee_point_scored(ServoPosition side_scored)
+void referee_point_scored(uint8_t player)
 {
+    ServoPosition side_scored = convert_player_to_side(player);
     buzzer_play_tone(notes6[6]);
     motor_move_motor_safely(side_scored);
     light_player_side(side_scored, get_rgb(GREEN));
