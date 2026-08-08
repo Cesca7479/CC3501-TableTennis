@@ -1,6 +1,7 @@
 #include "buzzer.h"
 
 #include "helpers/timing/timing.h"
+#include "game/gamestate.h"
 
 const uint32_t notes5[7] = {523, 587, 659, 698, 784, 879, 988};
 const uint32_t notes6[7] = {1047, 1175, 1319, 1397, 1568, 1760, 1976};
@@ -19,6 +20,7 @@ void buzzer_init(uint8_t GPIO_pin)
 
 void buzzer_play_tone(uint32_t frequency)
 {
+    if (State.game_mode == GameMode::NO_SOUND) return;
     uint32_t wrap = 125000000 / (4 * frequency) - 1;
     pwm_set_wrap(slice_num, wrap);
     pwm_set_gpio_level(GPIO_buzzer_pin, wrap / 2);
