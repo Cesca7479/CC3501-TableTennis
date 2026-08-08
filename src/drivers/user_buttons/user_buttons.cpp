@@ -26,9 +26,9 @@ struct ButtonState
     volatile uint32_t time_since_last_press;
 };
 
-ButtonState button_states[NUMBER_OF_BUTTONS]{};
+ButtonState buttonStates[NUMBER_OF_BUTTONS]{};
 
-void button_callback(uint gpio, uint32_t event_mask)
+void user_button_callback(uint gpio, uint32_t event_mask)
 {
     for (uint8_t i = 0; i < NUMBER_OF_BUTTONS; i++)
     {
@@ -36,14 +36,15 @@ void button_callback(uint gpio, uint32_t event_mask)
         {
             // check for 'button bounce'
             uint32_t current_time_us = time_us_32();
-            if (current_time_us - button_states[i].time_since_last_press > 10000) // 10000us = 10ms
+            if (current_time_us - buttonStates[i].time_since_last_press > 10000) // 10000us = 10ms
             {
-                button_states[i].time_since_last_press = current_time_us;
-                button_states[i].is_button_pressed = true;
+                buttonStates[i].time_since_last_press = current_time_us;
+                buttonStates[i].is_button_pressed = true;
 
-                if (State.mode != CHANGE_SCORE)
+                // Exceptions for if currently in CHANGE_SCORE or CHECK_VICTORY_AND_SCORE (has its own button handle case)
+                if (State.phase != CHANGE_SCORE || State.phase != CHECK_VICTORY_AND_SCORE)
                 {
-                    State.mode = CHANGE_SCORE;
+                    State.phase = CHANGE_SCORE;
                 }
             }
         }
@@ -57,10 +58,10 @@ void user_buttons_init()
         uint8_t pin = BUTTON_PINS[i];
         gpio_init(pin);
         gpio_set_dir(pin, GPIO_IN);
-        gpio_set_irq_enabled_with_callback(pin, GPIO_IRQ_EDGE_RISE, true, &button_callback);
+        gpio_set_irq_enabled_with_callback(pin, GPIO_IRQ_EDGE_RISE, true, &user_button_callback);
 
-        button_states[i].is_button_pressed = false;
-        button_states[i].time_since_last_press = 0;
+        buttonStates[i].is_button_pressed = false;
+        buttonStates[i].time_since_last_press = 0;
     }
 }
 
@@ -68,8 +69,8 @@ bool is_button_pressed(UserButton button)
 {
     // Ensure button interrupt doesn't override current button press
     uint32_t interrupt_state = save_and_disable_interrupts();
-    bool was_pressed = button_states[button].is_button_pressed;
-    button_states[button].is_button_pressed = false;
+    bool was_pressed = buttonStates[button].is_button_pressed;
+    buttonStates[button].is_button_pressed = false;
     restore_interrupts(interrupt_state);
     return was_pressed;
 }
@@ -115,6 +116,6 @@ void wait_for_select_release()
         sleep_ms(1);
     }
 
-    // Clear any bounce event produced during release
+    // Clear any event produced during release
     (void)is_button_pressed(SELECT_BUTTON);
 }

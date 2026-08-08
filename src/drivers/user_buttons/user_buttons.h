@@ -7,7 +7,7 @@ enum UserButton
     LEFT_BUTTON,
 };
 
-void button_callback(uint gpio, uint32_t event_mask);
+void user_button_callback(uint gpio, uint32_t event_mask);
 
 /**
  * @brief Initalise all user buttons
