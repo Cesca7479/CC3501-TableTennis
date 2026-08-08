@@ -64,17 +64,18 @@ if(CrossCompiling)
         src/helpers/game_settings/game_settings.cpp
         src/helpers/dc_bias/dc_bias.cpp
         src/helpers/timing/timing.cpp
+        src/helpers/scoring/scoring.cpp
 
         src/programs/referee_reactions/refereee_reactions.cpp
 
         src/game/gamestate.cpp
-        src/game/setup_game.cpp
-        src/game/setup_round.cpp
-        src/game/serve_detection.cpp
-        src/game/bounce_listen.cpp
-        src/game/check_victory_and_score.cpp
-        src/game/camera_check.cpp
-        src/game/change_score.cpp
+        src/game/setup_game/setup_game.cpp
+        src/game/setup_round/setup_round.cpp
+        src/game/serve_detection/serve_detection.cpp
+        src/game/bounce_listen/bounce_listen.cpp
+        src/game/check_victory_and_score/check_victory_and_score.cpp
+        src/game/camera_check/camera_check.cpp
+        src/game/change_score/change_score.cpp
 
         src/tests/testing.cpp
     )
@@ -128,6 +129,7 @@ else()
         tests/mocks/hardware/gpio.cpp
         tests/mocks/hardware/pio.cpp
         tests/mocks/ws2812.cpp
+
         src/drivers/leds/leds.cpp
         src/drivers/piezos/piezos.cpp
         src/drivers/display/display.cpp
@@ -141,17 +143,18 @@ else()
         src/helpers/game_settings/game_settings.cpp
         src/helpers/dc_bias/dc_bias.cpp
         src/helpers/timing/timing.cpp
+        src/helpers/scoring/scoring.cpp
 
         src/programs/referee_reactions/refereee_reactions.cpp
 
         src/game/gamestate.cpp
-        src/game/setup_game.cpp
-        src/game/setup_round.cpp
-        src/game/serve_detection.cpp
-        src/game/bounce_listen.cpp
-        src/game/check_victory_and_score.cpp
-        src/game/camera_check.cpp
-        src/game/change_score.cpp
+        src/game/setup_game/setup_game.cpp
+        src/game/setup_round/setup_round.cpp
+        src/game/serve_detection/serve_detection.cpp
+        src/game/bounce_listen/bounce_listen.cpp
+        src/game/check_victory_and_score/check_victory_and_score.cpp
+        src/game/camera_check/camera_check.cpp
+        src/game/change_score/change_score.cpp
 
         src/tests/testing.cpp
     )
