@@ -20,7 +20,8 @@ void buzzer_init(uint8_t GPIO_pin)
 
 void buzzer_play_tone(uint32_t frequency)
 {
-    if (State.game_mode == GameMode::NO_SOUND) return;
+    if (State.game_mode == GameMode::NO_SOUND)
+        return;
     uint32_t wrap = 125000000 / (4 * frequency) - 1;
     pwm_set_wrap(slice_num, wrap);
     pwm_set_gpio_level(GPIO_buzzer_pin, wrap / 2);
@@ -35,26 +36,19 @@ void buzzer_stop()
 void buzzer_play_victory_sequence()
 {
     buzzer_play_tone(notes6[2]);
-    if (sleep_ms_with_button_checking(100))
-        return;
+    sleep_ms(100);
     buzzer_play_tone(notes6[0]);
-    if (sleep_ms_with_button_checking(100))
-        return;
+    sleep_ms(100);
     buzzer_play_tone(notes6[2]);
-    if (sleep_ms_with_button_checking(100))
-        return;
+    sleep_ms(100);
     buzzer_play_tone(notes6[4]);
-    if (sleep_ms_with_button_checking(100))
-        return;
+    sleep_ms(100);
     buzzer_play_tone(notes6[2]);
-    if (sleep_ms_with_button_checking(100))
-        return;
+    sleep_ms(100);
     buzzer_play_tone(notes6[4]);
-    if (sleep_ms_with_button_checking(100))
-        return;
+    sleep_ms(100);
     buzzer_play_tone(notes7[0]);
-    if (sleep_ms_with_button_checking(300))
-        return;
+    sleep_ms(300);
 
     buzzer_stop();
 }
@@ -64,11 +58,9 @@ void buzzer_play_angry_sounds()
     for (uint8_t i = 0; i < 20; i++)
     {
         buzzer_play_tone(notes7[0]);
-        if (sleep_ms_with_button_checking(20))
-            return;
+        sleep_ms(20);
         buzzer_play_tone(notes6[6]);
-        if (sleep_ms_with_button_checking(20))
-            return;
+        sleep_ms(20);
     }
     buzzer_stop();
 }
@@ -76,11 +68,9 @@ void buzzer_play_angry_sounds()
 void buzzer_play_point_scored()
 {
     buzzer_play_tone(notes6[6]);
-    if (sleep_ms_with_button_checking(200))
-        return;
+    sleep_ms(200);
     buzzer_play_tone(notes7[2]);
-    if (sleep_ms_with_button_checking(200))
-        return;
+    sleep_ms(200);
 
     buzzer_stop();
 }
@@ -90,8 +80,7 @@ void buzzer_play_serve()
     for (uint8_t i = 0; i < 3; i++)
     {
         buzzer_play_tone(notes6[i * 2]);
-        if (sleep_ms_with_button_checking(200))
-            return;
+        sleep_ms(200);
     }
     buzzer_stop();
 }
@@ -101,11 +90,9 @@ void buzzer_play_select_pressed()
     for (uint8_t i = 0; i < 2; i++)
     {
         buzzer_play_tone(notes6[2]);
-        if (sleep_ms_with_button_checking(50))
-            return;
+        sleep_ms(50);
         buzzer_play_tone(notes7[0]);
-        if (sleep_ms_with_button_checking(50))
-            return;
+        sleep_ms(50);
     }
     buzzer_stop();
 }
