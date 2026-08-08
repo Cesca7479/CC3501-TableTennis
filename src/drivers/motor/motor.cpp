@@ -19,9 +19,9 @@ Use units of us as the PWM register uses an integer count and to simplify calcul
 #define COUNTER_HZ 1000000   // How many times the PWM counter increments per second
 #define PWM_PERIOD_US 20000  // 20ms
 
-#define MOTOR_LEFT_PULSE_US 1600
-#define MOTOR_CENTRE_PULSE_US 1800
-#define MOTOR_RIGHT_PULSE_US 2000
+#define MOTOR_LEFT_PULSE_US 1450
+#define MOTOR_CENTRE_PULSE_US 1700
+#define MOTOR_RIGHT_PULSE_US 1950
 
 #define MOTOR_FAULT_CHECK_INTERVAL_MS 10
 

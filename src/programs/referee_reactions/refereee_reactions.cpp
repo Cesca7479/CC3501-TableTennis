@@ -83,7 +83,7 @@ static bool perform_dance_move(ServoPosition position, absolute_time_t duration_
 
             tune_index = (tune_index + 1) % 4;
 
-            next_note_time = make_timeout_time_ms(120); // 120 ms per note
+            next_note_time = make_timeout_time_ms(100); // 120 ms per note
         }
 
         if (sleep_ms_with_button_checking(DANCE_UPDATE_INTERVAL_MS))
@@ -92,6 +92,7 @@ static bool perform_dance_move(ServoPosition position, absolute_time_t duration_
             return false;
         }
     }
+    buzzer_stop();
     motor_disable();
     return true;
 }
@@ -133,6 +134,21 @@ static void flash_leds_rainbow(uint time_interval_ms)
         if (sleep_ms_with_button_checking(time_interval_ms))
             return;
     }
+}
+
+void referee_dance_sequence()
+{
+    referee_dance(1000, 500);
+    referee_dance(500, 250);
+    if (sleep_ms_with_button_checking(250))
+        return;
+    referee_dance(1000, 500);
+    referee_dance(500, 250);
+    if (sleep_ms_with_button_checking(250))
+        return;
+    
+    buzzer_play_victory_sequence();
+    motor_move_motor_safely(CENTRE);
 }
 
 /**
@@ -181,23 +197,7 @@ void referee_point_scored(uint8_t player)
     if (sleep_ms_with_button_checking(200))
         return;
     buzzer_stop();
-    motor_move_motor_safely(CENTRE);
     clear_all_leds();
-}
-
-void referee_dance_sequence()
-{
-    buzzer_play_victory_sequence();
-    referee_dance(1000, 500);
-    referee_dance(500, 250);
-    if (sleep_ms_with_button_checking(250))
-        return;
-    referee_dance(1000, 500);
-    referee_dance(500, 250);
-    if (sleep_ms_with_button_checking(250))
-        return;
-    motor_move_motor_safely(CENTRE);
-    // Incorporate sound and movement
 }
 
 void referee_angry(uint duration_ms)
