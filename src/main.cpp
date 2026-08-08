@@ -24,6 +24,7 @@
 // Helpers and programs ============================================================================================================
 #include "programs/referee_reactions/referee_reactions.h" //
 #include "helpers/game_settings/game_settings.h"          //
+#include "helpers/dc_bias/dc_bias.h"
 
 // Game Modes
 #include "game/gamestate.h"
@@ -50,7 +51,7 @@ void init_board()
 
     for (size_t i = 0; i < 3; i++)
     {
-        Piezos[i].init_sensing();
+        Piezos[i].init();
     }
     buzzer_init(BUZZER_PIN);
 
@@ -69,6 +70,8 @@ void init_board()
     motor_pwr_ctrl_init();
     motor_init();
     hat_id_init();
+
+    set_dc_biases();
 
 }
 

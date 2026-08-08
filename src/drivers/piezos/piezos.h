@@ -15,7 +15,7 @@ private:
     int GPIO_sensing_pin;
 
 public:
-    void init_sensing();
+    void init();
     uint16_t read();
     Piezo(int sensing_pin)
     {

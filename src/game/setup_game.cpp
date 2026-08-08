@@ -1,6 +1,7 @@
 #include "setup_game.h"
 #include "drivers/hat_id/hat_id.h"
 #include "drivers/user_buttons/user_buttons.h"
+#include "helpers/dc_bias/dc_bias.h"
 
 void set_game_mode(GameMode mode)
 {
@@ -24,26 +25,7 @@ void run_setup_game_phase()
         }
     }
 
-    // Determine piezo DC biases
-    uint32_t sum_piezos[3] = {0, 0, 0};
-    uint16_t result;
-
-    for (size_t i = 0; i < 10; i++)
-    {
-        for (size_t j = 0; j < 3; j++)
-        {
-            result = Piezos[j].read();
-            sum_piezos[j] += result;
-        }
-        sleep_ms(100);
-    }
-
-    for (size_t i = 0; i < 3; i++)
-    {
-        State.piezo_dc_biases[i] = sum_piezos[i] / 10;
-    }
-
-    printf("DC Biases: %d, %d, %d\r\n", State.piezo_dc_biases[0], State.piezo_dc_biases[1], State.piezo_dc_biases[2]);
+    set_dc_biases();
 
     display_loading(125); // Transition to new display mode
     State.player_score[PLAYER_1] = 0;
