@@ -16,9 +16,13 @@ void referee_indicate_server(uint8_t player);
 void referee_point_scored(uint8_t player);
 
 /**
- * @brief Pre-choreographed dance sequence for victory 
+ * @brief Pre-choreographed dance sequence for victory
+ * 
+ * @param winner The player that won
  */
 void referee_dance_sequence(uint8_t winner);
+
+static void stop_all();
 
 /**
  * @brief Referee reaction for when a player's been BAD

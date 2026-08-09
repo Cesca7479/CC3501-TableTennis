@@ -13,146 +13,68 @@
 
 #include "game/gamestate.h"
 
-uint8_t RAINBOW_COLOUR_COUNT = 7;
-uint32_t DANCE_COLOUR_INTERVAL_MS = 75;
-uint32_t DANCE_UPDATE_INTERVAL_MS = 5;
+// Preset notes in each octave
+static constexpr uint32_t notes6[7] = {1047, 1175, 1319, 1397, 1568, 1760, 1976};
+static constexpr uint32_t notes7[7] = {2093, 2349, 2637, 2794, 3136, 3520, 3951};
 
-const uint32_t notes5[7] = {523, 587, 659, 698, 784, 879, 988};
-const uint32_t notes6[7] = {1047, 1175, 1319, 1397, 1568, 1760, 1976};
-const uint32_t notes7[7] = {2093, 2349, 2637, 2794, 3136, 3520, 3951};
 
+// Dance sequence configuration
+// Preset led colours and buzzer notes
+struct DanceStep
+{
+    uint32_t frequency;
+    LedColour colour;
+};
+
+static constexpr DanceStep DANCE_TUNE[] =
+    {
+        {notes6[2], PURPLE},
+        {notes6[0], PINK},
+        {notes6[2], PURPLE},
+        {notes6[4], BLUE},
+        {notes6[2], PURPLE},
+        {notes6[4], BLUE},
+        {notes7[0], PINK},
+        {notes7[0], PINK},
+        {notes7[0], PINK}};
+
+// adjustable parameters for dance sequence
+static constexpr uint32_t DANCE_STEP_INTERVAL_MS = 100;
+static constexpr uint32_t DANCE_UPDATE_INTERVAL_MS = 10;
+static constexpr uint8_t DANCE_REPEAT_COUNT = 2;
+
+static constexpr size_t DANCE_TUNE_LENGTH = sizeof(DANCE_TUNE) / sizeof(DANCE_TUNE[0]);
+
+struct DanceState
+{
+    uint8_t step_index = 0;
+};
+
+struct DanceSection
+{
+    uint32_t duration_ms;
+    uint32_t move_interval_ms;
+    uint32_t pause_after_ms;
+};
+
+static constexpr DanceSection VICTORY_DANCE[] =
+    {
+        {1000, 500, 0},
+        {500, 250, 250}};
+
+
+// Helper to stop motor, leds and buzzer once
+static void stop_all()
+{
+    motor_disable();
+    clear_all_leds();
+    buzzer_stop();
+}
+
+// Helper to determine which the ServoPosition given which player is passed in
 static ServoPosition convert_player_to_side(uint8_t player)
 {
     return (player == PLAYER_1) ? LEFT : RIGHT;
-}
-
-/**
- * @brief Perform one dance move, which moves arm once and changes colour 4 times
- * @param position Side to move motor to
- * @param duration_ms The duration of the dance in milliseconds
- * @param rainbow_index Reference to rainbow index
- * @param move_time Time for one dance move (time to move motor once)
- */
-static bool perform_dance_move(ServoPosition position, absolute_time_t duration_ms, uint8_t &rainbow_index, uint move_time)
-{
-    motor_set_position(position);
-
-    if (!motor_enable())
-    {
-        return false;
-    }
-
-    absolute_time_t move_end = make_timeout_time_ms(move_time);
-
-    absolute_time_t next_colour_time = get_absolute_time(); // Change the first colour immediately.
-
-    const uint32_t tune[] = {notes6[2],
-                             notes6[0],
-                             notes6[2],
-                             notes6[4],
-                             notes6[2],
-                             notes6[4],
-                             notes7[0],
-                             notes7[0],
-                             notes7[0]};
-    uint8_t tune_index = 0;
-    absolute_time_t next_note_time = get_absolute_time();
-    while (!time_reached(move_end) && !time_reached(duration_ms))
-    {
-        if (is_motor_fault_active())
-        {
-            log(LogLevel::ERROR, "Motor fault, over-current or high temperature detected. Motor power disabled.");
-            motor_disable();
-            return false;
-        }
-
-        if (time_reached(next_colour_time))
-        {
-            set_all_leds(get_rgb(rainbow[rainbow_index]));
-            update_all_leds();
-
-            rainbow_index = (rainbow_index + 1) % RAINBOW_COLOUR_COUNT;
-
-            next_colour_time = make_timeout_time_ms(DANCE_COLOUR_INTERVAL_MS);
-        }
-
-        if (time_reached(next_note_time))
-        {
-            buzzer_play_tone(tune[tune_index]);
-
-            tune_index = (tune_index + 1) % 4;
-
-            next_note_time = make_timeout_time_ms(100); // 120 ms per note
-        }
-
-        if (sleep_ms_with_button_checking(DANCE_UPDATE_INTERVAL_MS))
-        {
-            buzzer_stop();
-            return false;
-        }
-    }
-    buzzer_stop();
-    motor_disable();
-    return true;
-}
-
-/**
- * @brief Referee reaction for a dance
- * @param duration_ms The duration of the dance in milliseconds
- * @param move_time Time for each movement in perform_dance_move
- */
-static void referee_dance(uint duration_ms, uint move_time)
-{
-    absolute_time_t dance_end = make_timeout_time_ms(duration_ms);
-    ServoPosition position = LEFT;
-    uint8_t rainbow_index = 0;
-
-    while (!time_reached(dance_end))
-    {
-        if (!perform_dance_move(position, dance_end, rainbow_index, move_time))
-        {
-            break;
-        }
-        position = (position == LEFT) ? RIGHT : LEFT;
-    }
-    clear_all_leds();
-}
-
-/**
- * @brief Flashes LEDs in a rainbow pattern
- *
- * Note: move this function to an appropriate file in the future, as it is not specific to referee reactions
- * @param time_interval_ms The time interval between each color change in milliseconds
- */
-static void flash_leds_rainbow(uint time_interval_ms)
-{
-    for (uint i = 0; i < 7; i++)
-    {
-        set_all_leds(get_rgb(rainbow[i]));
-        update_all_leds();
-        if (sleep_ms_with_button_checking(time_interval_ms))
-            return;
-    }
-}
-
-void referee_dance_sequence(uint8_t winner)
-{
-    ServoPosition winner_side = convert_player_to_side(winner);
-    referee_dance(1000, 500);
-    referee_dance(500, 250);
-    if (sleep_ms_with_button_checking(250))
-        return;
-    referee_dance(1000, 500);
-    referee_dance(500, 250);
-    if (sleep_ms_with_button_checking(250))
-        return;
-    clear_all_leds();
-    motor_move_motor_safely(winner_side);
-    set_single_led(winner, get_rgb(YELLOW));
-    update_all_leds();
-    buzzer_play_victory_sequence();
-    motor_move_motor_safely(CENTRE);
-    clear_all_leds();
 }
 
 /**
@@ -162,15 +84,116 @@ void referee_dance_sequence(uint8_t winner)
  */
 static void light_player_side(ServoPosition player_side, rgb_colour colour)
 {
-    if (player_side == LEFT)
-    {
-        set_single_led(1, colour);
-    }
-    if (player_side == RIGHT)
-    {
-        set_single_led(0, colour);
-    }
+    const uint8_t led =(player_side == LEFT) ? 1 : 0;
+    set_single_led(led, colour);
     update_all_leds();
+}
+
+/**
+ * @brief Runs one section of the referee dance
+ *
+ * Motor, LEDs and buzzer are timed independently
+ *
+ * @param duration_ms Total duration of this dance section
+ * @param move_interval_ms Time between arm position changes
+ * @param state Persistent dance state so colour/tune continues between sections
+ *
+ * @return true if completed normally, false if interrupted or motor fault occurred
+ */
+static bool run_dance_section(const DanceSection &section, DanceState &state)
+{
+    const absolute_time_t dance_end = make_timeout_time_ms(section.duration_ms);
+    ServoPosition position = LEFT;
+
+    // Start first movement immediately
+    motor_set_position(position);
+    if (!motor_enable())
+    {
+        return false;
+    }
+
+    absolute_time_t next_move_time = make_timeout_time_ms(section.move_interval_ms);
+    absolute_time_t next_note_time = get_absolute_time();
+
+    // Dance sequence
+    while (!time_reached(dance_end))
+    {
+        // Motor fault checking, on fault stop animation
+        if (is_motor_fault_active())
+        {
+            log(LogLevel::ERROR, "Motor fault, over-current or high temperature detected. Motor power disabled.");
+            stop_all();
+            return false;
+        }
+
+        // Motor
+        if (time_reached(next_move_time))
+        {
+            position = (position == LEFT) ? RIGHT : LEFT;
+            motor_set_position(position);
+            next_move_time = make_timeout_time_ms(section.move_interval_ms);
+        }
+
+        // Buzzer + LEDs
+        if (time_reached(next_note_time))
+        {
+            const DanceStep &note = DANCE_TUNE[state.step_index];
+            // Play note
+            buzzer_play_tone(note.frequency);
+            // Display colour associated with note
+            set_all_leds(get_rgb(note.colour));
+            update_all_leds();
+            // Advance both together
+            state.step_index = (state.step_index + 1) % DANCE_TUNE_LENGTH;
+            next_note_time = make_timeout_time_ms(DANCE_STEP_INTERVAL_MS);
+        }
+
+        // Allow button interruption
+        if (sleep_ms_with_button_checking(DANCE_UPDATE_INTERVAL_MS))
+        {
+            stop_all();
+            return false;
+        }
+    }
+
+    stop_all();
+    return true;
+}
+
+void referee_dance_sequence(uint8_t winner)
+{
+    const ServoPosition winner_side = convert_player_to_side(winner);
+    DanceState dance_state;
+
+    // Full dance sequence is the preset VICTORY_DANCE played twice, where DANCE_TUNE restarts between
+    for (uint8_t repeat = 0; repeat < DANCE_REPEAT_COUNT; repeat++)
+    {
+        // Restart tune/LED sequence at beginning of each repetition
+        dance_state.step_index = 0;
+        for (const DanceSection &section : VICTORY_DANCE)
+        {
+            if (!run_dance_section(section, dance_state))
+            {
+                return;
+            }
+
+            if (section.pause_after_ms > 0)
+            {
+                if (sleep_ms_with_button_checking(section.pause_after_ms))
+                {
+                    return;
+                }
+            }
+        }
+    }
+
+    // Final sequence, with only winner side raised and lit
+    clear_all_leds();
+    motor_move_motor_safely(winner_side);
+    light_player_side(winner_side, get_rgb(YELLOW));
+    buzzer_play_victory_sequence();
+    motor_move_motor_safely(CENTRE);
+    clear_all_leds();
 }
 
 void referee_indicate_server(uint8_t player)
