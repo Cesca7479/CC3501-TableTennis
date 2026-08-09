@@ -42,10 +42,11 @@ void user_button_callback(uint gpio, uint32_t event_mask)
                 buttonStates[i].is_button_pressed = true;
 
                 // Exceptions for if currently in CHANGE_SCORE or CHECK_VICTORY_AND_SCORE (has its own button handle case)
-                if (State.phase != CHANGE_SCORE || State.phase != CHECK_VICTORY_AND_SCORE)
+                if (State.phase == CHANGE_SCORE || State.phase == CHECK_VICTORY_AND_SCORE)
                 {
-                    State.phase = CHANGE_SCORE;
+                    return;
                 }
+                State.phase = CHANGE_SCORE;
             }
         }
     }
