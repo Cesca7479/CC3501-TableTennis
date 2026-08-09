@@ -14,14 +14,10 @@
 
 #define SCORE_BLINK_INTERVAL_MS 300
 
-uint8_t selected_player = PLAYER_1;
+#define MAX_DISPLAY_SCORE 99
 
-enum class ButtonControllerMode
-{
-    NONE,
-    SCORE_SELECT_PLAYER,
-    SCORE_EDIT_VALUE
-};
+// Starting selected player, will be overwritten when selecting different player
+uint8_t selected_player = PLAYER_1;
 
 // Show score if visibility is enabled
 static void show_score_selection(bool visible)
@@ -39,7 +35,7 @@ static void show_score_selection(bool visible)
 void run_change_score_phase()
 {
     buzzer_play_select_pressed();
-    clear_all_leds(); // Clear any leds indicating point or serve
+    clear_all_leds();     // Clear any leds indicating point or serve
     display_loading(125); // Transition to new display mode
 
     uint8_t max_score = State.settings.points_to_win;
@@ -104,7 +100,7 @@ void run_change_score_phase()
 
         if (is_button_pressed(RIGHT_BUTTON))
         {
-            if (current_selected_score != max_score)
+            if (current_selected_score < MAX_DISPLAY_SCORE)
             {
                 State.player_score[selected_player]++;
                 display_player_score(State.player_score[PLAYER_1], State.player_score[PLAYER_2]);
