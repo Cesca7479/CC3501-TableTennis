@@ -84,6 +84,7 @@ void run_change_score_phase()
     while (!is_button_pressed(SELECT_BUTTON))
     {
         uint8_t current_selected_score = State.player_score[selected_player];
+        uint8_t other_player_score = State.player_score[(selected_player == PLAYER_1) ? PLAYER_2 : PLAYER_1];
         if (is_button_pressed(LEFT_BUTTON))
         {
             if (current_selected_score != 0)
@@ -105,10 +106,6 @@ void run_change_score_phase()
                 State.player_score[selected_player]++;
                 display_player_score(State.player_score[PLAYER_1], State.player_score[PLAYER_2]);
                 log(LogLevel::INFORMATION, "Score increase");
-            }
-            else
-            {
-                referee_angry(1000);
             }
         }
     }
