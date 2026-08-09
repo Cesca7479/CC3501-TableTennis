@@ -101,8 +101,19 @@ void run_change_score_phase()
 
         if (is_button_pressed(RIGHT_BUTTON))
         {
-            if (current_selected_score < MAX_DISPLAY_SCORE)
+
+            if ((State.settings.win_by_two &&
+                current_selected_score >= other_player_score + 2 &&
+                current_selected_score >= max_score) 
+                || 
+                (!State.settings.win_by_two &&
+                (current_selected_score == max_score || 
+                (other_player_score == max_score &&
+                current_selected_score == max_score - 1))))
             {
+                referee_angry(1000);
+            }
+            else {
                 State.player_score[selected_player]++;
                 display_player_score(State.player_score[PLAYER_1], State.player_score[PLAYER_2]);
                 log(LogLevel::INFORMATION, "Score increase");
