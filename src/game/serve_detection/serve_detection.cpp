@@ -95,7 +95,7 @@ void run_serve_detection_phase()
         }
         else
             State.phase = SETUP_ROUND;
-        display_player_score(State.player_score[0], State.player_score[2]);
+        display_player_score(State.player_score[0], State.player_score[1]);
 
         has_hit_table = false;
         has_hit_net = false;
