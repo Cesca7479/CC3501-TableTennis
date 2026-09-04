@@ -2,7 +2,11 @@
 
 This is a program that uses RP2040 code for the CC3501 product created by **Francesca Adcock, Keya Wong** and **Jamie White.**
 
-The product is a **Table Tennis Referee Robot,** which automatically adjudicates casual and professional table tennis matches in order to avoid player disputes. The system automatically adjudicates table tennis matches by combining piezoelectric bounce sensing, camera-based ball tracking, Bluetooth communication, and automated scoring logic. The system provides instant feedback through multiple visual and auditory components to create a straightforward and responsive user experience. This is done through a digital display, buttons, buzzers, leds, dual axis motor movement, a physical hat ID system for game mode switching and result uploads to a wesbite.
+The product is a **Table Tennis Referee Robot,** which automatically adjudicates casual and professional table tennis matches in order to avoid player disputes. The system is made of 3 distinct subsystems: 
+-	Automated scoring: vibration sensors and camera vision.
+-	Integrated UI: digital display, user buttons and a physical hat ID system.
+-	User feedback: buzzer, custom sounds, dual-axis movement, LED indicators and result streaming.
+
 
 ## System Overview
 
